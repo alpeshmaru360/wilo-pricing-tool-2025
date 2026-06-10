@@ -5,7 +5,6 @@ use DB;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\ScpCart;
-use App\ScpvCart; // A Code: 06-11-2025
 use App\ArticleFile;
 use App\ManualFile;
 use App\AtmosCart;
@@ -14,8 +13,10 @@ use App\Models\BoosterCart;
 use Session;
 
 class DocumentController
-{    
-    public function index(){         
+{
+    
+    public function index(){
+         
         return view('admin.document.update');
     }
 
@@ -31,12 +32,6 @@ class DocumentController
             $data=ControlPanelCart::whereNotNull('full_article_number')->groupBy('full_article_number')->get();
         }elseif($module=="scp_pump_assembly"){
             $data=ScpCart::whereNotNull('full_article_number')->groupBy('full_article_number')->get();
-
-        // A Code: 06-11-2025 Start
-        }elseif($module=="scpv_pump_assembly"){
-            $data=ScpvCart::whereNotNull('full_article_number')->groupBy('full_article_number')->get();
-        // A Code: 06-11-2025 End
-
         }elseif($module=="atmos_giga"){
             $data=AtmosCart::whereNotNull('full_article_number')->groupBy('full_article_number')->get();
         }
@@ -61,12 +56,6 @@ class DocumentController
             $moduleName="Control Panel";
         }elseif($module=="scp_pump_assembly"){
             $moduleName="SCP Pump Assembly";
-
-        // A Code: 06-11-2025 Start
-        }elseif($module=="scpv_pump_assembly"){
-            $moduleName="SCPV Pump Assembly";
-        // A Code: 06-11-2025 End
-
         }elseif($module=="atmos_giga"){
             $moduleName="Atmos GIGA";
         }
@@ -97,6 +86,7 @@ class DocumentController
 
     public function upload(Request $request) {
         $file = $request->file;
+        // die($request->module."===".$request->article."===".uniqid());
         if (!empty($file)) {
             $path = 'public/articles/';
             $fileName = $file->getClientOriginalName();
@@ -114,12 +104,15 @@ class DocumentController
              
             ArticleFile::insert($insertData);
             Session::flash('message', "Success! Your file has been uploaded ");
-            return redirect()->back();    
+            return redirect()->back();
+    
         }else{
             Session::flash('error', "File is empty");
             return redirect()->back();
     
-        }  
+        }
+
+  
     }
    
     public function deleteArticle(Request $request){
@@ -146,12 +139,6 @@ class DocumentController
             $moduleName="Control Panel";
         }elseif($module=="scp_pump_assembly"){
             $moduleName="SCP Pump Assembly";
-
-        // A Code: 06-11-2025 Start
-        }elseif($module=="scpv_pump_assembly"){
-            $moduleName="SCPV Pump Assembly";
-        // A Code: 06-11-2025 End
-
         }elseif($module=="atmos_giga"){
             $moduleName="Atmos GIGA";
         }
@@ -163,19 +150,22 @@ class DocumentController
         echo "<tr>
         <td>".$moduleName."</td>
      
-        <td> <input type='file' id='file' name='file' class='form-control h-100' accept='image/x-png,image/gif,image/jpeg, .pdf, .xls, .xlsx, .doc, .docx' required > ";
+        <td> <input type='file' id='file' name='file' class='form-control' accept='image/x-png,image/gif,image/jpeg, .pdf, .xls, .xlsx, .doc, .docx' required > ";
         
         if($dataExistingCount>0){
            
             foreach($dataExisting as $rs){
-                // A Code: 06-11-2025 Start
-                echo " <a href='". asset('manuals/'. $rs->file_name) ."' target='_blank'><i class='fas fa-file'></i></a>  ";                
-                echo " <a href='manuals/delete/".$rs->file_name."'  ><i class='fas fa-trash'></i></a>   ";
-                // A Code: 06-11-2025 End
+                echo " <a href='". asset('public/manuals/'. $dataExisting[0]->file_name) ."' target='_blank'><i class='fas fa-file'></i></a>  ";
+                echo " <a href='manuals/delete/".$dataExisting[0]->file_name."'  ><i class='fas fa-trash'></i></a>   ";
             }
             
-        }      
-        echo "</td></tr>";         
+        }
+        
+        
+
+        echo "</td></tr>";
+
+         
     }
     
 

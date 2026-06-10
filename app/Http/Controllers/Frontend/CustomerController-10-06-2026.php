@@ -21,9 +21,9 @@ use App\Quotation;
 use App\Item;
 use App\AtmosCart;
 use App\ScpCart;
-use App\ScpvCart; // A Code: 24-02-2026
 use App\Models\BoosterCart;
 use App\PrefixArticleNumber;
+
 
 class CustomerController extends Controller{
 
@@ -32,7 +32,7 @@ class CustomerController extends Controller{
         return view('frontend.customer.index',compact('countries'));
     }
 
-    public function save(Request $request){
+  public function save(Request $request){
         $customer = new Customer;
 
         if ($request->cp_ids) {
@@ -51,13 +51,6 @@ class CustomerController extends Controller{
         } else {
             $scpIds = null;
         }
-        // A Code: 24-02-2026 Start
-        if ($request->scpv_ids) {
-            $scpvIds = explode(",", $request->scpv_ids);
-        } else {
-            $scpvIds = null;
-        }
-        // A Code: 24-02-2026 End
         
         if ($request->booster_ids) {
             $boosterIds = explode(",", $request->booster_ids);
@@ -70,8 +63,7 @@ class CustomerController extends Controller{
         } else {
             $firefightingIds = null;
         }
-        // A Code: 24-02-2026
-        if ($ids || $atmosIds || $scpIds || $scpvIds || $boosterIds || $firefightingIds) {
+        if ($ids || $atmosIds || $scpIds || $boosterIds || $firefightingIds) {
             $customer->cp_cart_id = 0; //Dont need id's because id save in quotation
             $customer->name = $request->name;
             $customer->project_name = $request->project_name;
@@ -210,41 +202,6 @@ class CustomerController extends Controller{
                 }
             }
         }
-
-        // A Code: 24-02-2026 Start
-        //Scpv Cart
-        if ($scpvIds) {
-            foreach ($scpvIds as $id) {
-                $scpvCart = ScpvCart::where('id', $id)->first();
-                $prefix = PrefixArticleNumber::select('*')->orderBy('id','desc')->first();
-                $prefix_plus_one = $prefix->auto_increment + 1;
-                $prefix_company_code_with_AI =$prefix->prefix_company_code.''.sprintf('%04d',$prefix_plus_one);
-                if (!$scpvCart->article_number && empty($scpvCart->article_number)){
-                    $scpvCart->article_number = rand(10000000,99999999);
-                    $scpvCart->full_article_number =  $prefix_company_code_with_AI;
-                    $add_prefix = new PrefixArticleNumber;
-                    $add_prefix->prefix_company_code = '683';
-                    $add_prefix->article_number = $scpvCart->article_number;
-                    $add_prefix->auto_increment = sprintf('%04d',$prefix_plus_one);
-                    $add_prefix->full_article_number = $prefix_company_code_with_AI;
-					//add 339 article number if user is from KSA and country origin is KSA
-                    $new_ksa_article_number = '';
-                    if(auth()->user()->country_id == 6 && $scpvCart->country_origin == "ksa"){
-                        $new_ksa_article_number = str_replace("683", "339", $scpvCart->full_article_number);
-                        $scpvCart->ksa_full_article_number = $new_ksa_article_number;
-                    }
-                    $add_prefix->save();
-                    $scpvCart->save();
-                }
-                else
-                {
-                    $scpvCart->full_article_number =  $scpvCart->full_article_number;
-                    $AI = PrefixArticleNumber::where('article_number','=',$scpvCart->article_number)->first();
-                    $scpvCart->save();
-                }
-            }
-        }    
-        // A Code: 24-02-2026 End
         
         if($boosterIds){
             foreach($boosterIds as $id){
@@ -419,36 +376,6 @@ class CustomerController extends Controller{
                 $scpCart->save();
             }
         }
-
-        // A Code: 24-02-2026 Start
-        //Scpv Quotation
-        if ($scpvIds) {
-            foreach ($scpvIds as $id) {
-                $scpvCart = ScpvCart::where('id', $id)->first();
-                $quotation = new Quotation;
-                $quotation->quotation_number = $quotationNumber;
-                $quotation->cp_cart_id = $id;
-                $quotation->cart_model_name = 'scpv';
-                $quotation->user_id = auth()->user()->id;
-                $quotation->customer_id = $customer->id;
-                $quotation->total_quotation_value =  $scpvCart->total_price;
-                $quotation->status = 'Open';
-                $quotation->reason = '';
-                $quotation->modification = '';
-                $quotation->save();
-            }
-
-            foreach ($scpvIds as $id) {
-                $scpvCart = ScpvCart::where('id', $id)->first();
-
-                if (!$scpvCart->quotation_no && empty($scpvCart->quotation_number)) {
-                    $scpvCart->quotation_no = $quotationNumber;
-                }
-
-                $scpvCart->save();
-            }
-        }
-        // A Code: 24-02-2026 End
        
         //Booster Quotation
         if($boosterIds){

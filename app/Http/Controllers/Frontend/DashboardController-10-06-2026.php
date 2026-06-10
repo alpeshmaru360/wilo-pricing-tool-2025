@@ -10,7 +10,6 @@ use App\ManualFile;
 use App\Models\BoosterCart;
 use App\Quotation;
 use App\ScpCart;
-use App\ScpvCart; // A Code: 20-02-2026
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use DB;
@@ -20,15 +19,14 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $maintance_mode_atmos = DB::table("setup_fields")->where('label','atmos_maintance_mode')->pluck('value')[0];
-        $maintance_mode_sch = DB::table("setup_fields")->where('label','sch_maintance_mode')->pluck('value')[0];
         $maintance_mode_booster = DB::table("setup_fields")->where('label','maintance_mode_booster')->pluck('value')[0];
         $control_panel_maintance_mode = DB::table("setup_fields")->where('label','control_panel_maintance_mode')->pluck('value')[0];
         $maintance_mode_scp = DB::table("setup_fields")->where('label','scp_maintance_mode')->pluck('value')[0];
-        $maintance_mode_scpv = DB::table("setup_fields")->where('label','scpv_maintance_mode')->pluck('value')[0]; // A Code: 20-02-2026
-        $maintance_mode_fire_fighting = DB::table("setup_fields")->where('label','fire-fighting_maintance_mode')->pluck('value')[0];   
+        $maintance_mode_fire_fighting = DB::table("setup_fields")->where('label','fire-fighting_maintance_mode')->pluck('value')[0];
+        $maintance_mode_sch = DB::table("setup_fields")->where('label','sch_maintance_mode')->pluck('value')[0];
+        $maintance_mode_scvp = DB::table("setup_fields")->where('label','scvp_maintance_mode')->pluck('value')[0];
         
-        // A Code: 20-02-2026
-        return view('frontend.dashboard.index',compact('maintance_mode_atmos','maintance_mode_sch','maintance_mode_booster','control_panel_maintance_mode','maintance_mode_scp','maintance_mode_scpv','maintance_mode_fire_fighting'));
+        return view('frontend.dashboard.index',compact('maintance_mode_atmos','maintance_mode_sch','maintance_mode_booster','control_panel_maintance_mode','maintance_mode_scp','maintance_mode_fire_fighting','maintance_mode_scvp'));
     }
 
     public function getDocuments(){
@@ -37,7 +35,6 @@ class DashboardController extends Controller
         $ids = [];
         $atmosIds = [];
         $scpIds = [];
-        $scpvIds = []; // A Code: 20-02-2026
         $boosterIds = [];
 
         $user_id = Auth::user()->getAuthIdentifier();
@@ -89,9 +86,8 @@ class DashboardController extends Controller
 			->groupBy('article_number');
             //->get();
 
-            $atmosCartData = AtmosCart::whereNotNull('article_number')->with('documents');
+             $atmosCartData = AtmosCart::whereNotNull('article_number')->with('documents');
             $scpCartData = ScpCart::whereNotNull('article_number')->with('documents');
-            $scpvCartData = ScpvCart::whereNotNull('article_number')->with('documents'); // A Code: 20-02-2026
             $boosterCartData = BoosterCart::whereNotNull('article_number')->with('documents');
             //for admin
             if($role == "admin")
@@ -99,7 +95,6 @@ class DashboardController extends Controller
                 $controlPanelCartData = $controlPanelCartData->groupBy('article_number')->get();
                 $atmosCartData = $atmosCartData->groupBy('article_number')->get();
                 $scpCartData = $scpCartData->groupBy('article_number')->get();
-                $scpvCartData = $scpvCartData->groupBy('article_number')->get(); // A Code: 20-02-2026
                 $boosterCartData = $boosterCartData->groupBy('article_number')->get();
             }
             //for user
@@ -108,7 +103,6 @@ class DashboardController extends Controller
                 $controlPanelCartData = $controlPanelCartData->where("user_id",'=',$user_id)->groupBy('article_number')->get();
                 $atmosCartData = AtmosCart::where('user_id', $user_id)->whereNotNull('article_number')->groupBy('article_number')->with('documents')->get();
                 $scpCartData = ScpCart::where('user_id', $user_id)->whereNotNull('article_number')->groupBy('article_number')->with('documents')->get();
-                $scpvCartData = ScpvCart::where('user_id', $user_id)->whereNotNull('article_number')->groupBy('article_number')->with('documents')->get(); // A Code: 20-02-2026
                 $boosterCartData = BoosterCart::where('user_id', $user_id)->whereNotNull('article_number')->groupBy('article_number')->with('documents')->get();
             }
         }
@@ -136,11 +130,6 @@ class DashboardController extends Controller
             if($query_component == "scp"){
                 $scpCartData = ScpCart::cartDataByUserId($user_id,$query_param);
             }
-            // A Code: 20-02-2026 Start
-            if($query_component == "scpv"){
-                $scpvCartData = ScpvCart::cartDataByUserId($user_id,$query_param);
-            }
-            // A Code: 20-02-2026 End
             
             if($query_component == "booster"){
                 $boosterCartData = BoosterCart::cartDataByUserId($user_id,$query_param);
@@ -152,7 +141,6 @@ class DashboardController extends Controller
                     ->with('controlPanelCartData',isset($controlPanelCartData)?$controlPanelCartData:null)
                     ->with('atmosCartData',isset($atmosCartData)?$atmosCartData:null)
                     ->with('scpCartData',isset($scpCartData)?$scpCartData:null)
-                    ->with('scpvCartData',isset($scpvCartData)?$scpvCartData:null) // A Code: 20-02-2026
                     ->with('boosterCartData',isset($boosterCartData)?$boosterCartData:null);
         
     }
@@ -160,24 +148,14 @@ class DashboardController extends Controller
     public function getManuals(){
         $user_id = Auth::user()->getAuthIdentifier();
         $customer = Customer::find($user_id);
-
         $booster['module_name'] = 'Booster Set';
         $booster['data'] = ManualFile::where('module_name','booster_set')->get();
-
         $cp['module_name'] = 'Control Panel';
         $cp['data'] = ManualFile::where('module_name','control_panel')->get();
-
         $scp['module_name'] = 'SCP Pump Assembly';
         $scp['data'] = ManualFile::where('module_name','scp_pump_assembly')->get();
-
-        // A Code: 20-02-2026 Start
-        $scpv['module_name'] = 'SCPV Pump Assembly';
-        $scpv['data'] = ManualFile::where('module_name','scpv_pump_assembly')->get();
-        // A Code: 20-02-2026 End
-
         $atmos['module_name'] = 'Atmos GIGA';
         $atmos['data'] = ManualFile::where('module_name','atmos_giga')->get();
-
-        return view('frontend.dashboard.manual', compact('booster','cp','atmos','scp','scpv','customer')); // A Code: 20-02-2026
+        return view('frontend.dashboard.manual', compact('booster','cp','atmos','scp','customer'));
     }
 }

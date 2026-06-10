@@ -484,13 +484,6 @@ class HomeController
         return view('admin.tool_tip.scp_pump_assemby')->with('current_data',$current_data);
 
     }
-    // Alpesh Maru Date : 06-11-2025 Code Start
-    public function scpv_pumps(){
- 
-        $current_data = DB::table('tool_tip')->where('part_id',6)->get();
-        return view('admin.tool_tip.scpv_pump_assemby')->with('current_data',$current_data);
-    }
-    // Alpesh Maru Date : 06-11-2025 Code End
 
     public function save_control_panel_tool_tip(Request $request){
 
@@ -510,6 +503,8 @@ class HomeController
     }
 
     public function scp_t_tip(Request $request){
+
+        // dd("here");
         
         $data = $request->all();
         unset($data['_token']);
@@ -520,25 +515,13 @@ class HomeController
                 'tool_tip' => $val
             ]);
         
-        }    
+        }
+        
+
+      
+
         return view('admin.tool_tip.parts');
     }
-    // Alpesh Maru Date : 06-11-2025 Code Start
-    public function scpv_t_tip(Request $request){
-        
-        $data = $request->all();
-        unset($data['_token']);
-        
-        foreach($data as $key => $val){
-         
-            DB::table('tool_tip')->where('component_name',$key)->where('part_id',6)->update([
-                'tool_tip' => $val
-            ]);
-        
-        }   
-        return view('admin.tool_tip.parts');
-    }
-    // Alpesh Maru Date : 06-11-2025 Code End
 
     public function giga(Request $request){
 
@@ -720,45 +703,7 @@ class HomeController
         $selected_month = $request->selected_month;
         $start_date = "$selected_year-$selected_month-01";
         $end_date = date('Y-m-t', strtotime($start_date));
-
-        // A Code: 26-02-2026 Start
-        $quotation = Quotation::select('quotations.id as QuotationId','quotations.*','users.id as UserId','users.name as UserName','users.country_id','countries.id as CountryId','countries.country','customers.id as CustomerId','customers.name as CustomerName','customers.project_name','customers.country as ProjectCountry','customers.project_location as ProjectLocation','booster_carts.id as BoosterCartId',
-        'scp_carts.id as ScpCartId', 'scpv_carts.id as ScpvCartId',
-
-        'atmos_carts.id as AtmosCartId','control_panel_carts.id as ControlPanelId','booster_carts.full_article_number as BFullArticleNumber','booster_carts.pump_type as BPumpType','booster_carts.supply_voltage as BSupplyVoltage','booster_carts.adder_ids as BElecticleAdderIds','booster_carts.total_price as BTotalPrice','booster_carts.qty as BQty','booster_carts.price as BUnitPrice','booster_carts.mechanical_adder_ids as BMechanicalAdderIds','booster_carts.system_pressure as BSystemPressure','booster_carts.model_no as BModelNo','booster_carts.manifold as BManifold','booster_carts.inter_company_margin as BInterCompanyMargin','booster_carts.booster_overhead as BOverHead','booster_carts.mechanical_total_adders_price as BMechanicalTotalAdderIdsPrice','booster_carts.total_adders_price as BTotalAddersPrice','booster_carts.cp_price as BCPPrice','booster_carts.cablePrice as BCablePrice','booster_carts.mechanical_system_price as BMechanicalSystemPrice','booster_carts.pump_price as BPumpPrice','booster_carts.cp_id as BCpId','booster_carts.booster_article_number as BBoosterArticleNumber','booster_carts.article_number as BArticleNumber','control_panel_carts.starter_code as CStarterCode','atmos_carts.full_article_number as AFullArticleNumber','atmos_carts.pump_id as APump_id','atmos_carts.pump_name as APumpName',
-        'atmos_carts.material_id as AMaterialId','atmos_carts.brand as ABrand','atmos_carts.power as APower','atmos_carts.no_of_pole as ANoOfPoles','atmos_carts.voltage as AVoltage','atmos_carts.frequency as AFrequency','atmos_carts.efficiency as AEfficiency','atmos_carts.adder_ids as AAdderIds','atmos_carts.qty as AQty','atmos_carts.article_number as AArticleNumber','atmos_carts.price as AUnitPrice','atmos_carts.total_price as ATotalPrice','atmos_carts.application as AApplication','atmos_carts.shipping_cost_price as AShippingCostPrice','atmos_carts.packing_charge as APackingCharge','atmos_carts.painting_charge as APaintingCharge','atmos_carts.assembly_charge as AAssemblyCharge','atmos_carts.insulate_bearing_price as AInsulateBearingPrice','atmos_carts.accesories_price as AAssesoriesPrice','atmos_carts.inter_company_margin_price as AInterCompanyMarginPrice','atmos_carts.overhead_price as AOverHead','atmos_carts.bare_pump_price as APumpPrice','control_panel_carts.full_article_number as CFatmos_cartsullArticleNumber','control_panel_carts.control_panel_id as CControlPanelId','control_panel_carts.no_of_pump_id as CNoOfPumpId','control_panel_carts.power_id as CPowerId','control_panel_carts.voltage_id as CVoltageId','control_panel_carts.application_id as CApplicationId','control_panel_carts.ambient_temp_id as CAmbientTempId','control_panel_carts.stater_type_id as CStaterTypeId','control_panel_carts.full_article_number as CFullArticleNumber','control_panel_carts.article_number as CArticleNumber','control_panel_carts.communication_protocol_id as CCommunicationProtocolId','control_panel_carts.ip_rating_id as CIpRatingId','control_panel_carts.components_id as CComponentId','control_panel_carts.enclosure_id as CEnclosureId','control_panel_carts.qty as CQty','control_panel_carts.price as CUnitPrice','control_panel_carts.total_price as CTotalPrice','control_panel_carts.adder_ids as CAdderIds','control_panel_carts.intercompany_margin as CInterCompanyMargin','control_panel_carts.overhead as COverHead','control_panel_carts.price as CPrice',
-        
-        'scp_carts.full_article_number as SFullArticleNumber','scpv_carts.full_article_number as SVFullArticleNumber',
-        'scp_carts.pump_id as SPumpId','scpv_carts.pump_id as SVPumpId',
-        'scp_carts.pump_name as SPumpName','scpv_carts.pump_name as SVPumpName',
-        'scp_carts.material_id as SMaterialId','scpv_carts.material_id as SVMaterialId',
-        'scp_carts.article_number as SArticleNumber','scpv_carts.article_number as SVArticleNumber',
-        'scp_carts.seal_gland_pack_id as SSealGlandPackId','scpv_carts.seal_gland_pack_id as SVSealGlandPackId',
-        'scp_carts.master_id as SMasterId','scpv_carts.master_id as SVMasterId',
-        'scp_carts.brand as SBrand','scpv_carts.brand as SVBrand',
-        'scp_carts.power as SPower','scpv_carts.power as SVPower',
-        //'scp_carts.power as SPower'
-        'scp_carts.no_of_pole as SNoOfPole','scpv_carts.no_of_pole as SVNoOfPole',
-        'scp_carts.voltage as SVoltage','scpv_carts.voltage as SVVoltage',
-        'scp_carts.frequency as SFrequency','scpv_carts.frequency as SVFrequency',
-        'scp_carts.efficiency as SEfficiency','scpv_carts.efficiency as SVEfficiency',
-        'scp_carts.adder_ids as SAdderIds','scpv_carts.adder_ids as SVAdderIds',
-        'scp_carts.qty as SQty','scpv_carts.qty as SVQty',
-        'scp_carts.price as SUnitPrice','scpv_carts.price as SVUnitPrice',
-        'scp_carts.application as SApplication','scpv_carts.application as SVApplication',
-        'scp_carts.total_price as STotalPrice','scpv_carts.total_price as SVTotalPrice',
-        'scp_carts.shipping_cost_price as SShippingCostPrice','scpv_carts.shipping_cost_price as SVShippingCostPrice',
-        'scp_carts.packing_charge as SPackingCharge','scpv_carts.packing_charge as SVPackingCharge',
-        'scp_carts.painting_charge as SPaintingCharge','scpv_carts.painting_charge as SVPaintingCharge',
-        'scp_carts.assembly_charge as SAssemblyCharge','scpv_carts.assembly_charge as SVAssemblyCharge',
-        'scp_carts.insulate_bearing_price as SInsulateBearingPrice','scpv_carts.insulate_bearing_price as SVInsulateBearingPrice',
-        'scp_carts.accesories_price as SAssesoriesPrice','scpv_carts.accesories_price as SVAssesoriesPrice',
-        'scp_carts.overhead_price as SOverHead','scpv_carts.overhead_price as SVOverHead',
-        'scp_carts.bare_pump_price as SPumpPrice','scpv_carts.bare_pump_price as SVPumpPrice',
-        'scp_carts.inter_company_margin_price as SInterCompanyMargin','scpv_carts.inter_company_margin_price as SVInterCompanyMargin',
-        // A Code: 26-02-2026 End
-
-        DB::raw("(SELECT value from powers where id = booster_carts.motor_power) as BMotorPower"),DB::raw("(SELECT value from powers where id = control_panel_carts.power_id) as CPower"),DB::raw("(SELECT value from voltages where id = booster_carts.supply_voltage) as BSupplyVoltages"),DB::raw("(SELECT value from voltages where id = control_panel_carts.voltage_id) as CSupplyVoltages"),DB::raw("(SELECT value from applications where id = control_panel_carts.application_id) as CApplicationIdd"),DB::raw("(SELECT value from enclousres where id = control_panel_carts.enclosure_id) as CEnclosure"),DB::raw("(SELECT value from components where id = control_panel_carts.components_id) as CComponent"),DB::raw("(SELECT value from ip_ratings where id = control_panel_carts.ip_rating_id) as CIpRating"),DB::raw("(SELECT value from comunication_protocols where id = control_panel_carts.communication_protocol_id) as CCommunicationProtocol"),DB::raw("(SELECT value from starter_types where id = control_panel_carts.stater_type_id) as CStarterType"),DB::raw("(SELECT value from ambient_temps where id = control_panel_carts.ambient_temp_id) as CAmbientTemp"))
+        $quotation = Quotation::select('quotations.id as QuotationId','quotations.*','users.id as UserId','users.name as UserName','users.country_id','countries.id as CountryId','countries.country','customers.id as CustomerId','customers.name as CustomerName','customers.project_name','customers.country as ProjectCountry','customers.project_location as ProjectLocation','booster_carts.id as BoosterCartId','scp_carts.id as ScpCartId','atmos_carts.id as AtmosCartId','control_panel_carts.id as ControlPanelId','booster_carts.full_article_number as BFullArticleNumber','booster_carts.pump_type as BPumpType','booster_carts.supply_voltage as BSupplyVoltage','booster_carts.adder_ids as BElecticleAdderIds','booster_carts.total_price as BTotalPrice','booster_carts.qty as BQty','booster_carts.price as BUnitPrice','booster_carts.mechanical_adder_ids as BMechanicalAdderIds','booster_carts.system_pressure as BSystemPressure','booster_carts.model_no as BModelNo','booster_carts.manifold as BManifold','booster_carts.inter_company_margin as BInterCompanyMargin','booster_carts.booster_overhead as BOverHead','booster_carts.mechanical_total_adders_price as BMechanicalTotalAdderIdsPrice','booster_carts.total_adders_price as BTotalAddersPrice','booster_carts.cp_price as BCPPrice','booster_carts.cablePrice as BCablePrice','booster_carts.mechanical_system_price as BMechanicalSystemPrice','booster_carts.pump_price as BPumpPrice','booster_carts.cp_id as BCpId','booster_carts.booster_article_number as BBoosterArticleNumber','booster_carts.article_number as BArticleNumber','control_panel_carts.starter_code as CStarterCode','atmos_carts.full_article_number as AFullArticleNumber','atmos_carts.pump_id as APump_id','atmos_carts.pump_name as APumpName','atmos_carts.material_id as AMaterialId','atmos_carts.brand as ABrand','atmos_carts.power as APower','atmos_carts.no_of_pole as ANoOfPoles','atmos_carts.voltage as AVoltage','atmos_carts.frequency as AFrequency','atmos_carts.efficiency as AEfficiency','atmos_carts.adder_ids as AAdderIds','atmos_carts.qty as AQty','atmos_carts.article_number as AArticleNumber','atmos_carts.price as AUnitPrice','atmos_carts.total_price as ATotalPrice','atmos_carts.application as AApplication','atmos_carts.shipping_cost_price as AShippingCostPrice','atmos_carts.packing_charge as APackingCharge','atmos_carts.painting_charge as APaintingCharge','atmos_carts.assembly_charge as AAssemblyCharge','atmos_carts.insulate_bearing_price as AInsulateBearingPrice','atmos_carts.accesories_price as AAssesoriesPrice','atmos_carts.inter_company_margin_price as AInterCompanyMarginPrice','atmos_carts.overhead_price as AOverHead','atmos_carts.bare_pump_price as APumpPrice','control_panel_carts.full_article_number as CFatmos_cartsullArticleNumber','control_panel_carts.control_panel_id as CControlPanelId','control_panel_carts.no_of_pump_id as CNoOfPumpId','control_panel_carts.power_id as CPowerId','control_panel_carts.voltage_id as CVoltageId','control_panel_carts.application_id as CApplicationId','control_panel_carts.ambient_temp_id as CAmbientTempId','control_panel_carts.stater_type_id as CStaterTypeId','control_panel_carts.full_article_number as CFullArticleNumber','control_panel_carts.article_number as CArticleNumber','control_panel_carts.communication_protocol_id as CCommunicationProtocolId','control_panel_carts.ip_rating_id as CIpRatingId','control_panel_carts.components_id as CComponentId','control_panel_carts.enclosure_id as CEnclosureId','control_panel_carts.qty as CQty','control_panel_carts.price as CUnitPrice','control_panel_carts.total_price as CTotalPrice','control_panel_carts.adder_ids as CAdderIds','control_panel_carts.intercompany_margin as CInterCompanyMargin','control_panel_carts.overhead as COverHead','control_panel_carts.price as CPrice','scp_carts.full_article_number as SFullArticleNumber','scp_carts.pump_id as SPumpId','scp_carts.pump_name as SPumpName','scp_carts.material_id as SMaterialId','scp_carts.article_number as SArticleNumber','scp_carts.seal_gland_pack_id as SSealGlandPackId','scp_carts.master_id as SMasterId','scp_carts.brand as SBrand','scp_carts.power as SPower','scp_carts.power as SPower','scp_carts.no_of_pole as SNoOfPole','scp_carts.voltage as SVoltage','scp_carts.frequency as SFrequency','scp_carts.efficiency as SEfficiency','scp_carts.adder_ids as SAdderIds','scp_carts.qty as SQty','scp_carts.price as SUnitPrice','scp_carts.application as SApplication','scp_carts.total_price as STotalPrice','scp_carts.shipping_cost_price as SShippingCostPrice','scp_carts.packing_charge as SPackingCharge','scp_carts.painting_charge as SPaintingCharge','scp_carts.assembly_charge as SAssemblyCharge','scp_carts.insulate_bearing_price as SInsulateBearingPrice','scp_carts.accesories_price as SAssesoriesPrice','scp_carts.overhead_price as SOverHead','scp_carts.bare_pump_price as SPumpPrice','scp_carts.inter_company_margin_price as SInterCompanyMargin',DB::raw("(SELECT value from powers where id = booster_carts.motor_power) as BMotorPower"),DB::raw("(SELECT value from powers where id = control_panel_carts.power_id) as CPower"),DB::raw("(SELECT value from voltages where id = booster_carts.supply_voltage) as BSupplyVoltages"),DB::raw("(SELECT value from voltages where id = control_panel_carts.voltage_id) as CSupplyVoltages"),DB::raw("(SELECT value from applications where id = control_panel_carts.application_id) as CApplicationIdd"),DB::raw("(SELECT value from enclousres where id = control_panel_carts.enclosure_id) as CEnclosure"),DB::raw("(SELECT value from components where id = control_panel_carts.components_id) as CComponent"),DB::raw("(SELECT value from ip_ratings where id = control_panel_carts.ip_rating_id) as CIpRating"),DB::raw("(SELECT value from comunication_protocols where id = control_panel_carts.communication_protocol_id) as CCommunicationProtocol"),DB::raw("(SELECT value from starter_types where id = control_panel_carts.stater_type_id) as CStarterType"),DB::raw("(SELECT value from ambient_temps where id = control_panel_carts.ambient_temp_id) as CAmbientTemp"))
                     ->whereBetween('quotations.created_at', [$start_date . ' 00:00:00', $end_date . ' 23:59:59'])
                     ->leftJoin('users','users.id','=','quotations.user_id')
                     ->leftJoin('customers','customers.id','=','quotations.customer_id')
@@ -779,12 +724,6 @@ class HomeController
                         $join->on('scp_carts.id', '=', 'quotations.cp_cart_id')
                              ->where('quotations.cart_model_name', '=', 'scp');
                                })
-                    // A Code: 26-02-2026 Start
-                    ->leftJoin('scpv_carts', function ($join) {
-                        $join->on('scpv_carts.id', '=', 'quotations.cp_cart_id')
-                             ->where('quotations.cart_model_name', '=', 'scpv');
-                               })
-                    // A Code: 26-02-2026 End                            
                     ->leftJoin('firefighting_carts', function ($join) {
                         $join->on('firefighting_carts.id', '=', 'quotations.cp_cart_id')
                              ->where('quotations.cart_model_name', '=', 'firefighting');

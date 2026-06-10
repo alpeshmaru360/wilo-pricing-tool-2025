@@ -23,23 +23,22 @@ use App\Item;
 use App\AtmosCart;
 use App\AtmosItem;
 use App\ScpCart;
-use App\ScpvCart; // A Code: 24-02-2026
 use App\QuotationCounter;
 use App\Models\BoosterCart;
 
 class QuotationController extends Controller
 {
+
     public function index($quotation_no)
     {
         $quotations = Quotation::where('quotation_number', $quotation_no)->get();
         $ids = [];
         $atmosIds = [];
         $scpIds = [];
-        $scpvIds = []; // A Code: 24-02-2026
         $boosterIds = [];
-        $firefightingIds = [];        
+        $firefightingIds = [];
+
         $customer = Customer::find($quotations[0]->customer_id);
-        
         foreach ($quotations as $quotation) {
             if ($quotation->cart_model_name == 'controlpanel') {
                 $ids[] = $quotation->cp_cart_id;
@@ -47,14 +46,10 @@ class QuotationController extends Controller
             if ($quotation->cart_model_name == 'atmos') {
                 $atmosIds[] = $quotation->cp_cart_id;
             }
+
             if ($quotation->cart_model_name == 'scp') {
                 $scpIds[] = $quotation->cp_cart_id;
             }
-            // A Code: 24-02-2026 Start
-            if ($quotation->cart_model_name == 'scpv') {
-                $scpvIds[] = $quotation->cp_cart_id;
-            }
-            // A Code: 24-02-2026 End
             if ($quotation->cart_model_name == 'booster') {
                 $boosterIds[] = $quotation->cp_cart_id;
             }
@@ -77,11 +72,9 @@ class QuotationController extends Controller
 
         $atmosCartData = AtmosCart::cartDataByQuotation($atmosIds);
         $scpCartData = ScpCart::cartDataByQuotation($scpIds);
-        $scpvCartData = ScpvCart::cartDataByQuotation($scpvIds); // A Code: 24-02-2026
         $boosterCartData = BoosterCart::cartDataByQuotation($boosterIds);
         $firefightingCartData = FireFightingCarts::cartDataByQuotation($firefightingIds);
-        return view('frontend.quotation.index', compact('quotation', 'customer', 'controlPanelCartData', 'atmosCartData', 'scpCartData', 
-        'scpvCartData', 'boosterCartData', 'firefightingCartData')); // A Code: 24-02-2026
+        return view('frontend.quotation.index', compact('quotation', 'customer', 'controlPanelCartData', 'atmosCartData', 'scpCartData', 'boosterCartData', 'firefightingCartData'));
     }
 
     // public function userList() 
@@ -191,7 +184,6 @@ class QuotationController extends Controller
             ->paginate(50)
             ->withQueryString(); // Keeps ?search in all links
 
-
         // Fetch actual Quotation rows (by grouped id) for details
         $quotationRows = \App\Quotation::whereIn('id', $paginated->pluck('id'))->get()->keyBy('quotation_number');
 
@@ -201,9 +193,8 @@ class QuotationController extends Controller
             $c_price = \App\ControlPanelCart::where('quotation_no', $quotation->quotation_number)->sum('total_price');
             $b_price = \App\Models\BoosterCart::where('quotation_no', $quotation->quotation_number)->sum('total_price');
             $s_price = \App\ScpCart::where('quotation_no', $quotation->quotation_number)->sum('total_price');
-            $sv_price = \App\ScpvCart::where('quotation_no', $quotation->quotation_number)->sum('total_price'); // A Code: 24-02-2026
             $a_price = \App\AtmosCart::where('quotation_no', $quotation->quotation_number)->sum('total_price');
-            $price_data = $c_price + $b_price + $s_price + $sv_price + $a_price + $f_price; // A Code: 24-02-2026
+            $price_data = $c_price + $b_price + $s_price + $a_price + $f_price;
 
             $customer = \App\Customer::find($quotation->customer_id);
 
@@ -223,6 +214,8 @@ class QuotationController extends Controller
             'search' => $search
         ]);
     }
+
+
 
     public function ajaxStatusUpdate(Request $request)
     {
@@ -269,7 +262,6 @@ class QuotationController extends Controller
             $ids = [];
             $atmosIds = [];
             $scpIds = [];
-            $scpvIds = []; // A Code: 24-02-2026
             $boosterIds = [];
             $firefightingIds = [];
             $customer = Customer::find($quotations[0]->customer_id);
@@ -283,11 +275,6 @@ class QuotationController extends Controller
                 if ($quotation->cart_model_name == 'scp') {
                     $scpIds[] = $quotation->cp_cart_id;
                 }
-                // A Code: 24-02-2026 Start
-                if ($quotation->cart_model_name == 'scpv') {
-                    $scpvIds[] = $quotation->cp_cart_id;
-                }
-                // A Code: 24-02-2026 End
                 if ($quotation->cart_model_name == 'booster') {
                     $boosterIds[] = $quotation->cp_cart_id;
                 }
@@ -310,11 +297,9 @@ class QuotationController extends Controller
             // dd($controlPanelCartData);
             $atmosCartData = AtmosCart::cartDataByQuotation($atmosIds);
             $scpCartData = ScpCart::cartDataByQuotation($scpIds);
-            $scpvCartData = ScpvCart::cartDataByQuotation($scpvIds); // A Code: 24-02-2026
             $boosterCartData = BoosterCart::cartDataByQuotation($boosterIds);
             $firefightingCartData = FireFightingCarts::cartDataByQuotation($firefightingIds);
-            return view('frontend.quotation.edit', compact('quotation', 'customer', 'controlPanelCartData', 'atmosCartData', 'scpCartData', 
-                        'scpvCartData', 'boosterCartData', 'quotations_revision_counter', 'firefightingCartData')); // A Code: 24-02-2026
+            return view('frontend.quotation.edit', compact('quotation', 'customer', 'controlPanelCartData', 'atmosCartData', 'scpCartData', 'boosterCartData', 'quotations_revision_counter', 'firefightingCartData'));
         } else {
             $quotation = "";
             return view('frontend.quotation.edit', ['quotation' => $quotation, 'quotations_revision_counter' => $quotations_revision_counter]);
@@ -327,7 +312,6 @@ class QuotationController extends Controller
         $ids = [];
         $atmosIds = [];
         $scpIds = [];
-        $scpvIds = []; // A Code: 24-02-2026
         $boosterIds = [];
         $customer = Customer::find($quotations[0]->customer_id);
         foreach ($quotations as $quotation) {
@@ -340,11 +324,6 @@ class QuotationController extends Controller
             if ($quotation->cart_model_name == 'scp') {
                 $scpIds[] = $quotation->cp_cart_id;
             }
-            // A Code: 24-02-2026 Start
-            if ($quotation->cart_model_name == 'scpv') {
-                $scpvIds[] = $quotation->cp_cart_id;
-            }
-            // A Code: 24-02-2026 End
             if ($quotation->cart_model_name == 'booster') {
                 $boosterIds[] = $quotation->cp_cart_id;
             }
@@ -365,13 +344,11 @@ class QuotationController extends Controller
 
         $atmosCartData = AtmosCart::cartDataByQuotation($atmosIds);
         $scpCartData = ScpCart::cartDataByQuotation($scpIds);
-        $scpvCartData = ScpvCart::cartDataByQuotation($scpvIds); // A Code: 24-02-2026
         $boosterCartData = BoosterCart::cartDataByQuotation($boosterIds);
 
         $returnHTML = view('frontend.quotation.qty_updated_total_price')->with('controlPanelCartData', $controlPanelCartData)
             ->with('atmosCartData', $atmosCartData)
             ->with('scpCartData', $scpCartData)
-            ->with('scpvCartData', $scpvCartData) // A Code: 24-02-2026
             ->with('boosterCartData', $boosterCartData)
             ->render();
         //
@@ -432,32 +409,15 @@ class QuotationController extends Controller
         return response()->json(array('success' => false, 'data' => $data, 'message' => 'Failed to delete..!!', 'status' => 'Failed'));
     }
 
-    // A Code: 24-02-2026 Start
-    public function deleteSCPVItemFromEditQuotation(Request $request)
-    {
-        $data['quotation_item'] = Quotation::where('quotation_number', $request->quotation_number)
-            ->where('cp_cart_id', $request->cp_scpv_cart_id)
-            ->where('cart_model_name', 'scpv')
-            ->delete();
-        $data['controlpanelItem'] = ScpvCart::where('quotation_no', $request->quotation_number)
-            ->where('id', $request->cp_scpv_cart_id)
-            ->delete();
-        return response()->json(array('success' => true, 'data' => $data, 'message' => 'SCPV Item Deleted..!!', 'status' => 'success'));
-        return response()->json(array('success' => false, 'data' => $data, 'message' => 'Failed to delete..!!', 'status' => 'Failed'));
-    }
-    // A Code: 24-02-2026 End
-
     public function home_page($quotation_no)
     {
         $maintance_mode_atmos = DB::table("setup_fields")->where('label', 'atmos_maintance_mode')->pluck('value')[0];
         $maintance_mode_booster = DB::table("setup_fields")->where('label', 'maintance_mode_booster')->pluck('value')[0];
         $control_panel_maintance_mode = DB::table("setup_fields")->where('label', 'control_panel_maintance_mode')->pluck('value')[0];
         $maintance_mode_scp = DB::table("setup_fields")->where('label', 'scp_maintance_mode')->pluck('value')[0];
-        $maintance_mode_scpv = DB::table("setup_fields")->where('label', 'scpv_maintance_mode')->pluck('value')[0]; // A Code: 24-02-2026
         $maintance_mode_fire_fighting = DB::table("setup_fields")->where('label', 'fire-fighting_maintance_mode')->pluck('value')[0];
         $maintance_mode_sch = DB::table("setup_fields")->where('label', 'sch_maintance_mode')->pluck('value')[0];
-        return view('frontend.dashboard.index', compact('quotation_no', 'maintance_mode_atmos', 'maintance_mode_sch', 'maintance_mode_booster', 'control_panel_maintance_mode', 
-                    'maintance_mode_scp', 'maintance_mode_scpv', 'maintance_mode_fire_fighting')); // A Code: 24-02-2026
+        return view('frontend.dashboard.index', compact('quotation_no', 'maintance_mode_atmos', 'maintance_mode_sch', 'maintance_mode_booster', 'control_panel_maintance_mode', 'maintance_mode_scp', 'maintance_mode_fire_fighting'));
     }
 
     public function AddQuotationWithBooster($quotation_no, $total_price, $booster_cart_id)
@@ -507,24 +467,6 @@ class QuotationController extends Controller
             $quotation->save();
         }
     }
-
-    // A Code: 24-02-2026 Start
-    public function AddQuotationWithSCPV($quotation_no, $total_price, $scpv_cart_id)
-    {
-        $quotation_data = Quotation::where("quotation_number", "=", $quotation_no)->first();
-        if ($quotation_data) {
-            $quotation = new Quotation;
-            $quotation->quotation_number = $quotation_no;
-            $quotation->cp_cart_id = $scpv_cart_id;
-            $quotation->cart_model_name = "scpv";
-            $quotation->user_id = auth()->user()->id;
-            $quotation->customer_id = $quotation_data->customer_id;
-            $quotation->total_quotation_value = $total_price;
-            $quotation->status = "open";
-            $quotation->save();
-        }
-    }
-    // A Code: 24-02-2026 End
 
     public function AddQuotationWithAtmos($quotation_no, $total_price, $atmos_cart_id)
     {

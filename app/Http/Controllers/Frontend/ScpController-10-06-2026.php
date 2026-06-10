@@ -25,10 +25,11 @@ class ScpController extends Controller {
         $poles = DB::table('scp_master_motor_prices')->distinct()->pluck('no_of_pole');
         $efficiency = DB::table('scp_master_motor_prices')->distinct()->pluck('efficiency');
 
-        return view('frontend.scp_pump.index', compact('power', 'voltage', 'efficiency', 'poles', 'brand', 'frequency'))
-            ->with('pump_types', DB::table('scp_pump_types')->get())
-            ->with('atmos_materials', DB::table('scp_materials')->get());
-        
+        return view('frontend.scp_pump.index', compact('power', 'voltage', 'efficiency', 'poles', 'brand', 'frequency'))->with(
+                        'pump_types', DB::table('scp_pump_types')->get()
+                )->with(
+                        'atmos_materials', DB::table('scp_materials')->get()
+        );
     }
 
     public function get_price(Request $request) {
@@ -202,15 +203,7 @@ class ScpController extends Controller {
     }
 
     public function ajaxCalculate(Request $request) {
-        //$getScpPumpName = ScpPumpType::where('id', $request->pump_model)->pluck('name')[0];
-
-        // A Code: 19-03-2026 Start
-        $getScpPumpName = ScpPumpType::where('id', $request->pump_model)->value('name');
-        if(!$getScpPumpName){
-            $getScpPumpName = $request->pump_model;
-        }
-        // A Code: 19-03-2026 End
-
+        $getScpPumpName = ScpPumpType::where('id', $request->pump_model)->pluck('name')[0];
         $scpPrice = 0.00;
         $optionalPrice = 0.00; //Adders Code
         $interCompanyMargin = User::ic_margin_scp(); // This is temporary 
@@ -218,44 +211,30 @@ class ScpController extends Controller {
         $overHead = ScpPumpType::scp_over_head(); //This $overHead can be editable by admin
         $assemblyPrice = 0.00;
 
-        // if ($request->code_price && $request->code_price != 'undefined') {
-        //     $optionalPrice = $request->code_price;
-        // }
-        // $getAPPPrice = ScpAssemblyCostPcPk::where('power', $request->motor_power)->get();
-        // if ($getAPPPrice) {
-        //     $assemblyPrice = $getAPPPrice[0]->assembly_charge + $getAPPPrice[0]->painting_charge + $getAPPPrice[0]->packing_charge;
-        // }
-
-        // A Code: 19-03-2026 Start
-        if (!empty($request->code_price) && $request->code_price != 'undefined') {
+        if ($request->code_price && $request->code_price != 'undefined') {
             $optionalPrice = $request->code_price;
         }
-        $getAPPPrice = ScpAssemblyCostPcPk::where('power', $request->motor_power)->first();
+
+        $getAPPPrice = ScpAssemblyCostPcPk::where('power', $request->motor_power)->get();
         if ($getAPPPrice) {
-            $assemblyPrice = $getAPPPrice->assembly_charge 
-                        + $getAPPPrice->painting_charge 
-                        + $getAPPPrice->packing_charge;
+
+            $assemblyPrice = $getAPPPrice[0]->assembly_charge + $getAPPPrice[0]->painting_charge + $getAPPPrice[0]->packing_charge;
         }
-        // A Code: 19-03-2026 End
 
         $shippingCost = ($request->bare_shaft_price + $request->acessories_price) * $shippingPercentage;
-        $scpPrice += ((($request->bare_shaft_price 
-            + $request->acessories_price 
-            + $request->motor_price 
-            + $optionalPrice 
-            + $assemblyPrice) * $overHead) + $shippingCost ) / $interCompanyMargin;
 
-        $returnHTML = view('frontend.scp_pump.table')
-                ->with('pumpName', $getScpPumpName)
+        $scpPrice += ((($request->bare_shaft_price + $request->acessories_price + $request->motor_price + $optionalPrice + $assemblyPrice) * $overHead) + $shippingCost ) / $interCompanyMargin;
+
+        $returnHTML = view('frontend.scp_pump.table')->with('pumpName', $getScpPumpName)
                 ->with('price', $scpPrice)
                 ->with('motor_power', $request->motor_power)
                 ->with('motor_brand', $request->motor_brand)
                 ->render();
-                
+        //         
         $data['cp_records_html'] = $returnHTML;
+
         $data['cp_price'] = number_format($scpPrice, 2);
         $data['total_price'] = $scpPrice;
-
         return response()->json(array('success' => true, 'data' => $data));
     }
 
@@ -299,42 +278,46 @@ class ScpController extends Controller {
     }
 
     public function addToCart(Request $request){
-		$SCPCartData = DB::table('scp_carts')->where('full_article_number','=',$request->full_article_number);
+		  $SCPCartData = DB::table('scp_carts')->where('full_article_number','=',$request->full_article_number);
         if(auth()->user()->country_id == 6){
             $SCPCartData = $SCPCartData->orWhere('ksa_full_article_number','=',$request->full_article_number);
         }
+
         $SCPCartData = $SCPCartData->latest('id')->first();
-        if($request->impeller_material == null && $request->application == null && $request->adder_ids == null){
-            $request->adder_ids = $SCPCartData->adder_ids;
-        }
-        if($request->motor_power == ""){
-            $request->motor_power = $SCPCartData->power;
-        }
-        if($request->pump_model == ""){
-            $request->pump_model = $SCPCartData->pump_id;
-        }
-        if($request->impeller_material == ""){
-            $request->impeller_material = $SCPCartData->material_id;
-        }
-        if($request->application == ""){
-            $request->application = $SCPCartData->application;
-        }
-        if($request->master_price_id == ""){
-            $request->master_price_id = $SCPCartData->master_id;
-        }
-        if($request->bare_shaft_price == ""){
-            $request->bare_shaft_price = $SCPCartData->bare_pump_price;
-        }
-        if($request->power_supply == ""){
-            $request->power_supply = $SCPCartData->voltage;
-        }
-        if($request->s_g_pack == ""){
+          if($request->impeller_material == null && $request->application == null && $request->adder_ids == null){
+              $request->adder_ids = $SCPCartData->adder_ids;
+          }
+          if($request->motor_power == ""){
+              $request->motor_power = $SCPCartData->power;
+          }
+          if($request->pump_model == ""){
+              $request->pump_model = $SCPCartData->pump_id;
+          }
+          if($request->impeller_material == ""){
+              $request->impeller_material = $SCPCartData->material_id;
+          }
+          if($request->application == ""){
+              $request->application = $SCPCartData->application;
+          }
+          if($request->master_price_id == ""){
+              $request->master_price_id = $SCPCartData->master_id;
+          }
+          if($request->bare_shaft_price == ""){
+              $request->bare_shaft_price = $SCPCartData->bare_pump_price;
+          }
+          if($request->power_supply == ""){
+              $request->power_supply = $SCPCartData->voltage;
+          }
+
+          if($request->s_g_pack == ""){
             $request->s_g_pack = $SCPCartData->seal_gland_pack_id;
-        }
-        // add it because add to cart not working
+          }
+
+          // add it because add to cart not working
         if($request->frame_size == ""){
             $request->frame_size = $SCPCartData->frame_size;
         }
+
         if($request->frequency == ""){
             $request->frequency = $SCPCartData->frequency;
         }
@@ -356,26 +339,15 @@ class ScpController extends Controller {
         if($request->code_price == null){
             $request->code_price = "0.00";
         }
-        //code ends for search via article number		
+          //code ends for search via article number
+		
         $getAssemblyPrice = $this->getCartAssemblyPrices($request->motor_power);
         $interCompanyMargin = User::ic_margin_scp(); // This is temporary 
         $shippingPercentage = ScpPumpType::scp_shipping_percentage() / 100; //This percentage can be editable by admin
         $overHead = ScpPumpType::scp_over_head(); //This $overHead can be editable by admin
 
         if ($request->adder_ids) {
-            // $scpCartData = ScpCart::where('pump_id', $request->pump_model)
-            //         ->where('material_id', $request->impeller_material)
-            //         ->where('seal_gland_pack_id', $request->s_g_pack)
-            //         ->where('master_id', $request->master_price_id)
-            //         ->where('application', $request->application)
-            //         ->where('adder_ids', $request->adder_ids)
-            //         ->where('user_id', auth()->user()->id)
-            //         ->orderBy('id', 'desc')
-            //         ->first();
-
-            // A Code: 20-03-2026 Start
-            $pumpId = is_numeric($request->pump_model) ? (int)$request->pump_model : null;
-            $scpCartData = ScpCart::where('pump_id', $pumpId)
+            $scpCartData = ScpCart::where('pump_id', $request->pump_model)
                     ->where('material_id', $request->impeller_material)
                     ->where('seal_gland_pack_id', $request->s_g_pack)
                     ->where('master_id', $request->master_price_id)
@@ -384,21 +356,8 @@ class ScpController extends Controller {
                     ->where('user_id', auth()->user()->id)
                     ->orderBy('id', 'desc')
                     ->first();
-            // A Code: 20-03-2026 End            
-
             if($scpCartData == null){
-                // $scpCartData1 = ScpCart::where('pump_id', $request->pump_model)
-                //     ->where('material_id', $request->impeller_material)
-                //     ->where('seal_gland_pack_id', $request->s_g_pack)
-                //     ->where('master_id', $request->master_price_id)
-                //     ->where('application', $request->application)
-                //     ->where('adder_ids', $request->adder_ids)
-                //     ->orderBy('id', 'desc')
-                //     ->first();
-
-                // A Code: 20-03-2026 Start
-                $pumpId = is_numeric($request->pump_model) ? (int)$request->pump_model : null;
-                $scpCartData1 = ScpCart::where('pump_id', $pumpId)
+                $scpCartData1 = ScpCart::where('pump_id', $request->pump_model)
                     ->where('material_id', $request->impeller_material)
                     ->where('seal_gland_pack_id', $request->s_g_pack)
                     ->where('master_id', $request->master_price_id)
@@ -406,8 +365,6 @@ class ScpController extends Controller {
                     ->where('adder_ids', $request->adder_ids)
                     ->orderBy('id', 'desc')
                     ->first();
-                // A Code: 20-03-2026 End
-
                 $scpCart = new ScpCart;
 				$new_ksa_article_number = '';
                 if(auth()->user()->country_id == 6){
@@ -418,14 +375,15 @@ class ScpController extends Controller {
 								$scpCart->ksa_full_article_number = $new_ksa_article_number;
                             }
                         }
-                    }elseif($scpCartData1){
+                    }
+                    elseif($scpCartData1){
 							if($scpCartData1->full_article_number != "" || $scpCartData1->full_article_number != null){
                             if($request->country == "ksa"){
                                 $new_ksa_article_number = str_replace("683", "339", $scpCartData1->full_article_number);
                                 $scpCart->ksa_full_article_number = $new_ksa_article_number;
                             }
                         }
-                    }
+        }
                     else{
 
                     }
@@ -438,8 +396,7 @@ class ScpController extends Controller {
                 }
                 //BarE sHAFT dATA
                 $scpCart->pump_id = $request->pump_model;
-                //$scpCart->pump_name = isset(ScpPumpType::where('id', $request->pump_model)->pluck('name')[0]) ? ScpPumpType::where('id', $request->pump_model)->pluck('name')[0] : '';
-                $scpCart->pump_name = ScpPumpType::where('id', $request->pump_model)->value('name') ?? $request->pump_model; // A Code: 19-03-2026
+                $scpCart->pump_name = isset(ScpPumpType::where('id', $request->pump_model)->pluck('name')[0]) ? ScpPumpType::where('id', $request->pump_model)->pluck('name')[0] : '';
                 $scpCart->material_id = $request->impeller_material;
                 $scpCart->seal_gland_pack_id = $request->s_g_pack;
                 $scpCart->bare_pump_price = $request->bare_shaft_price;
@@ -489,6 +446,7 @@ class ScpController extends Controller {
             } else {
                 if (empty($scpCartData->quotation_no)) {
                     $msg = 'This item already in your cart.';
+                //  dd($msg);
                     return response()->json(array('success' => true, 'msg' => $msg));
                 } else {
 					$new_ksa_article_number = '';
@@ -503,23 +461,23 @@ class ScpController extends Controller {
 						}
                     }
                     $scpCart = $scpCartData->replicate();
-                    // $scpCart->bare_shaft_price = $request->bare_shaft_price;
-                    // $scpCart->is_bare_manual = $request->is_bare_shaft_price_manual;
-                    // Asscesories
-                    $scpCart->accesories_price = $request->acessories_price;
-                    $scpCart->is_accesories_manual = $request->is_acessories_price_manual;
-                    // Assembly Charge
-                    // $scpCart->assembly_charge = $getAssemblyPrice['assembly_charge'];
-                    // $scpCart->painting_charge = $getAssemblyPrice['painting_charge'];
-                    // $scpCart->packing_charge = $getAssemblyPrice['packing_charge'];
-                    // Shiiping Cost
-                    // $scpCart->shipping_cost_price = ($request->bare_shaft_price + $request->acessories_price) * $shippingPercentage;
-                    // $scpCart->shipping_cost_percentage = $shippingPercentage;
-                    // $scpCart->overhead_price = $overHead;
+                   // $scpCart->bare_shaft_price = $request->bare_shaft_price;
+                   // $scpCart->is_bare_manual = $request->is_bare_shaft_price_manual;
+                   // Asscesories
+                   $scpCart->accesories_price = $request->acessories_price;
+                   $scpCart->is_accesories_manual = $request->is_acessories_price_manual;
+                   // Assembly Charge
+                   // $scpCart->assembly_charge = $getAssemblyPrice['assembly_charge'];
+                   // $scpCart->painting_charge = $getAssemblyPrice['painting_charge'];
+                   // $scpCart->packing_charge = $getAssemblyPrice['packing_charge'];
+                   // Shiiping Cost
+                   // $scpCart->shipping_cost_price = ($request->bare_shaft_price + $request->acessories_price) * $shippingPercentage;
+                   // $scpCart->shipping_cost_percentage = $shippingPercentage;
+                   // $scpCart->overhead_price = $overHead;
                     $scpCart->inter_company_margin_price = $interCompanyMargin;
 
-                    // $scpCart->adder_ids = $request->adder_ids;
-                    // $scpCart->total_adders_price = $request->code_price;
+                   // $scpCart->adder_ids = $request->adder_ids;
+                   // $scpCart->total_adders_price = $request->code_price;
                     $scpCart->user_id = auth()->user()->id;
                     $scpCart->price = $request->total_price;
                     $scpCart->total_price = $request->total_price;
@@ -536,20 +494,8 @@ class ScpController extends Controller {
                 }
             }
         }else{
-            
-            // $scpCartData = ScpCart::where('pump_id', $request->pump_model)
-            //         ->where('material_id', $request->impeller_material)
-            //         ->where('seal_gland_pack_id', $request->s_g_pack)
-            //         ->where('master_id', $request->master_price_id)
-            //         ->where('application', $request->application)
-            //         ->whereNull('adder_ids')
-            //         ->where('user_id', auth()->user()->id)
-            //         ->orderBy('id', 'desc')
-            //         ->first();
-
-            // A Code: 20-03-2026 Start
-            $pumpId = is_numeric($request->pump_model) ? (int)$request->pump_model : null;
-            $scpCartData = ScpCart::where('pump_id', $pumpId)
+                //DB::enableQueryLog();
+            $scpCartData = ScpCart::where('pump_id', $request->pump_model)
                     ->where('material_id', $request->impeller_material)
                     ->where('seal_gland_pack_id', $request->s_g_pack)
                     ->where('master_id', $request->master_price_id)
@@ -558,22 +504,11 @@ class ScpController extends Controller {
                     ->where('user_id', auth()->user()->id)
                     ->orderBy('id', 'desc')
                     ->first();
-            // A Code: 20-03-2026 End
-                    
+            //dd(DB::getQueryLog());
+
             if ($scpCartData == null) {
                 //query for find article number and full article number starts for diff user id..!!
-                // $scpCartData1 = ScpCart::where('pump_id', $request->pump_model)
-                //     ->where('material_id', $request->impeller_material)
-                //     ->where('seal_gland_pack_id', $request->s_g_pack)
-                //     ->where('master_id', $request->master_price_id)
-                //     ->where('application', $request->application)
-                //     ->whereNull('adder_ids')
-                //     ->orderBy('id', 'desc')
-                //     ->first();
-
-                // A Code: 20-03-2026 Start
-                $pumpId = is_numeric($request->pump_model) ? (int)$request->pump_model : null;
-                $scpCartData1 = ScpCart::where('pump_id', $pumpId)
+                $scpCartData1 = ScpCart::where('pump_id', $request->pump_model)
                     ->where('material_id', $request->impeller_material)
                     ->where('seal_gland_pack_id', $request->s_g_pack)
                     ->where('master_id', $request->master_price_id)
@@ -581,32 +516,30 @@ class ScpController extends Controller {
                     ->whereNull('adder_ids')
                     ->orderBy('id', 'desc')
                     ->first();
-                // A Code: 20-03-2026 End
-
                 //query for find article number and full article number ends diff user id..!!
                 $scpCart = new ScpCart;
 				$new_ksa_article_number = '';
-                if(auth()->user()->country_id == 6){
-                    if($scpCartData){
-                        if($scpCartData->full_article_number != "" || $scpCartData->full_article_number != null){
-                            if($request->country == "ksa"){
-                                $new_ksa_article_number = str_replace("683", "339", $scpCartData->full_article_number);
-                                $scpCart->ksa_full_article_number = $new_ksa_article_number;
+                    if(auth()->user()->country_id == 6){
+                        if($scpCartData){
+                            if($scpCartData->full_article_number != "" || $scpCartData->full_article_number != null){
+                                if($request->country == "ksa"){
+                                    $new_ksa_article_number = str_replace("683", "339", $scpCartData->full_article_number);
+                                    $scpCart->ksa_full_article_number = $new_ksa_article_number;
+                                }
                             }
                         }
-                    }elseif($scpCartData1){
-                        if($scpCartData1->full_article_number != "" || $scpCartData1->full_article_number != null){
-                            if($request->country == "ksa"){
-                                $new_ksa_article_number = str_replace("683", "339", $scpCartData1->full_article_number);
-                                $scpCart->ksa_full_article_number = $new_ksa_article_number;
-                            }
+                        elseif($scpCartData1){
+								if($scpCartData1->full_article_number != "" || $scpCartData1->full_article_number != null){
+                                if($request->country == "ksa"){
+                                    $new_ksa_article_number = str_replace("683", "339", $scpCartData1->full_article_number);
+                                    $scpCart->ksa_full_article_number = $new_ksa_article_number;
+                                }
+            }
+                        }
+                        else{
+
                         }
                     }
-                    else{
-
-                    }
-                }
-
                 if($scpCartData1 != null)
                 {
                     $scpCart->article_number = ($scpCartData1->article_number==null)?null:$scpCartData1->article_number;
@@ -614,8 +547,7 @@ class ScpController extends Controller {
                 }
                 //BarE sHAFT dATA
                 $scpCart->pump_id = $request->pump_model;
-                //$scpCart->pump_name = isset(ScpPumpType::where('id', $request->pump_model)->pluck('name')[0]) ? ScpPumpType::where('id', $request->pump_model)->pluck('name')[0] : '';
-                $scpCart->pump_name = ScpPumpType::where('id', $request->pump_model)->value('name') ?? $request->pump_model; // A Code: 19-03-2026
+                $scpCart->pump_name = isset(ScpPumpType::where('id', $request->pump_model)->pluck('name')[0]) ? ScpPumpType::where('id', $request->pump_model)->pluck('name')[0] : '';
                 $scpCart->material_id = $request->impeller_material;
                 $scpCart->seal_gland_pack_id = $request->s_g_pack;
                 $scpCart->is_bare_manual = $request->is_bare_shaft_price_manual;
@@ -662,27 +594,16 @@ class ScpController extends Controller {
             } else {
                 if (empty($scpCartData->quotation_no)) {
                     $msg = 'This item already in your cart.';   
+                //dd('msg');
                     return response()->json(array('success' => true, 'msg' => $msg));
                 } else {
-                    
-					// $scpCartData = ScpCart::where('pump_id', $request->pump_model)
-                    //                 ->where('material_id', $request->impeller_material)
-                    //                 ->where('master_id', $request->master_price_id)
-                    //                 ->where('application', $request->application)
-                    //                 ->whereNull('adder_ids')
-                    //                 ->orderBy('id', 'desc')
-                    //                 ->first();
-
-                    // A Code: 20-03-2026 Start
-                    $pumpId = is_numeric($request->pump_model) ? (int)$request->pump_model : null;
-                    $scpCartData = ScpCart::where('pump_id', $pumpId)
-                                    ->where('material_id', $request->impeller_material)
-                                    ->where('master_id', $request->master_price_id)
-                                    ->where('application', $request->application)
-                                    ->whereNull('adder_ids')
-                                    ->orderBy('id', 'desc')
-                                    ->first();
-                    // A Code: 20-03-2026 End  
+					$scpCartData = ScpCart::where('pump_id', $request->pump_model)
+                    ->where('material_id', $request->impeller_material)
+                    ->where('master_id', $request->master_price_id)
+                    ->where('application', $request->application)
+                    ->whereNull('adder_ids')
+					->orderBy('id', 'desc')
+                    ->first();
 
                     $new_ksa_article_number = '';
                     if(auth()->user()->country_id == 6){
@@ -696,26 +617,23 @@ class ScpController extends Controller {
                         }
                     }
                     $scpCart = $scpCartData->replicate();
-
-                    // $scpCart->bare_shaft_price = $request->bare_shaft_price;
-                    // $scpCart->is_bare_manual = $request->is_bare_shaft_price_manual;
-                    //
-
-                    //Asscesories
-                    $scpCart->accesories_price = $request->acessories_price;
-                    $scpCart->is_accesories_manual = $request->is_acessories_price_manual;
-
-
-                    // //Assembly Charge
-                    // $scpCart->assembly_charge = $getAssemblyPrice['assembly_charge'];
-                    // $scpCart->painting_charge = $getAssemblyPrice['painting_charge'];
-                    // $scpCart->packing_charge = $getAssemblyPrice['packing_charge'];
-                    // //Shiiping Cost
-                    // $scpCart->shipping_cost_price = ($request->bare_shaft_price + $request->acessories_price) * $shippingPercentage;
-                    // $scpCart->shipping_cost_percentage = $shippingPercentage;
-                    // $scpCart->overhead_price = $overHead;
-                    // $scpCart->inter_company_margin_price = $interCompanyMargin;
-
+                //                    $scpCart->bare_shaft_price = $request->bare_shaft_price;
+                //                    $scpCart->is_bare_manual = $request->is_bare_shaft_price_manual;
+                //
+                                   //Asscesories
+                                   $scpCart->accesories_price = $request->acessories_price;
+                                   $scpCart->is_accesories_manual = $request->is_acessories_price_manual;
+                //
+                //                    //Assembly Charge
+                //
+                //                    $scpCart->assembly_charge = $getAssemblyPrice['assembly_charge'];
+                //                    $scpCart->painting_charge = $getAssemblyPrice['painting_charge'];
+                //                    $scpCart->packing_charge = $getAssemblyPrice['packing_charge'];
+                //                    //Shiiping Cost
+                //                    $scpCart->shipping_cost_price = ($request->bare_shaft_price + $request->acessories_price) * $shippingPercentage;
+                //                    $scpCart->shipping_cost_percentage = $shippingPercentage;
+                //                    $scpCart->overhead_price = $overHead;
+                //                    $scpCart->inter_company_margin_price = $interCompanyMargin;
                     $scpCart->inter_company_margin_price = $interCompanyMargin;
                     $scpCart->price = $request->total_price;
                     $scpCart->total_price = $request->total_price;
@@ -882,11 +800,14 @@ class ScpController extends Controller {
                 'adderData' => $adderData,
                 'cartId' => $cartId,
                 'is_manual' => $is_manual ?? 0,
+                // 'atmosBOMitems' => $atmosBOMitems,
                 'scpCart' => $scpCart,
                 'motor_price' => $motor_price,
                 'scp_master_motor_prices_item_desc' => $scp_master_motor_prices_item_desc,
                 'scp_master_motor_prices_article_number' => $scp_master_motor_prices_article_number,
                 'article_number' =>  $article_number,
+                // 'otpMargin' => $otpMargin,
+                // 'atmosBOMitemsSupervisor' => $atmosBOMitemsSupervisor,
             ];
         }
         return view('frontend.scp_pump.items', compact('items', 'adderData','cartId','is_manual'));
@@ -969,94 +890,74 @@ class ScpController extends Controller {
         if($scpCartData)
         {
             $interCompanyMargin = User::ic_margin_scp(); // This is temporary 
-
             $scpPrice = 0.00;
             $optionalPrice = 0.00; //Adders Code.
-
             $motor_price = DB::table('scp_master_motor_prices')
-                            ->where('power','=',$scpCartData->power)
-                            ->where('no_of_pole','=',$scpCartData->no_of_pole)
-                            ->where('voltage','=',$scpCartData->voltage)
-                            ->where('frequency','=',$scpCartData->frequency)
-                            ->where('efficiency','=',$scpCartData->efficiency)
-                            ->where('frame_size','=',$scpCartData->frame_size)
-                            ->first();
-
+            ->where('power','=',$scpCartData->power)
+            ->where('no_of_pole','=',$scpCartData->no_of_pole)
+            ->where('voltage','=',$scpCartData->voltage)
+            ->where('frequency','=',$scpCartData->frequency)
+            ->where('efficiency','=',$scpCartData->efficiency)
+            ->where('frame_size','=',$scpCartData->frame_size)
+            ->first();
             if($motor_price)
             {
                 $setup_field = DB::table('setup_fields')->where('name','=','scp_adder_code_no_4')->first();
                 $enclousreAdderItemData = null;
                 if($scpCartData->adder_ids && $scpCartData->adder_ids != '') {
-                    $explode_ids = explode(",",$scpCartData->adder_ids);
-                    $total_adders_price = 0.00;
-                    $adder_id_one_price = 0.00;
-                    $adder_id_two_price = 0.00;
-                    $adder_id_three_price = 0.00;
-                    $adder_id_four_price = 0.00;
+                $explode_ids = explode(",",$scpCartData->adder_ids);
+                $total_adders_price = 0.00;
+                $adder_id_one_price = 0.00;
+                $adder_id_two_price = 0.00;
+                $adder_id_three_price = 0.00;
+                $adder_id_four_price = 0.00;
 
-                    foreach($explode_ids as $key=>$value)
-                    {
-                            if($value == "1")
-                            {
-                                $adder_id_one_price = $motor_price->forwinding;
-                            }
-                            if($value == "2")
-                            {
-                                $adder_id_two_price = $motor_price->forbearing;
-                            }
-                            if($value == "3")
-                            {
-                                $adder_id_three_price = $motor_price->space_heater;
-                            }
-                            if($value == "4")
-                            {
-                                $adder_id_four_price = $setup_field->value;
-                            }
-                    }
-                    $total_adders_price = $adder_id_one_price + $adder_id_two_price + $adder_id_three_price + $adder_id_four_price;
+                foreach($explode_ids as $key=>$value)
+                {
+                        if($value == "1")
+                        {
+                            $adder_id_one_price = $motor_price->forwinding;
+                        }
+                        if($value == "2")
+                        {
+                            $adder_id_two_price = $motor_price->forbearing;
+                        }
+                        if($value == "3")
+                        {
+                            $adder_id_three_price = $motor_price->space_heater;
+                        }
+                        if($value == "4")
+                        {
+                            $adder_id_four_price = $setup_field->value;
+                        }
                 }
-                else{                    
+                $total_adders_price = $adder_id_one_price + $adder_id_two_price + $adder_id_three_price + $adder_id_four_price;
+                }
+                else{
                     $total_adders_price = 0.00;
                 }
+				//dd($total_adders_price);
                 $overHead = ScpPumpType::scp_over_head(); //This $overHead can be editable by admin
                 $assemblyPrice = $scpCartData->assembly_charge + $scpCartData->painting_charge + $scpCartData->packing_charge;
                 $shippingPercentage = ScpPumpType::scp_shipping_percentage() / 100; //This percentage can be editable by admin
                 $shippingCost =($scpCartData->bare_pump_price + $scpCartData->accesories_price) * $shippingPercentage;
-
-                // dd('bare_pump_price: '.$scpCartData->bare_pump_price,
-                // 'accesories_price: '.$scpCartData->accesories_price,
-                // 'shippingPercentage: '.$shippingPercentage,
-                // 'shippingCost: '.$shippingCost);
                
                 if($scpCartData->application == "1")
                 {
                     $motor_price = $motor_price->price;
-                }elseif($scpCartData->application == "2"){
+                }
+                elseif($scpCartData->application == "2"){
                     $motor_price = $motor_price->price + $motor_price->insulate_bearing;
-                }else{
+                }
+                else{
                     $motor_price = $motor_price->price;
                 }
-                $scpPrice = ((($scpCartData->bare_pump_price 
-                            + $scpCartData->accesories_price 
-                            + $motor_price 
-                            + $total_adders_price 
-                            + $assemblyPrice) * $overHead) + $shippingCost ) / $interCompanyMargin;
-
-                // dd('bare_pump_price: '.$scpCartData->bare_pump_price,
-                // 'accesories_price: '.$scpCartData->accesories_price,
-                // 'motor_price: '.$motor_price,
-                // 'total_adders_price: '.$total_adders_price,
-                // 'assemblyPrice: '.$assemblyPrice,
-                // 'overHead: '.$overHead,
-                // 'shippingCost: '.$shippingCost,
-                // 'interCompanyMargin: '.$interCompanyMargin,
-                // 'Total scpPrice: '.$scpPrice);
-
+                $scpPrice = ((($scpCartData->bare_pump_price + $scpCartData->accesories_price + $motor_price + $total_adders_price + $assemblyPrice) * $overHead) + $shippingCost ) / $interCompanyMargin;
                 $returnHTML = view('frontend.atmos_giga.table')->with('pumpName', $scpCartData->pump_name)
-                                ->with('price', $scpPrice)
-                                ->with('motor_power', $scpCartData->power)
-                                ->with('motor_brand', $scpCartData->brand)
-                                ->render();
+                ->with('price', $scpPrice)
+                ->with('motor_power', $scpCartData->power)
+                ->with('motor_brand', $scpCartData->brand)
+                ->render();
                 $data['cp_records_html'] = $returnHTML;
                 $data['motor_power'] = $scpCartData->power;
                 $data['pump_model'] = $scpCartData->pump_model;

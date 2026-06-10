@@ -22,17 +22,14 @@ use App\Models\Country;
 use Illuminate\Support\Arr;
 use App\Models\AtmosCart;
 use App\Models\ScpCart;
-use App\Models\ScpvCart; // A Code: 23-02-2026
 use App\Models\ControlPanelCart;
 use App\Models\FirefightingCart;
 use App\AtmosPump;
 use App\ScpPumpType;
-use App\ScpvPumpType; // A Code: 23-02-2026
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Response;
 use App\Http\Controllers\Frontend\AtmosGigaController;
 use App\Http\Controllers\Frontend\ScpController;
-use App\Http\Controllers\Frontend\ScpvController; // A Code: 23-02-2026
 use App\Http\Controllers\Frontend\BoosterSetController;
 use App\Http\Controllers\Frontend\ControlpanelController;
 use App\Http\Controllers\Frontend\CPCartController;
@@ -57,10 +54,11 @@ class BOMSummaryController extends Controller
                 'user.country:id,country',
                 'customer:id,name,project_name,project_location,country',
                 'boosterCart:id,full_article_number,pump_type,supply_voltage,total_price,qty,price,inter_company_margin,model_no,booster_overhead',
+
                 'atmosCart:id,full_article_number,pump_name,brand,power,qty,price,total_price,inter_company_margin_price,overhead_price,assembly_charge,painting_charge,packing_charge',
+
                 'scpCart:id,full_article_number,pump_name,brand,power,qty,price,total_price,inter_company_margin_price,overhead_price,assembly_charge,painting_charge,packing_charge',
-                // A Code: 23-02-2026
-                'scpvCart:id,full_article_number,pump_name,brand,power,qty,price,total_price,inter_company_margin_price,overhead_price,assembly_charge,painting_charge,packing_charge',
+
                 'controlPanelCart:id,full_article_number,article_number,qty,price,total_price,intercompany_margin,overhead',
                 'firefightingCart:id,full_article_number,qty,price,total_price,inter_company_margin_price,pump_models,overhead_price',
             ]);
@@ -100,14 +98,7 @@ class BOMSummaryController extends Controller
                 })->orWhere(function ($subQ) use ($articleNumber) {
                     $subQ->where('cart_model_name', 'scp')
                          ->whereHas('scpCart', fn($sub) => $sub->where('full_article_number', $articleNumber));
-                })
-                // A Code: 23-02-2026 Start
-                ->orWhere(function ($subQ) use ($articleNumber) {
-                    $subQ->where('cart_model_name', 'scpv')
-                         ->whereHas('scpvCart', fn($sub) => $sub->where('full_article_number', $articleNumber));
-                })
-                // A Code: 23-02-2026 End
-                ->orWhere(function ($subQ) use ($articleNumber) {
+                })->orWhere(function ($subQ) use ($articleNumber) {
                     $subQ->where('cart_model_name', 'controlPanel')
                          ->whereHas('controlPanelCart', fn($sub) => $sub->where('full_article_number', $articleNumber));
                 })->orWhere(function ($subQ) use ($articleNumber) {
@@ -194,8 +185,7 @@ class BOMSummaryController extends Controller
                                             ($quotation->atmosCart->painting_charge ?? 0) +
                                             ($quotation->atmosCart->packing_charge ?? 0);
 
-            }            
-            else if($quotation->cart_model_name == 'scp'){
+            }else if($quotation->cart_model_name == 'scp'){
                 $articleNo = $quotation->scpCart->full_article_number ?? '-';           
                 $description = $quotation->scpCart->pump_name ?? '-';
                 $qty = $quotation->scpCart->qty ?? 0;
@@ -208,24 +198,7 @@ class BOMSummaryController extends Controller
                                             ($quotation->scpCart->painting_charge ?? 0) +
                                             ($quotation->scpCart->packing_charge ?? 0);
 
-            }
-            // A Code: 23-02-2026 Start
-            else if($quotation->cart_model_name == 'scpv'){
-                $articleNo = $quotation->scpvCart->full_article_number ?? '-';           
-                $description = $quotation->scpvCart->pump_name ?? '-';
-                $qty = $quotation->scpvCart->qty ?? 0;
-                $unitPrice = $quotation->scpvCart->price ?? 0;
-                $totalPrice = $quotation->scpvCart->total_price ?? 0;
-                $interMargin = $quotation->scpvCart->inter_company_margin_price ?? 0;
-                $overhead = $quotation->scpvCart->overhead_price ?? 0;
-                $cart_id = $quotation->scpvCart->id ?? '-';
-                $bomLabourCostAndCharges += ($quotation->scpvCart->assembly_charge ?? 0) +
-                                            ($quotation->scpvCart->painting_charge ?? 0) +
-                                            ($quotation->scpvCart->packing_charge ?? 0);
-
-            }
-            // A Code: 23-02-2026 End            
-            else if($quotation->cart_model_name == 'controlpanel'){
+            }else if($quotation->cart_model_name == 'controlpanel'){
                 $articleNo = $quotation->controlPanelCart->full_article_number ?? '-';              
                 $description = $quotation->controlPanelCart->article_number ?? '-';
                 $qty = $quotation->controlPanelCart->qty ?? 0;
@@ -297,7 +270,7 @@ class BOMSummaryController extends Controller
         ]);
     }
 
-    // A Code: 22-09-2025 Start
+    // Alpesh Maru Date : 22-09-2025 Export Code Start
     public function exportCSV(Request $request)
     {
         // Start base query
@@ -317,8 +290,6 @@ class BOMSummaryController extends Controller
                 'boosterCart:id,full_article_number,pump_type,supply_voltage,total_price,qty,price,inter_company_margin,model_no,booster_overhead',
                 'atmosCart:id,full_article_number,pump_name,brand,power,qty,price,total_price,inter_company_margin_price,overhead_price,assembly_charge,painting_charge,packing_charge',
                 'scpCart:id,full_article_number,pump_name,brand,power,qty,price,total_price,inter_company_margin_price,overhead_price,assembly_charge,painting_charge,packing_charge',
-                // A Code: 24-02-2026
-                'scpvCart:id,full_article_number,pump_name,brand,power,qty,price,total_price,inter_company_margin_price,overhead_price,assembly_charge,painting_charge,packing_charge',
                 'controlPanelCart:id,full_article_number,article_number,qty,price,total_price,intercompany_margin,overhead',
                 'firefightingCart:id,full_article_number,qty,price,total_price,inter_company_margin_price,pump_models,overhead_price',
             ]);
@@ -349,18 +320,10 @@ class BOMSummaryController extends Controller
                 })->orWhere(function ($subQ) use ($articleNumber) {
                     $subQ->where('cart_model_name', 'atmos')
                          ->whereHas('atmosCart', fn($sub) => $sub->where('full_article_number', $articleNumber));
-                })
-                ->orWhere(function ($subQ) use ($articleNumber) {
+                })->orWhere(function ($subQ) use ($articleNumber) {
                     $subQ->where('cart_model_name', 'scp')
                          ->whereHas('scpCart', fn($sub) => $sub->where('full_article_number', $articleNumber));
-                })
-                // A Code: 23-02-2026 Start
-                ->orWhere(function ($subQ) use ($articleNumber) {
-                    $subQ->where('cart_model_name', 'scpv')
-                         ->whereHas('scpvCart', fn($sub) => $sub->where('full_article_number', $articleNumber));
-                })
-                // A Code: 23-02-2026 End
-                ->orWhere(function ($subQ) use ($articleNumber) {
+                })->orWhere(function ($subQ) use ($articleNumber) {
                     $subQ->where('cart_model_name', 'controlPanel')
                          ->whereHas('controlPanelCart', fn($sub) => $sub->where('full_article_number', $articleNumber));
                 })->orWhere(function ($subQ) use ($articleNumber) {
@@ -470,8 +433,7 @@ class BOMSummaryController extends Controller
                                             ($quotation->atmosCart->painting_charge ?? 0) +
                                             ($quotation->atmosCart->packing_charge ?? 0);
 
-                }
-                else if($quotation->cart_model_name == 'scp'){
+                }else if($quotation->cart_model_name == 'scp'){
 
                     $cart = $quotation->scpCart;
 
@@ -487,27 +449,7 @@ class BOMSummaryController extends Controller
                                             ($quotation->scpCart->painting_charge ?? 0) +
                                             ($quotation->scpCart->packing_charge ?? 0);
 
-                }
-                // A Code: 23-02-2026 Start
-                else if($quotation->cart_model_name == 'scpv'){
-
-                    $cart = $quotation->scpvCart;
-
-                    $articleNo   = $cart?->full_article_number ?? null;
-                    $description = $cart?->pump_name ?? null;
-                    $qty         = $cart?->qty ?? 0;
-                    $unitPrice   = $cart?->price ?? 0;
-                    $totalPrice  = $cart?->total_price ?? 0;
-                    $interMargin = $cart?->inter_company_margin_price ?? 0;
-                    $overhead    = $cart?->overhead_price ?? 0;
-
-                    $bomLabourCostAndCharges += ($quotation->scpvCart->assembly_charge ?? 0) +
-                                            ($quotation->scpvCart->painting_charge ?? 0) +
-                                            ($quotation->scpvCart->packing_charge ?? 0);
-
-                }
-                // A Code: 23-02-2026 End              
-                else if($quotation->cart_model_name == 'controlpanel'){  
+                }else if($quotation->cart_model_name == 'controlpanel'){  
 
                     $cart = $quotation->controlPanelCart;
 
@@ -588,7 +530,7 @@ class BOMSummaryController extends Controller
 
         return Response::stream($callback, 200, $headers);
     }
-    // A Code: 22-09-2025 End
+    // Alpesh Maru Date : 22-09-2025 Export Code End
 
     private function extractControlPanelBOMChargesAndCosts($bom)
     {
@@ -749,21 +691,6 @@ class BOMSummaryController extends Controller
         }
         return $article;
     }
-
-    // A Code: 23-02-2026 Start
-    public static function scpv_pump_article_number($pump_name)
-    {
-        $article = ScpvPumpType::select('bare_shaft_article_number')
-            ->where('name', '=', $pump_name)
-            ->first();
-        if ($article) {
-            $article = $article->bare_shaft_article_number;
-        } else {
-            $article = '-';
-        }
-        return $article;
-    }
-    // A Code: 23-02-2026 End
 
     public static function cp_table_name($cp_id)
     {

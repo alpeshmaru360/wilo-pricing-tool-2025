@@ -7,12 +7,14 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('/dashboard', 'HomeController@index')->name('home');
 
     Route::resource('bom_summary', 'BOMSummaryController');
+    //Route::get('bom_summary', 'BOMSummaryController@index');
+
     Route::post('bom_summary/filter', 'BOMSummaryController@index')->name('BOMSummaryFilter');
     Route::post('bom_summary/export-csv', 'BOMSummaryController@exportCSV')->name('BOMSummaryExportCsv');
   
     // For add and show the country
 	Route::get('country/show', 'CountryController@show_country');
-    Route::post('country/add_country', 'CountryController@add_country');
+    Route::post('country/add_country', 'CountryController@add_country');    
 
     Route::post('country/edit_country', 'CountryController@edit_country');
     Route::delete('country/delete_country', 'CountryController@delete_country');
@@ -39,12 +41,6 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('atmos_giga', 'HomeController@atmos_giga')->name('atmos_giga');
     Route::get('control_panel', 'HomeController@control_panel')->name('control_panel');
     Route::get('scp_pumps', 'HomeController@scp_pumps')->name('scp_pumps');
-
-    // A Code: 06-11-2025 Start
-    Route::get('scpv_pumps', 'HomeController@scpv_pumps')->name('scpv_pumps');
-    Route::post('scpv_t_tip', 'HomeController@scpv_t_tip')->name('scpv_t_tip');
-    // A Code: 06-11-2025 End
-
     Route::post('save_control_panel_tool_tip', 'HomeController@save_control_panel_tool_tip')->name('save_control_panel_tool_tip');
     Route::post('scp_t_tip', 'HomeController@scp_t_tip')->name('scp_t_tip');
     Route::post('giga', 'HomeController@giga')->name('giga');
@@ -85,23 +81,21 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     //Master Price Sheet Import
     Route::get('master-price-file-import', 'MasterPriceFileImportController@import');
+
     Route::post('upload/master', 'MasterPriceFileImportController@upload')->name('master.price.upload');
     
     //Control Panel main file import
-    Route::get('cp/control-panel-import', 'CPBasicController@import');
+     Route::get('cp/control-panel-import', 'CPBasicController@import');
+
     Route::post('cp/upload/main-file-upload', 'CPBasicController@upload')->name('cp.main.upload');
-
-    // A Code: 05-03-2026 Start
-    Route::get('cp/short-control-panel-import', 'CPBasicController@import_short');
-    Route::post('cp/upload/short-file-upload', 'CPBasicController@upload_short')->name('cp.short.upload');
-    // A Code: 05-03-2026 End
-
     //AdderOptionalImportControllerImport
     Route::get('adder-optional-file-import', 'AdderOptionalImportController@import');
+
     Route::post('upload/adder-optional-upload', 'AdderOptionalImportController@upload')->name('adder.optional.upload');
     Route::get('/create-table-csv-upload', 'CreateTableCsvFileController@index');
 
     Route::get('adder-optional-list-file-import', 'AdderOptionalListImportController@import');
+
     Route::post('upload/adder-optional-list-upload', 'AdderOptionalListImportController@upload')->name('adder.optional.upload');
 
     /* Start Atmos GIGA Import */
@@ -153,19 +147,16 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('booster/pump-price/full-pump-price-import', 'BoosterPumpPriceFileImportController@importFullPumpPrice');
     Route::post('booster/pump-price/full-pump-price-upload', 'BoosterPumpPriceFileImportController@uploadFullPumpPrice')->name('booster.full_pump_price.upload');
 
-    /* Start SCPV Import */
-    Route::get('scpv/pump-type-import', 'ScpvFileImportController@pumpTypeImport')->name('scpv.pumptype.import.view');
-    Route::post('scpv/pump-type/upload', 'ScpvFileImportController@pumpTypeImportUpload')->name('scpv.pumptype.import.upload');
+    // SCVP
 
-    Route::get('scpv/accessories-import', 'ScpvFileImportController@importAccessories')->name('scpv.accessories.import.view');
-    Route::post('scpv/accessories/upload', 'ScpvFileImportController@importAccessoriesUpload')->name('scpv.accessories.import.upload');
+    Route::get('scvp/accessories-import', 'SCVPFileImportController@importAccessories')->name('scvp.accessories.import.view');
+    Route::post('scvp/accessories/upload', 'SCVPFileImportController@importAccessoriesUpload')->name('scvp.accessories.import.upload');
 
-    Route::get('scpv/master-import', 'ScpvFileImportController@masterPriceImport')->name('scpv.master.import.view');
-    Route::post('scpv/master/upload', 'ScpvFileImportController@masterPriceImportUpload')->name('scpv.master.import.upload');
+    Route::get('scvp/master-import', 'SCVPFileImportController@masterPriceImport')->name('scvp.master.import.view');
+    Route::post('scvp/master/upload', 'SCVPFileImportController@masterPriceImportUpload')->name('scvp.master.import.upload');
 
-    Route::get('scpv/cost-paint-pack-import', 'ScpvFileImportController@costPaintPackImport')->name('scpv.costpaint.import.view');
-    Route::post('scpv/cost-paint-pack-import/upload', 'ScpvFileImportController@costPaintPackImportUpload')->name('scpv.master.costpaint.upload');
-    /* End SCPV Import */
+    Route::get('scvp/cost-paint-pack-import', 'SCVPFileImportController@costPaintPackImport')->name('scvp.costpaint.import.view');
+    Route::post('scvp/cost-paint-pack-import/upload', 'SCVPFileImportController@costPaintPackImportUpload')->name('scvp.master.costpaint.upload');
 
     //Booster 
 

@@ -49,15 +49,6 @@ class CountryController extends Controller
       $scp_margin->country_id = $country->id;
       $scp_margin->save();
 
-      // A Code: 02-03-2026 Start
-      $scpv_margin = new ICMargin;
-      $scpv_margin->country = $request->country_name;
-      $scpv_margin->value = 0.9;
-      $scpv_margin->part_id = 6;
-      $scpv_margin->country_id = $country->id;
-      $scpv_margin->save();
-      // A Code: 02-03-2026 End
-
       $atmos_margin = new ICMargin;
       $atmos_margin->country = $request->country_name;
       $atmos_margin->value = 0.9;
@@ -65,7 +56,7 @@ class CountryController extends Controller
       $atmos_margin->country_id = $country->id;
       $atmos_margin->save();
 	  
-	  $fire_fighting_margin = new ICMargin;
+	    $fire_fighting_margin = new ICMargin;
       $fire_fighting_margin->country = $request->country_name;
       $fire_fighting_margin->value = 0.9;
       $fire_fighting_margin->part_id = 5;
@@ -91,7 +82,6 @@ class CountryController extends Controller
       }
       return redirect()->back()->with('error', 'Country not found. Please try again.');
   }
-  
   public function delete_country(Request $request)
   {
       try {
@@ -102,4 +92,5 @@ class CountryController extends Controller
           return redirect()->back()->with('error', 'Failed to delete country. Please try again.');
       }
   }
+
 }

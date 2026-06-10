@@ -17,7 +17,6 @@ use App\Models\FireFighting\FireFightingCarts;
 use App\AtmosCart;
 use App\AtmosItem;
 use App\ScpCart;
-use App\ScpvCart; // A Code: 26-02-2026
 use App\Models\BoosterCart;
 use App\Exports\QuotationExcel;
 use Excel;
@@ -30,7 +29,6 @@ class PDFController extends Controller {
         $ids = [];
         $atmosIds = [];
         $scpIds = [];
-        $scpvIds = []; // A Code: 26-02-2026
         $boosterIds = [];
 		$firefightingIds = [];
 
@@ -42,15 +40,10 @@ class PDFController extends Controller {
             if ($quotation->cart_model_name == 'atmos') {
                 $atmosIds[] = $quotation->cp_cart_id;
             }
-            if ($quotation->cart_model_name == 'scp') {
+             if ($quotation->cart_model_name == 'scp') {
                 $scpIds[] = $quotation->cp_cart_id;
             }
-            // A Code: 26-02-2026 Start
-            if ($quotation->cart_model_name == 'scpv') {
-                $scpvIds[] = $quotation->cp_cart_id;
-            }
-            // A Code: 26-02-2026 End
-            if ($quotation->cart_model_name == 'booster') {
+              if ($quotation->cart_model_name == 'booster') {
                 $boosterIds[] = $quotation->cp_cart_id;
             }
 			if ($quotation->cart_model_name == 'firefighting') {
@@ -80,19 +73,19 @@ class PDFController extends Controller {
                 ->get();
         $atmosCartData = AtmosCart::cartDataByQuotation($atmosIds);
         $scpCartData = ScpCart::cartDataByQuotation($scpIds);
-        $scpvCartData = ScpvCart::cartDataByQuotation($scpvIds); // A Code: 26-02-2026
         $boosterCartData = BoosterCart::cartDataByQuotation($boosterIds);
         $firefightingCartData = FireFightingCarts::cartDataByQuotation($firefightingIds);
         
         $isPDF = true;
-        $pdf = PDF::loadView('frontend.pdf.quotation_pdf', compact('quotations', 'quotations_revision_no', 'customer', 'controlPanelCartData', 'atmosCartData', 
-        'scpCartData', 'scpvCartData', 'boosterCartData', 'firefightingCartData')); // A Code: 26-02-2026
+        $pdf = PDF::loadView('frontend.pdf.quotation_pdf', compact('quotations','quotations_revision_no', 'customer', 'controlPanelCartData', 'atmosCartData','scpCartData','boosterCartData','firefightingCartData'));
         $pdf->getDomPDF()->set_option("enable_php", true);
         $pdfName = 'quotation_' . Carbon::now()->format('m/d/Y h:i:s') . '.pdf';
         return $pdf->stream($pdfName);
     }
 
-    public function controlPanelQuotationExcel($quotation_no) {
+
+
+  public function controlPanelQuotationExcel($quotation_no) {
         $excel_file = 'quotation_' . Carbon::now()->format('m-d-Y h:i:s') . '.xlsx';
         return Excel::download(new QuotationExcel($quotation_no),$excel_file);
     }

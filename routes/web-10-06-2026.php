@@ -64,23 +64,7 @@ Route::group(['namespace' => 'Frontend', 'middleware' => ['auth', 'user']], func
     Route::get('scp/item/delete', 'QuotationController@deleteSCPItemFromEditQuotation')->name('deleteSCPItemFromEditQuotation');
 
     // SCPV
-    Route::get('/scpv_pump', 'ScpvController@index')->name('scpv.index');
-    // A Code: 03-11-2025 Start
-    Route::post('/scpv_price', 'ScpvController@get_price')->name('scpv.price');
-    Route::post('/get_scpv_frame', 'ScpvController@get_frame')->name('scpv.get_frame');
-    Route::post('/get_scpv_accessories', 'ScpvController@get_accessories')->name('scpv.get_accessories');
-    Route::post('/get_scpv_motor_price', 'ScpvController@get_motor_price')->name('scpv.get_motor_price');
-
-    Route::post('/scpv/ajax-optional-modal', 'ScpvController@ajaxOptionalModal');
-    Route::post('/scpv/ajax-optional-selected-adder', 'ScpvController@ajaxOptionalSelectedAdderData');
-    Route::get('/scpv/ajaxCalculate', 'ScpvController@ajaxCalculate');
-    Route::post('/scpv/addtocart', 'ScpvController@addToCart')->name('scpv.addtocart');
-    Route::get('/scpv/remove-cart/{id}', 'ScpvController@removeCart')->name('scpv.removecart');
-    Route::get('/scpv/ajax-qty-update', 'ScpvController@ajaxQtyUpdate');
-    Route::get('/scpv/cart-item/{id}', 'ScpvController@cartItems');
-    Route::get('/scpv/search-article-number', 'ScpvController@searchByArticleNumber')->name('scpv.searchbyarticle');
-    Route::get('scpv/item/delete', 'QuotationController@deleteSCPVItemFromEditQuotation')->name('deleteSCPVItemFromEditQuotation');
-    // A Code: 03-11-2025 End
+    Route::get('/scpv_pump', 'SCVPController@index')->name('scvp.index');
 
     //SCH Pump
     Route::get('/sch_pump', 'schController@index_home')->name('sch.pump');
@@ -99,7 +83,6 @@ Route::group(['namespace' => 'Frontend', 'middleware' => ['auth', 'user']], func
     //Route::get('/controlpanel/ajax-detail-modal-cp', 'CPCartController@controlpanel/customer-information');
     Route::get('/controlpanel/ajax-detail-modal-cp', 'CPCartController@ajaxDetailModalControlPanel');
     Route::get('/scp/ajax-detail-modal-scp', 'ScpController@ajaxDetailModalScp');
-    Route::get('/scpv/ajax-detail-modal-scpv', 'ScpvController@ajaxDetailModalScpv'); // A Code: 18-02-2026
     Route::get('/atmos/ajax-detail-modal-atmos', 'AtmosGigaController@ajaxDetailModalAtmos');
     Route::get('/booster/ajax-detail-modal-booster', 'BoosterSetController@ajaxDetailModalBooster');
 
@@ -143,9 +126,11 @@ Route::group(['namespace' => 'Frontend', 'middleware' => ['auth', 'user']], func
     Route::get('/controlPanel-set-by-quotation/{quotation_number}', 'ControlpanelController@index')->name('controlPanelsetByQuotation');
     Route::get('/scp_pump-set-by-quotation/{quotation_number}', 'ScpController@index')->name('scpsetByQuotation');
     Route::get('/atmos_giga-set-by-quotation/{quotation_number}', 'AtmosGigaController@index')->name('atmos_gigaByQuotation');
-    //add items with quotation number routes ends
 
+    //add items with quotation number routes ends
 });
+
+
 
 // Route::get('change-password', 'ChangePasswordController@index');
 // Route::post('change-password', 'ChangePasswordController@store')->name('change.password');
