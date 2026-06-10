@@ -1,19 +1,20 @@
 <style type="text/css">
-    .nav-link, nav-link i{font-size: 15px !important;}
-    .nav-sidebar .nav.nav-treeview{margin-left:8px;}
+    .nav-link, nav-link i{
+        font-size: 15px !important;
+    }
 </style>
 <nav class="mt-2">
     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 
         <li class="nav-item">
-            <a href="{{ route('admin.home') }}" class="nav-link {{ request()->is(['admin','admin/dashboard']) ? 'active' : '' }}">
+            <a href="{{ route("admin.home") }}" class="nav-link {{ request()->is('admin') ? 'active' : '' }}">
                <i class="nav-icon fas fa-tachometer-alt"></i>
                 {{ trans('global.dashboard') }}
             </a>
         </li>
 
         <li class="nav-item">
-            <a href="{{ url('admin/bom_summary') }}" class="nav-link {{ request()->is('admin/bom_summary') ? 'active' : '' }}">
+            <a href="{{ url('admin/bom_summary') }}" class="nav-link">
                 <i class="nav-icon fas fa-sign-out-alt"></i>
                 BOM summary
             </a>
@@ -29,19 +30,19 @@
             </a>
             <ul class="nav nav-treeview">
                 <li class="nav-item">
-                    <a href="{{ route('admin.permissions.index') }}" class="nav-link {{ request()->is('admin/permissions') || request()->is('admin/permissions/*') ? 'active' : '' }}">
+                    <a href="{{ route("admin.permissions.index") }}" class="nav-link {{ request()->is('admin/permissions') || request()->is('admin/permissions/*') ? 'active' : '' }}">
                        <i class="far fa-circle nav-icon"></i>
                         {{ trans('global.permission.title') }}
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('admin.roles.index') }}" class="nav-link {{ request()->is('admin/roles') || request()->is('admin/roles/*') ? 'active' : '' }}">
+                    <a href="{{ route("admin.roles.index") }}" class="nav-link {{ request()->is('admin/roles') || request()->is('admin/roles/*') ? 'active' : '' }}">
                        <i class="far fa-circle nav-icon"></i>
                         {{ trans('global.role.title') }}
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->is('admin/users') || request()->is('admin/users/*') ? 'active' : '' }}">
+                    <a href="{{ route("admin.users.index") }}" class="nav-link {{ request()->is('admin/users') || request()->is('admin/users/*') ? 'active' : '' }}">
                        <i class="far fa-circle nav-icon"></i>
                         {{ trans('global.user.title') }}
                     </a>
@@ -50,14 +51,14 @@
         </li>
 		
         <li class="nav-item">
-            <a href="{{ url('admin/country/show') }}" class="nav-link  {{ request()->is(['admin/country/show']) ? 'active' : '' }}">
+            <a href="{{ url('admin/country/show') }}" class="nav-link">
                 <i class="nav-icon fas fa-sign-out-alt"></i>
                 Country
             </a>
         </li>
 
-        <li class="nav-item {{ request()->is(['admin/atmos-giga/*']) ? 'menu-open' : '' }}">
-            <a href="#" class="nav-link {{ request()->is(['admin/atmos-giga/*']) ? 'active' : '' }}">
+        <li class="nav-item {{ request()->is(['admin/permissions','admin/permissions/*','admin/roles','admin/roles/*','admin/users','admin/users/*']) ? 'menu-open' : '' }}">
+            <a href="#" class="nav-link {{ request()->is(['admin/permissions','admin/permissions/*','admin/roles','admin/roles/*','admin/users','admin/users/*']) ? 'active' : '' }}">
                 <i class="nav-icon far fa-user"></i>
                 <p>
                     Atmos GIGA File Import
@@ -65,58 +66,55 @@
                 </p>
             </a>
             <ul class="nav nav-treeview">
+
                 <li class="nav-item">
-                    <a href="{{ route('admin.atmos.pump_assmebly_cost.import.view') }}" 
-                    class="nav-link {{ request()->is(['admin/atmos-giga/pump-assmebly_cost-import']) ? 'active' : '' }}">
+                    <a href="{{ route('admin.atmos.pump_assmebly_cost.import.view') }}" class="nav-link {{ request()->is('admin/permissions') || request()->is('admin/permissions/*') ? 'active' : '' }}">
                        <i class="nav-icon fas fa-sign-out-alt"></i>
                        Pump assmebly cost
                     </a>
                 </li>
+
                 <li class="nav-item">
-                    <a href="{{ route('admin.atmos.pump_bom.import.view') }}" 
-                    class="nav-link {{ request()->is(['admin/atmos-giga/pump-bom-import']) ? 'active' : '' }}">
+                    <a href="{{ route('admin.atmos.pump_bom.import.view') }}" class="nav-link {{ request()->is('admin/permissions') || request()->is('admin/permissions/*') ? 'active' : '' }}">
                        <i class="nav-icon fas fa-sign-out-alt"></i>
                       BOM
                     </a>
                 </li>
+
                 <li class="nav-item">
-                    <a href="{{ route('admin.atmos.pump_master_sheet.import.view') }}" 
-                    class="nav-link {{ request()->is(['admin/atmos-giga/pump-master-sheet-import']) ? 'active' : '' }}">
+                    <a href="{{ route('admin.atmos.pump_master_sheet.import.view') }}" class="nav-link {{ request()->is('admin/permissions') || request()->is('admin/permissions/*') ? 'active' : '' }}">
                        <i class="nav-icon fas fa-sign-out-alt"></i>
                       Pump Master Price
                     </a>
                 </li>
+
                 <li class="nav-item">
-                    <a href="{{ route('admin.atmos.pumptype.import.view') }}" 
-                    class="nav-link {{ request()->is(['admin/atmos-giga/pump-type-import']) ? 'active' : '' }}">
+                    <a href="{{ route('admin.atmos.pumptype.import.view') }}" class="nav-link {{ request()->is('admin/permissions') || request()->is('admin/permissions/*') ? 'active' : '' }}">
                        <i class="nav-icon fas fa-sign-out-alt"></i>
                         Bare Shaft Import
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('admin.atmos.accessories.import.view') }}" 
-                    class="nav-link {{ request()->is(['admin/atmos-giga/accessories-import']) ? 'active' : '' }}">
+                    <a href="{{ route('admin.atmos.accessories.import.view') }}" class="nav-link {{ request()->is('admin/roles') || request()->is('admin/roles/*') ? 'active' : '' }}">
                        <i class="far fa-circle nav-icon"></i>
                        Accessories Import
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('admin.atmos.master.import.view') }}" 
-                    class="nav-link {{ request()->is(['admin/atmos-giga/master-import']) ? 'active' : '' }}">
+                    <a href="{{ route('admin.atmos.master.import.view') }}" class="nav-link {{ request()->is('admin/users') || request()->is('admin/users/*') ? 'active' : '' }}">
                        <i class="far fa-circle nav-icon"></i>
                        Master Import
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a href="{{ route('admin.atmos.costpaint.import.view') }}" 
-                    class="nav-link {{ request()->is(['admin/atmos-giga/cost-paint-pack-import']) ? 'active' : '' }}">
+                 <li class="nav-item">
+                    <a href="{{ route('admin.atmos.costpaint.import.view') }}" class="nav-link {{ request()->is('admin/users') || request()->is('admin/users/*') ? 'active' : '' }}">
                        <i class="far fa-circle nav-icon"></i>
                     Assembly Cost
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a href="{{ route('admin.atmos.adder.import.view') }}" 
-                    class="nav-link {{ request()->is(['admin/atmos-giga/adder-import']) ? 'active' : '' }}">
+
+                   <li class="nav-item">
+                    <a href="{{ route('admin.atmos.adder.import.view') }}" class="nav-link {{ request()->is('admin/users') || request()->is('admin/users/*') ? 'active' : '' }}">
                        <i class="far fa-circle nav-icon"></i>
                   Adder
                     </a>
@@ -124,7 +122,7 @@
             </ul>
         </li>
 
-        <li class="nav-item {{ request()->is(['admin/booster','admin/booster/*']) ? 'menu-open' : '' }}">
+        <li class="nav-item {{ request()->is(['admin/booster','admin/booster/*','admin/booster','admin/booster/*','admin/booster','admin/booster/*']) ? 'menu-open' : '' }}">
             <a href="#" class="nav-link {{ request()->is(['admin/booster','admin/booster/*']) ? 'active' : '' }}">
                 <i class="nav-icon far fa-user"></i>
                 <p>
@@ -137,35 +135,35 @@
                     <a href="#" class="nav-link {{ request()->is(['admin/booster/pump-price','admin/booster/pump-price/*']) ? 'active' : '' }}">
                         <i class="nav-icon far fa-user"></i>
                         <p>
-                            Pump Price                        
-                        </p>
+                            Pump Price                        </p>
+
                         <i class="right fas fa-angle-left"></i>
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{{url('admin/booster/pump-price/full-pump-price-import')}}" 
-                            class="nav-link {{ request()->is(['admin/booster/pump-price/full-pump-price-import','admin/booster/pump-price/full-pump-price-import/*']) ? 'active' : '' }}">
+                            <a href="{{url('admin/booster/pump-price/full-pump-price-import')}}" class="nav-link {{ request()->is(['admin/booster/pump-price/full-pump-price-import','admin/booster/pump-price/full-pump-price-import/*']) ? 'active' : '' }}">
                                 <i class="nav-icon far fa-user"></i>
                                 <p>
                                     Full Pump Price
                                 </p>
                             </a>
+
                         </li>
                         <li class="nav-item">
-                            <a href="{{url('admin/booster/pump-price/bareshaft-pump-motor-price-import')}}" 
-                            class="nav-link {{ request()->is(['admin/booster/pump-price/bareshaft-pump-motor-price-import']) ? 'active' : '' }}">
+                            <a href="{{url('admin/booster/pump-price/bareshaft-pump-motor-price-import')}}" class="nav-link">
                                 <i class="nav-icon far fa-user"></i>
                                 <p>
                                     Bareshaft Pump &<br> Motor Price
                                 </p>
                             </a>
+
                         </li>
                     </ul>
                 </li>
             </ul>
             <ul class="nav nav-treeview">
-                <li class="nav-item {{ request()->is(['admin/booster/mechanical-component','admin/booster/mechanical-component/*','admin/booster/bom-file-import']) ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ request()->is(['admin/booster/mechanical-component','admin/booster/mechanical-component/*','admin/booster/bom-file-import']) ? 'active' : '' }}">
+                <li class="nav-item {{ request()->is(['admin/booster/mechanical-component','admin/booster/mechanical-component/*']) ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->is(['admin/booster/mechanical-component','admin/booster/mechanical-component/*']) ? 'active' : '' }}">
                         <i class="nav-icon far fa-user"></i>
                         <p>
                             Mechanical Component                       </p>
@@ -174,8 +172,7 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{{url('admin/booster/mechanical-component/master-sheet-price-import')}}" 
-                            class="nav-link {{ request()->is(['admin/booster/mechanical-component/master-sheet-price-import','admin/booster/mechanical-component/master-sheet-price-import/*']) ? 'active' : '' }}">
+                            <a href="{{url('admin/booster/mechanical-component/master-sheet-price-import')}}" class="nav-link {{ request()->is(['admin/booster/mechanical-component/master-sheet-price-import','admin/booster/mechanical-component/master-sheet-price-import/*']) ? 'active' : '' }}">
                                 <i class="nav-icon far fa-user"></i>
                                 <p>
                                   Master Sheet Price
@@ -183,8 +180,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{url('admin/booster/mechanical-component/ptp-distance-import')}}" 
-                            class="nav-link {{ request()->is(['admin/booster/mechanical-component/ptp-distance-import','admin/booster/mechanical-component/ptp-distance-import/*']) ? 'active' : '' }}">
+                            <a href="{{url('admin/booster/mechanical-component/ptp-distance-import')}}" class="nav-link {{ request()->is(['admin/booster/mechanical-component/ptp-distance-import','admin/booster/mechanical-component/ptp-distance-import/*']) ? 'active' : '' }}">
                                 <i class="nav-icon far fa-user"></i>
                                 <p>
                                     PTP Distance Sheet
@@ -201,8 +197,7 @@
 
                         {{--</li>--}}
                         <li class="nav-item">
-                            <a href="{{url('admin/booster/bom-file-import')}}" 
-                            class="nav-link {{ request()->is(['admin/booster/bom-file-import']) ? 'active' : '' }}">
+                            <a href="{{url('admin/booster/bom-file-import')}}" class="nav-link">
                                 <i class="nav-icon far fa-user"></i>
                                 <p>
                                     BOM File Import
@@ -233,73 +228,55 @@
             </ul>
         </li>
 
-        <!-- A Code: 05-03-2026 Start -->
-        <li class="nav-item {{ request()->is(['admin/cp/control-panel-import','admin/file-import','admin/master-price-file-import','admin/master-price-file-import',
-        'admin/adder-optional-file-import','admin/adder-optional-list-file-import','admin/cp/short-control-panel-import']) ? 'menu-open' : '' }}">
-            <a href="#" class="nav-link {{ request()->is(['admin/cp/control-panel-import','admin/file-import','admin/master-price-file-import','admin/master-price-file-import',
-            'admin/adder-optional-file-import','admin/adder-optional-list-file-import','admin/cp/short-control-panel-import']) ? 'active' : '' }}">
+        <li class="nav-item {{ request()->is(['admin/cp/control-panel-import/','admin/file-import/','admin//master-price-file-import/','admin/master-price-file-import/','admin/adder-optional-file-import/']) ? 'menu-open' : '' }}">
+            <a href="#" class="nav-link {{ request()->is(['admin/cp/control-panel-import/','admin/file-import/','admin//master-price-file-import/','admin/master-price-file-import/','admin/adder-optional-file-import/']) ? 'active' : '' }}">
                 <i class="nav-icon far fa-user"></i>
                 <p>
                     Control Panel
                     <i class="right fas fa-angle-left"></i>
                 </p>
             </a>
-        <!-- A Code: 05-03-2026 End -->
             
             <ul class="nav nav-treeview">
                 <li class="nav-item">
-                    <a href="{{ url('/admin/cp/control-panel-import') }}" 
-                    class="nav-link {{ request()->is('admin/cp/control-panel-import') ? 'active' : '' }}">
+                    <a href="{{ url('/admin/cp/control-panel-import') }}" class="nav-link {{ request()->is('admin/cp/control-panel-import') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-sign-out-alt"></i>
                        CP File selection Upload/Import
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="{{ url('/admin/file-import') }}" 
-                    class="nav-link {{ request()->is('admin/file-import') ? 'active' : '' }}">
+                    <a href="{{ url('/admin/file-import') }}" class="nav-link {{ request()->is('admin/file-import') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-sign-out-alt"></i>
                        CP  All Components Import
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="{{ url('/admin/master-price-file-import') }}" 
-                    class="nav-link {{ request()->is('admin/master-price-file-import') ? 'active' : '' }}">
+                    <a href="{{ url('/admin/master-price-file-import') }}" class="nav-link {{ request()->is('admin/master-price-file-import') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-sign-out-alt"></i>
                        CP Master Sheet Price Import
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="{{ url('/admin/adder-optional-file-import') }}" 
-                    class="nav-link {{ request()->is('admin/adder-optional-file-import') ? 'active' : '' }}">
+                    <a href="{{ url('/admin/adder-optional-file-import') }}" class="nav-link {{ request()->is('admin/adder-optional-file-import') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-sign-out-alt"></i>
                         CP Electric Adder Code Import
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="{{ url('/admin/adder-optional-list-file-import') }}" 
-                    class="nav-link {{ request()->is('admin/adder-optional-list-file-import') ? 'active' : '' }}">
+                    <a href="{{ url('/admin/adder-optional-list-file-import') }}" class="nav-link {{ request()->is('admin/adder-optional-list-file-import') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-sign-out-alt"></i>
                         CP Adder Optional Components Import
                     </a>
                 </li>
-                <!-- A Code: 05-03-2026 Start -->
-                <li class="nav-item">
-                    <a href="{{ url('/admin/cp/short-control-panel-import') }}" 
-                    class="nav-link {{ request()->is('admin/cp/short-control-panel-import') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-sign-out-alt"></i>
-                        CP Short File Selection Upload/Import
-                    </a>
-                </li>
-                <!-- A Code: 05-03-2026 End -->
             </ul>
         </li>
 
-        <li class="nav-item {{ request()->is(['admin/scp/*']) ? 'menu-open' : '' }}">
-            <a href="#" class="nav-link {{ request()->is(['admin/scp/*']) ? 'active' : '' }}">
+        <li class="nav-item {{ request()->is(['admin/permissions','admin/permissions/*','admin/roles','admin/roles/*','admin/users','admin/users/*']) ? 'menu-open' : '' }}">
+            <a href="#" class="nav-link {{ request()->is(['admin/permissions','admin/permissions/*','admin/roles','admin/roles/*','admin/users','admin/users/*']) ? 'active' : '' }}">
                 <i class="nav-icon far fa-user"></i>
                 <p>
                     SCP File Import
@@ -308,36 +285,32 @@
             </a>
             <ul class="nav nav-treeview">
                 <li class="nav-item">
-                    <a href="{{ route('admin.scp.pumptype.import.view') }}" 
-                    class="nav-link {{ request()->is(['admin/scp/pump-type-import']) ? 'active' : '' }}">
+                    <a href="{{ route("admin.scp.pumptype.import.view") }}" class="nav-link {{ request()->is('admin/permissions') || request()->is('admin/permissions/*') ? 'active' : '' }}">
                        <i class="nav-icon fas fa-sign-out-alt"></i>
                         Bare Shaft Import
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('admin.scp.accessories.import.view') }}" 
-                    class="nav-link {{ request()->is(['admin/scp/accessories-import']) ? 'active' : '' }}">
+                    <a href="{{ route("admin.scp.accessories.import.view") }}" class="nav-link {{ request()->is('admin/roles') || request()->is('admin/roles/*') ? 'active' : '' }}">
                        <i class="far fa-circle nav-icon"></i>
                        Accessories Import
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('admin.scp.master.import.view') }}" 
-                    class="nav-link {{ request()->is(['admin/scp/master-import']) ? 'active' : '' }}">
+                    <a href="{{ route('admin.scp.master.import.view') }}" class="nav-link {{ request()->is('admin/users') || request()->is('admin/users/*') ? 'active' : '' }}">
                        <i class="far fa-circle nav-icon"></i>
                        Master Import
                     </a>
                 </li>
                  <li class="nav-item">
-                    <a href="{{ route('admin.scp.costpaint.import.view') }}" 
-                    class="nav-link {{ request()->is(['admin/scp/cost-paint-pack-import']) ? 'active' : '' }}">
+                    <a href="{{ route('admin.scp.costpaint.import.view') }}" class="nav-link {{ request()->is('admin/users') || request()->is('admin/users/*') ? 'active' : '' }}">
                        <i class="far fa-circle nav-icon"></i>
                     Assembly Cost
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a href="{{ route('admin.scp.adder.import.view') }}" 
-                    class="nav-link {{ request()->is(['admin/scp/adder-import']) ? 'active' : '' }}">
+
+                   <li class="nav-item">
+                    <a href="{{ route('admin.scp.adder.import.view') }}" class="nav-link {{ request()->is('admin/users') || request()->is('admin/users/*') ? 'active' : '' }}">
                        <i class="far fa-circle nav-icon"></i>
                   Adder
                     </a>
@@ -345,51 +318,39 @@
             </ul>
         </li>
 
-        <!-- A Code: 13-02-2026 Start -->
-
-        <!--  SCPV Tool Code starts -->
-        <li class="nav-item {{ request()->is(['admin/scpv/*']) ? 'menu-open' : '' }}">
-            <a href="#" class="nav-link {{ request()->is(['admin/scpv/*']) ? 'active' : '' }}">
+        <!--  SCVP Tool Code starts -->
+         <li class="nav-item {{ request()->is(['admin/permissions','admin/permissions/*','admin/roles','admin/roles/*','admin/users','admin/users/*']) ? 'menu-open' : '' }}">
+            <a href="#" class="nav-link {{ request()->is(['admin/permissions','admin/permissions/*','admin/roles','admin/roles/*','admin/users','admin/users/*']) ? 'active' : '' }}">
                 <i class="nav-icon far fa-user"></i>
                 <p>
-                    SCPV File Import
+                    SCVP File Import
                     <i class="right fas fa-angle-left"></i>
                 </p>
             </a>
-            <ul class="nav nav-treeview"> 
+            <ul class="nav nav-treeview">
                 <li class="nav-item">
-                    <a href="{{ route('admin.scpv.pumptype.import.view') }}" 
-                    class="nav-link {{ request()->is(['admin/scpv/pump-type-import']) ? 'active' : '' }}">
-                       <i class="nav-icon fas fa-sign-out-alt"></i>
-                        Bare Shaft Import
-                    </a>
-                </li>               
-                <li class="nav-item">
-                    <a href="{{ route('admin.scpv.accessories.import.view') }}" 
-                    class="nav-link {{ request()->is(['admin/scpv/accessories-import']) ? 'active' : '' }}">
-                    <i class="far fa-circle nav-icon"></i>
+                    <a href="{{ route("admin.scvp.accessories.import.view") }}" class="nav-link {{ request()->is('admin/roles') || request()->is('admin/roles/*') ? 'active' : '' }}">
+                       <i class="far fa-circle nav-icon"></i>
                        Accessories Import
                     </a>
                 </li>
+
                 <li class="nav-item">
-                    <a href="{{ route('admin.scpv.master.import.view') }}" 
-                    class="nav-link {{ request()->is(['admin/scpv/master-import']) ? 'active' : '' }}">
+                    <a href="{{ route('admin.scvp.master.import.view') }}" class="nav-link {{ request()->is('admin/users') || request()->is('admin/users/*') ? 'active' : '' }}">
                        <i class="far fa-circle nav-icon"></i>
                        Master Import
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a href="{{ route('admin.scpv.costpaint.import.view') }}" 
-                    class="nav-link {{ request()->is(['admin/scpv/cost-paint-pack-import']) ? 'active' : '' }}">
+
+                 <li class="nav-item">
+                    <a href="{{ route('admin.scvp.costpaint.import.view') }}" class="nav-link {{ request()->is('admin/users') || request()->is('admin/users/*') ? 'active' : '' }}">
                        <i class="far fa-circle nav-icon"></i>
                     Assembly Cost
                     </a>
-                </li>                
+                </li>
             </ul>
         </li>
-        <!--  SCPV Tool Code Ends -->
-
-        <!-- A Code: 13-02-2026 End -->
+        <!--  SCVP Tool Code Ends -->
 
         <li class="nav-item {{ request()->is(['admin/fire-fighting/*']) ? 'menu-open' : '' }}">
             <a href="#" class="nav-link {{ request()->is(['admin/fire-fighting*']) ? 'active' : '' }}">
@@ -424,94 +385,96 @@
                 Fire Fighting Document
             </a>
         </li>--}}
-
-        {{--  A Code: 06-11-2025 Start --}}
-        <!-- Inter Country Margin code starts -->
-        @php
-            $routeIsICMargin = request()->routeIs('admin.ic_margin');
-            $partId = request()->get('part_id');
-
-            $isMenuOpen = $routeIsICMargin && in_array($partId, [1, 2, 3, 4, 5, 6]);
-
-            // Define menu items (part_id => Label)
-            $icMarginItems = [
-                2 => 'Inter Country Margin Control Panel',
-                1 => 'Inter Country Margin Booster Set',
-                3 => 'Inter Country Margin SCP',
-                6 => 'Inter Country Margin SCPV',
-                4 => 'Inter Country Margin AtmosGiga',
-                5 => 'Inter Country Margin Fire Fighting'
-            ];
-        @endphp
-
-        <li class="nav-item {{ $isMenuOpen ? 'menu-open' : '' }}">
-            <a href="#" class="nav-link {{ $isMenuOpen ? 'active' : '' }}">
+		
+        <li class="nav-item {{ request()->is(['admin/permissions','admin/permissions/*','admin/roles','admin/roles/*','admin/users','admin/users/*']) ? 'menu-open' : '' }}">
+            <a href="#" class="nav-link {{ request()->is(['admin/permissions','admin/permissions/*','admin/roles','admin/roles/*','admin/users','admin/users/*']) ? 'active' : '' }}">
                 <i class="nav-icon far fa-user"></i>
                 <p>
-                    Inter Country Margin
+                Inter Country Margin
                     <i class="right fas fa-angle-left"></i>
                 </p>
             </a>
-
             <ul class="nav nav-treeview">
-                @foreach($icMarginItems as $id => $label)
-                    <li class="nav-item">
-                        <a href="{{ route('admin.ic_margin', ['part_id' => $id]) }}"
-                           class="nav-link {{ $routeIsICMargin && $partId == $id ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-sign-out-alt"></i>
-                            {{ $label }}
-                        </a>
-                    </li>
-                @endforeach
+            <li class="nav-item">
+                <a href="{{ route('admin.ic_margin') }}?part_id=2" class="nav-link">
+                    <i class="nav-icon fas fa-sign-out-alt"></i>
+                        Inter Country Margin Control Panel
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.ic_margin') }}?part_id=1" class="nav-link">
+                    <i class="nav-icon fas fa-sign-out-alt"></i>
+                        Inter Country Margin Booster Set
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.ic_margin') }}?part_id=3" class="nav-link">
+                    <i class="nav-icon fas fa-sign-out-alt"></i>
+                        Inter Country Margin SCP
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.ic_margin') }}?part_id=4" class="nav-link">
+                    <i class="nav-icon fas fa-sign-out-alt"></i>
+                        Inter Country Margin AtmosGiga
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.ic_margin') }}?part_id=5" class="nav-link">
+                    <i class="nav-icon fas fa-sign-out-alt"></i>
+                        Inter Country Margin Fire Fighting
+                </a>
+            </li>
             </ul>
         </li>
-        <!-- Inter Country Margin code ends -->
 
         <!-- OTP margin code starts -->
-        @php
-            $routeIsOtpMargin = request()->routeIs('admin.otp_margin');
-            $partId = request()->get('part_id');
-            
-            $isMenuOpen = $routeIsOtpMargin && in_array($partId, [1, 2, 3, 4, 5, 6]);
-
-            // Define menu items (part_id => Label)
-            $otpMarginItems = [
-                2 => 'OTP Margin Control Panel',
-                1 => 'OTP Margin Booster Set',
-                3 => 'OTP Margin SCP',
-                6 => 'OTP Margin SCPV',
-                4 => 'OTP Margin AtmosGiga',
-                5 => 'OTP Margin Fire Fighting'
-            ];
-        @endphp
-
-        <li class="nav-item {{ $isMenuOpen ? 'menu-open' : '' }}">
-            <a href="#" class="nav-link {{ $isMenuOpen ? 'active' : '' }}">
+        <li class="nav-item {{ request()->is(['admin/permissions','admin/permissions/*','admin/roles','admin/roles/*','admin/users','admin/users/*']) ? 'menu-open' : '' }}">
+            <a href="#" class="nav-link {{ request()->is(['admin/permissions','admin/permissions/*','admin/roles','admin/roles/*','admin/users','admin/users/*']) ? 'active' : '' }}">
                 <i class="nav-icon far fa-user"></i>
                 <p>
                     OTP Margin
                     <i class="right fas fa-angle-left"></i>
                 </p>
             </a>
-
             <ul class="nav nav-treeview">
-                @foreach($otpMarginItems as $id => $label)
-                    <li class="nav-item">
-                        <a href="{{ route('admin.otp_margin', ['part_id' => $id]) }}"
-                           class="nav-link {{ $routeIsOtpMargin && $partId == $id ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-sign-out-alt"></i>
-                            {{ $label }}
-                        </a>
-                    </li>
-                @endforeach
+                <li class="nav-item">
+                    <a href="{{ route('admin.otp_margin') }}?part_id=2" class="nav-link">
+                        <i class="nav-icon fas fa-sign-out-alt"></i>
+                            OTP Margin Control Panel
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('admin.otp_margin') }}?part_id=1" class="nav-link">
+                        <i class="nav-icon fas fa-sign-out-alt"></i>
+                            OTP Margin Booster Set
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('admin.otp_margin') }}?part_id=3" class="nav-link">
+                        <i class="nav-icon fas fa-sign-out-alt"></i>
+                            OTP Margin SCP
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('admin.otp_margin') }}?part_id=4" class="nav-link">
+                        <i class="nav-icon fas fa-sign-out-alt"></i>
+                            OTP Margin AtmosGiga
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('admin.otp_margin') }}?part_id=5" class="nav-link">
+                        <i class="nav-icon fas fa-sign-out-alt"></i>
+                            OTP Margin Fire Fighting
+                    </a>
+                </li>
             </ul>
         </li>
         <!-- OTP margin code ends -->
-        {{--  A Code: 06-11-2025 End --}}
 
         <!-- Under maintance code starts -->
-        <li class="nav-item {{ request()->is(['admin/maintance_mode/*','admin/maintance_mode']) ? 'menu-open' : '' }}">
-            <a href="#" class="nav-link {{ request()->is(['admin/maintance_mode/*','admin/maintance_mode']) ? 'active' : '' }}">
+        <li class="nav-item {{ request()->is(['admin/maintance_mode/*']) ? 'menu-open' : '' }}">
+            <a href="#" class="nav-link {{ request()->is(['admin/maintance_mode/*']) ? 'active' : '' }}">
                 <i class="nav-icon far fa-user"></i>
                 <p>
                     Under Maintance Mode
@@ -520,88 +483,89 @@
             </a>
             <ul class="nav nav-treeview">
                 <li class="nav-item">
-                    <a href="{{ route('admin.maintance_mode',['lable'=>'atmos_maintance_mode']) }}" 
-                    class="nav-link {{ request()->is('admin/maintance_mode') && request()->query('lable') == 'atmos_maintance_mode' ? 'active' : '' }}">
+                    <a href="{{ route('admin.maintance_mode',['lable'=>'atmos_maintance_mode']) }}" class="nav-link">
                         <i class="nav-icon fas fa-sign-out-alt"></i>
-                        Atmos Giga
+                         Atmos Giga
                     </a>
-                </li>                
+                </li>
+                
                 <li class="nav-item">
-                    <a href="{{ route('admin.maintance_mode',['lable'=>'maintance_mode_booster']) }}"
-                    class="nav-link {{ request()->is('admin/maintance_mode') && request()->query('lable') == 'maintance_mode_booster' ? 'active' : '' }}">
+                    <a href="{{ route('admin.maintance_mode',['lable'=>'maintance_mode_booster']) }}" class="nav-link">
                         <i class="nav-icon fas fa-sign-out-alt"></i>
                          Booster
                     </a>
-                </li>                
+                </li>
+                
                 <li class="nav-item">
-                    <a href="{{ route('admin.maintance_mode',['lable'=>'control_panel_maintance_mode']) }}"
-                    class="nav-link {{ request()->is('admin/maintance_mode') && request()->query('lable') == 'control_panel_maintance_mode' ? 'active' : '' }}">
+                    <a href="{{ route('admin.maintance_mode',['lable'=>'control_panel_maintance_mode']) }}" class="nav-link">
                         <i class="nav-icon fas fa-sign-out-alt"></i>
                          Control Panel pump
                     </a>
                 </li>
+
                 <li class="nav-item">
-                    <a href="{{ route('admin.maintance_mode',['lable'=>'scp_maintance_mode']) }}"
-                    class="nav-link {{ request()->is('admin/maintance_mode') && request()->query('lable') == 'scp_maintance_mode' ? 'active' : '' }}">
+                    <a href="{{ route('admin.maintance_mode',['lable'=>'scp_maintance_mode']) }}" class="nav-link">
                         <i class="nav-icon fas fa-sign-out-alt"></i>
                          SCP pump
                     </a>
-                </li>                
-                <li class="nav-item">
-                    <a href="{{ route('admin.maintance_mode',['lable'=>'scpv_maintance_mode']) }}"
-                    class="nav-link {{ request()->is('admin/maintance_mode') && request()->query('lable') == 'scpv_maintance_mode' ? 'active' : '' }}">
+                </li>
+                
+                 <li class="nav-item">
+                    <a href="{{ route('admin.maintance_mode',['lable'=>'scvp_maintance_mode']) }}" class="nav-link">
                         <i class="nav-icon fas fa-sign-out-alt"></i>
-                         SCPV pump
+                         SCVP pump
                     </a>
                 </li>
+
                 <li class="nav-item">
-                    <a href="{{ route('admin.maintance_mode',['lable'=>'fire-fighting_maintance_mode']) }}"
-                    class="nav-link {{ request()->is('admin/maintance_mode') && request()->query('lable') == 'fire-fighting_maintance_mode' ? 'active' : '' }}">
+                    <a href="{{ route('admin.maintance_mode',['lable'=>'fire-fighting_maintance_mode']) }}" class="nav-link">
                         <i class="nav-icon fas fa-sign-out-alt"></i>
                          Fire-fighting
                     </a>
                 </li>
+
                 <li class="nav-item">
-                    <a href="{{ route('admin.maintance_mode',['lable'=>'sch_maintance_mode']) }}"
-                    class="nav-link {{ request()->is('admin/maintance_mode') && request()->query('lable') == 'sch_maintance_mode' ? 'active' : '' }}">
+                    <a href="{{ route('admin.maintance_mode',['lable'=>'sch_maintance_mode']) }}" class="nav-link">
                         <i class="nav-icon fas fa-sign-out-alt"></i>
                          SCH Pump
                     </a>
                 </li>
+
+
             </ul>
         </li>
         <!-- Under maintance code ends -->
 		
         <li class="nav-item">
-            <a href="{{ route('admin.document') }}" class="nav-link {{ request()->is(['admin/document']) ? 'active' : '' }}">
+            <a href="{{ route('admin.document') }}" class="nav-link">
                 <i class="nav-icon fas fa-sign-out-alt"></i>
                 Document
             </a>
         </li>
 
         <li class="nav-item">
-            <a href="{{ route('admin.manual') }}" class="nav-link {{ request()->is(['admin/manual']) ? 'active' : '' }}">
+            <a href="{{ route('admin.manual') }}" class="nav-link">
                 <i class="nav-icon fas fa-sign-out-alt"></i>
                 Manual
             </a>
         </li>
 
         <li class="nav-item">
-            <a href="{{ route('admin.manage_tooltips') }}" class="nav-link {{ request()->is(['admin/manage_tooltips']) ? 'active' : '' }}">
+            <a href="{{ route('admin.manage_tooltips') }}" class="nav-link">
                 <i class="nav-icon fas fa-sign-out-alt"></i>
                 Manage Tooltips
             </a>
         </li>
 
         <li class="nav-item">
-            <a href="{{ route('admin.setup') }}" class="nav-link {{ request()->is(['admin/setup']) ? 'active' : '' }}">
+            <a href="{{ route('admin.setup') }}" class="nav-link">
                 <i class="nav-icon fas fa-sign-out-alt"></i>
                 Setup Configuration
             </a>
         </li>
 
         <li class="nav-item">
-            <a href="{{ url('/admin/change-password') }}" class="nav-link {{ request()->is(['admin/change-password']) ? 'active' : '' }}">
+            <a href="{{ url('/admin/change-password') }}" class="nav-link">
                 <i class="nav-icon fas fa-sign-out-alt"></i>
                 Change Password
             </a>
@@ -613,5 +577,6 @@
                 {{ trans('global.logout') }}
             </a>
         </li>
+
     </ul>
 </nav>

@@ -1,12 +1,9 @@
 <?php $totalPrice = 0.00; ?>
 
 @if($controlPanelCartData->isNotEmpty())
-@foreach($controlPanelCartData as $key=> $val)
-
-
-
-<?php $totalPrice += round($val->price * $val->qty); ?>
-@endforeach
+	@foreach($controlPanelCartData as $key=> $val)
+		<?php $totalPrice += round($val->price * $val->qty); ?>
+	@endforeach
 @endif
 
 @if($atmosCartData->isNotEmpty())
@@ -20,28 +17,30 @@
 @endif
 
 @if($scpCartData->isNotEmpty())
-@foreach($scpCartData as $key=> $val)
-
-
-
-<?php $totalPrice += $val->price * $val->qty; ?>
-@endforeach
+	@foreach($scpCartData as $key=> $val)
+		<?php $totalPrice += $val->price * $val->qty; ?>
+	@endforeach
 @endif
 
+<!-- A Code: 18-02-2026 Start -->
+@if($scpvCartData->isNotEmpty())
+	@foreach($scpvCartData as $key=> $val)
+		<?php $totalPrice += $val->price * $val->qty; ?>
+	@endforeach
+@endif
+<!-- A Code: 18-02-2026 End -->
 
 @if($boosterCartData->isNotEmpty())
-@foreach($boosterCartData as $key=> $val)
-
-
-<?php $totalPrice += $val->price * $val->qty; ?>
-@endforeach
+	@foreach($boosterCartData as $key=> $val)
+		<?php $totalPrice += $val->price * $val->qty; ?>
+	@endforeach
 @endif
 
 @if($fireFightingCartData->isNotEmpty())
-		@foreach($fireFightingCartData as $key=> $val)
+	@foreach($fireFightingCartData as $key=> $val)
 		<?php $totalPrice += $val->price * $val->qty; ?>
-		@endforeach
-		@endif
+	@endforeach
+@endif
 
 {{App\Helpers\CurrencyHelper::withCurrency($totalPrice) }}
 

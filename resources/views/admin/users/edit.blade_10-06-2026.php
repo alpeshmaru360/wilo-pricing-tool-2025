@@ -24,7 +24,7 @@
     </div>
 
     <div class="card-body">
-        <form action="{{ route('admin.users.update', [$user->id]) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route("admin.users.update", [$user->id]) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="form-group {{ $errors->has('name') ? 'has-error' : '' }}">
@@ -39,7 +39,6 @@
                     {{ trans('global.user.fields.name_helper') }}
                 </p>
             </div>
-
             <div class="form-group {{ $errors->has('email') ? 'has-error' : '' }}">
                 <label for="email">{{ trans('global.user.fields.email') }}*</label>
                 <input type="email" id="email" name="email" class="form-control" value="{{ old('email', isset($user) ? $user->email : '') }}">
@@ -52,7 +51,6 @@
                     {{ trans('global.user.fields.email_helper') }}
                 </p>
             </div>
-
             <div class="form-group {{ $errors->has('password') ? 'has-error' : '' }}">
                 <label for="password">{{ trans('global.user.fields.password') }}</label>
                 <input type="password" id="password" name="password" class="form-control">
@@ -105,21 +103,6 @@
                 </p>
             </div>
 
-            <!-- A Code: 05-03-2026 Start -->
-            <div class="form-group {{ $errors->has('name') ? 'has-error' : '' }}">
-                <label for="name">SCPV Access* [0 = No Access , 1 = Access Given]</label>
-                <input type="text" id="scpv_access" name="scpv_access" class="form-control" value="{{ old('scpv_access', isset($user) ? $user->scpv_access : '') }}">
-                @if($errors->has('name'))
-                    <em class="invalid-feedback">
-                        {{ $errors->first('name') }}
-                    </em>
-                @endif
-                <p class="helper-block">
-                    {{ trans('global.user.fields.name_helper') }}
-                </p>
-            </div>
-            <!-- A Code: 05-03-2026 End -->
-
             <div class="form-group {{ $errors->has('name') ? 'has-error' : '' }}">
                 <label for="name">Booster Access* [0 = No Access , 1 = Access Given]</label>
                 <input type="text" id="booster_access" name="booster_access" class="form-control" value="{{ old('booster_access', isset($user) ? $user->booster_access : '') }}">
@@ -147,7 +130,7 @@
             </div>
 
             <div class="form-group {{ $errors->has('name') ? 'has-error' : '' }}">
-                <label for="name">Control Panel Access* [0 = No Access , 1 = Access Given]</label>
+                <label for="name">SCH Access* [0 = No Access , 1 = Access Given]</label>
                 <input type="text" id="control_panel_access" name="control_panel_access" class="form-control" value="{{ old('control_panel_access', isset($user) ? $user->control_panel_access : '') }}">
                 @if($errors->has('name'))
                     <em class="invalid-feedback">
@@ -198,7 +181,6 @@
                     {{ trans('global.user.fields.roles_helper') }}
                 </p>
             </div>
-
             <div>
                 <input class="btn btn-danger" type="submit" value="{{ trans('global.save') }}">
             </div>

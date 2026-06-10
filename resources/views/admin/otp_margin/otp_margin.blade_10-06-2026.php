@@ -7,21 +7,15 @@
         <div class="row mb-2">
         <div class="col-sm-6">
         @if($part_id == 4)
-            <h1 class="m-0 text-dark">{{ trans('Inter Country Margin For ') }}{{"Atmos Giga"}}</h1>
+            <h1 class="m-0 text-dark">{{ trans('OTP Margin For ') }}{{"Atmos Giga"}}</h1>
         @elseif($part_id == 3)
-            <h1 class="m-0 text-dark">{{ trans('Inter Country Margin For ') }}{{"Scp Pump Assembly"}}</h1>
-
-        {{-- A Code: 03-11-2025 Start --}}
-        @elseif($part_id == 6)
-            <h1 class="m-0 text-dark">{{ trans('Inter Country Margin For ') }}{{"Scpv Pump Assembly"}}</h1>
-        {{-- A Code: 03-11-2025 End --}}
-
-		@elseif($part_id == 5)
-            <h1 class="m-0 text-dark">{{ trans('Inter Country Margin For ') }}{{"Fire fighting"}}</h1>
+            <h1 class="m-0 text-dark">{{ trans('OTP Margin For ') }}{{"Scp Pump Assembly"}}</h1>
+			@elseif($part_id == 5)
+            <h1 class="m-0 text-dark">{{ trans('OTP Margin For ') }}{{"Fire fighting"}}</h1>
         @elseif($part_id == 2)
-            <h1 class="m-0 text-dark">{{ trans('Inter Country Margin For ') }}{{"Control Panel"}}</h1>
+            <h1 class="m-0 text-dark">{{ trans('OTP Margin For ') }}{{"Control Panel"}}</h1>
         @else
-            <h1 class="m-0 text-dark">{{ trans('Inter Country Margin For ') }}{{"Booster Set"}}</h1>
+            <h1 class="m-0 text-dark">{{ trans('OTP Margin For ') }}{{"Booster Set"}}</h1>
         @endif
         </div><!-- /.col -->
         <div class="col-sm-6">
@@ -37,7 +31,7 @@
 @include('layouts.message')
 
 <div class="card-body">
-        <form action="{{ route("admin.ic_margin_post") }}" method="POST">
+        <form action="{{ route("admin.otp_margin_post") }}" method="POST">
               @csrf
               <input type="hidden" name="part_id" value="{{$part_id}}">
               @foreach($current_data as $cd)
@@ -51,8 +45,5 @@
             </div>
         </form>
     </div>
-
-
 </section>
-
 @endsection

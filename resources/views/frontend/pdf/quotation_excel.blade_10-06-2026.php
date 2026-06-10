@@ -258,9 +258,7 @@
         $booster_ksa_count = 0;
         $booster_count = 0;
         $scp_ksa_count = 0;
-        $scpv_ksa_count = 0; // A Code: 26-02-2026
         $scp_count = 0;
-        $scpv_count = 0; // A Code: 26-02-2026
         @endphp
 
         @if($atmosCartData->isNotEmpty())
@@ -277,44 +275,44 @@
                 @endphp
             @endif
             <tr>
-                <td align="left">{{ $i}}</td>
-                <td align="left">
-                {{--{{$val['full_article_number']}}--}}
-                @if(auth()->user() && auth()->user()->country_id == "6")
-                    @if($val['country_origin'] != null && $val['country_origin'] == "ksa")
-                    {{ !empty($val['ksa_full_article_number']) ? $val['ksa_full_article_number'] : '--' }}
-                    @else
-                    {{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
-                    @endif 
+            <td align="left">{{ $i}}</td>
+            <td align="left">
+            {{--{{$val['full_article_number']}}--}}
+            @if(auth()->user() && auth()->user()->country_id == "6")
+                @if($val['country_origin'] != null && $val['country_origin'] == "ksa")
+                {{ !empty($val['ksa_full_article_number']) ? $val['ksa_full_article_number'] : '--' }}
                 @else
                 {{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
+                @endif 
+            @else
+            {{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
+            @endif
+            @if($val->bare_shaft_article_number != null)
+                <br>
+                [Bare Shaft Article Number: {{$val->bare_shaft_article_number}}]
+            @endif
+            </td>
+            <td align="left">{{$val->pump_name }} -{{$short_code}}/{{$val->power}}KW/{{$val->no_of_pole}}/AE
+                @if(!empty($val->adder_ids))
+                    [Adder code :- {{$val->adder_ids}}]
                 @endif
-                @if($val->bare_shaft_article_number != null)
-                    <br>
-                    [Bare Shaft Article Number: {{$val->bare_shaft_article_number}}]
-                @endif
-                </td>
-                <td align="left">{{$val->pump_name }} -{{$short_code}}/{{$val->power}}KW/{{$val->no_of_pole}}/AE
-                    @if(!empty($val->adder_ids))
-                        [Adder code :- {{$val->adder_ids}}]
-                    @endif
 
-                </td>
-                <td align="left">{{$val->qty}}</td>
-                <td align="left">
-                    @if($val['is_bareshaft_selection'] != "1")
-                        {{ App\Helpers\CurrencyHelper::withCurrency($val->price)}}
-                    @else
-                        {{ App\Helpers\CurrencyHelper::withCurrency($val['bare_pump_price'])}}
-                    @endif
-                </td>
-                <td align="left" class="total-price">
-                    @if($val['is_bareshaft_selection'] != "1")
-                        {{ App\Helpers\CurrencyHelper::withCurrency($val->price*$val->qty) }}
-                    @else
-                        {{App\Helpers\CurrencyHelper::withCurrency($val->bare_pump_price*$val->qty)}}
-                    @endif
-                </td>
+            </td>
+            <td align="left">{{$val->qty}}</td>
+            <td align="left">
+                @if($val['is_bareshaft_selection'] != "1")
+                    {{ App\Helpers\CurrencyHelper::withCurrency($val->price)}}
+                @else
+                    {{ App\Helpers\CurrencyHelper::withCurrency($val['bare_pump_price'])}}
+                @endif
+            </td>
+            <td align="left" class="total-price">
+                @if($val['is_bareshaft_selection'] != "1")
+                    {{ App\Helpers\CurrencyHelper::withCurrency($val->price*$val->qty) }}
+                @else
+                    {{App\Helpers\CurrencyHelper::withCurrency($val->bare_pump_price*$val->qty)}}
+                @endif
+            </td>
             </tr>
             @php
             $i++
@@ -322,7 +320,6 @@
             <?php $totalPrice += round($val->price * $val->qty); ?>
         @endforeach
         @endif
-
         @if($scpCartData->isNotEmpty())
         @php
             $scp_count = count($scpCartData);
@@ -368,56 +365,6 @@
             <?php $totalPrice += round($val->price * $val->qty); ?>
         @endforeach
         @endif
-
-        <!-- A Code: 26-02-2026 Start -->
-
-        @if($scpvCartData->isNotEmpty())
-        @php
-            $scpv_count = count($scpvCartData);
-        @endphp
-        @foreach($scpvCartData as $key=> $val)
-            @php
-            $short_code = DB::table('scpv_materials')->where('id',$val->material_id)->pluck("short_code")->first();
-            @endphp
-            @if($val->country_origin == "ksa")
-                @php
-                    $scpv_ksa_count = $scpv_ksa_count + 1;
-                @endphp
-            @endif
-            <tr>
-                <td align="left">{{ $i}}</td>
-                <td align="left">
-                    {{--{{$val['full_article_number']}}--}}
-                    @if(auth()->user() && auth()->user()->country_id == "6")
-                        @if($val['country_origin'] != null && $val['country_origin'] == "ksa")
-                            {{ !empty($val['ksa_full_article_number']) ? $val['ksa_full_article_number'] : '--' }}
-                        @else
-                            {{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
-                        @endif 
-                    @else
-                        {{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
-                    @endif
-                </td>
-                <td align="left">{{$val->pump_name }} -{{$short_code}}/{{$val->power}}KW/{{$val->no_of_pole}}/AE
-                    @if(!empty($val->adder_ids))
-                        [Adder code :- {{$val->adder_ids}}]
-                    @endif
-                </td>
-                <td align="left">
-                    {{$val->qty}}
-                </td>
-                <td align="left">{{App\Helpers\CurrencyHelper::withCurrency($val->price)}}</td>
-                <td align="left" class="total-price">{{ App\Helpers\CurrencyHelper::withCurrency($val->price*$val->qty) }}</td>
-            </tr>
-            @php
-            $i++
-            @endphp
-            <?php $totalPrice += round($val->price * $val->qty); ?>
-        @endforeach
-        @endif
-
-        <!-- A Code: 26-02-2026 End -->
-
         <!--Booster quotation-->
         @if($boosterCartData->isNotEmpty())
         @php
@@ -434,15 +381,15 @@
 
                 <td align="left">
                     {{--{{$val['full_article_number']}}--}}
-                    @if(auth()->user() && auth()->user()->country_id == "6")
-                        @if($val['country_origin'] != null && $val['country_origin'] == "ksa")
-                            {{ !empty($val['ksa_full_article_number']) ? $val['ksa_full_article_number'] : '--' }}
-                        @else
-                            {{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
-                        @endif 
+                @if(auth()->user() && auth()->user()->country_id == "6")
+                    @if($val['country_origin'] != null && $val['country_origin'] == "ksa")
+                    {{ !empty($val['ksa_full_article_number']) ? $val['ksa_full_article_number'] : '--' }}
                     @else
-                        {{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
-                    @endif
+                    {{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
+                    @endif 
+                @else
+                    {{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
+                @endif
                 </td>
 
                 <td align="left">                        
@@ -467,7 +414,8 @@
                 @if(!empty($val->mechanical_adder_ids))
                     [Mechanical Adder Code :- {{$val->mechanical_adder_ids}}]
                 @endif
-                <br>
+
+                 <br>
                 @if(!empty($val['mechanical_article_number']))
                 [{{$val['mechanical_article_number']}} - Mechnical Assembly]
                 @endif
@@ -487,6 +435,7 @@
                 </td>
                 <td align="left" class="total-price">{{ App\Helpers\CurrencyHelper::withCurrency($val->price*$val->qty) }}</td>
             </tr>
+
             @php
             $i++
             @endphp
@@ -543,17 +492,11 @@
             <td>Delivery conditions:  </td>
             <!-- <td colspan="2">Ex works Jebel Ali, Ex works KSA</td> -->
             <td colspan="2">
-                @if( ($atmos_ksa_count > 0 || $booster_ksa_count > 0 || $scp_ksa_count > 0 || $scpv_ksa_count > 0) 
-                && ($atmos_count != $atmos_ksa_count 
-                && $booster_count != $booster_ksa_count 
-                && $scp_count != $scp_ksa_count
-                && $scpv_count != $scpv_ksa_count) )
-
+                @if( ($atmos_ksa_count > 0 || $booster_ksa_count > 0 || $scp_ksa_count > 0) && ($atmos_count != $atmos_ksa_count && $booster_count != $booster_ksa_count && $scp_count != $scp_ksa_count) )
                     delivery shows only KSA and jabel ali
-                @elseif( $atmos_ksa_count == 0 && $booster_ksa_count == 0 && $scp_ksa_count == 0 && $scpv_ksa_count == 0)
-
+                @elseif( $atmos_ksa_count == 0 && $booster_ksa_count == 0 && $scp_ksa_count == 0)
                     delivery shows only jabel ali
-                @elseif($atmos_count == $atmos_ksa_count && $booster_count == $booster_ksa_count && $scp_count == $scp_ksa_count && $scpv_count == $scpv_ksa_count)
+                @elseif($atmos_count == $atmos_ksa_count && $booster_count == $booster_ksa_count && $scp_count == $scp_ksa_count)
                     delivery shows only KSA
                 @endif
             </td>
@@ -564,7 +507,6 @@
                 Booster - 16 - 18 Weeks<br>
                 Atmos GIGA - 16 - 18 Weeks<br>
                 SCP pump - 20 - 22 Weeks<br>
-                SCPV pump - 20 - 22 Weeks<br>
                 Control panel - 08 - 10 Weeks
             </td>
           </tr>

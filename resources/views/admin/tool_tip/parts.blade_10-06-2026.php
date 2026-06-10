@@ -19,13 +19,10 @@
 <section class="content">
 @include('layouts.message')
 
-<a href="{{ route('admin.booster_set') }}">Booster Set</a><br>
-<a href="{{ route('admin.control_panel') }}">Control Panel</a><br>
-<a href="{{ route('admin.scp_pumps') }}">Scp Pump Assembly</a><br>
-<!-- A Code: 06-11-2026 Start -->
-<a href="{{ route('admin.scpv_pumps') }}">Scpv Pump Assembly</a><br>
-<!-- A Code: 06-11-2026 End -->
-<a href="{{ route('admin.atmos_giga') }}">Atmos Giga</a><br>
+<a href="{{ route("admin.booster_set") }}">Booster Set</a><br>
+<a href="{{ route("admin.control_panel") }}">Control Panel</a><br>
+<a href="{{ route("admin.scp_pumps") }}">Scp Pump Assembly</a><br>
+<a href="{{ route("admin.atmos_giga") }}">Atmos Giga</a><br>
 
 
 </section>

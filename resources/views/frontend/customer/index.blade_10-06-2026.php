@@ -12,9 +12,6 @@
                         <input type ="hidden" value="{{ Request::get('cp_ids') }}" name="cp_ids">
                         <input type ="hidden" value="{{ Request::get('atmosIds') }}" name="atmos_ids">
                         <input type ="hidden" value="{{ Request::get('scpIds') }}" name="scp_ids">
-                        <!-- A Code: 24-02-2026 Start -->
-                        <input type ="hidden" value="{{ Request::get('scpvIds') }}" name="scpv_ids">
-                        <!-- A Code: 24-02-2026 End -->
                         <input type ="hidden" value="{{ Request::get('boosterIds') }}" name="booster_ids">
 						<input type ="hidden" value="{{ Request::get('firefightingIds') }}" name="firefighting_ids">
                         <input type ="hidden" value="{{ Request::get('removeCartIds') }}" name="removeCartIds">

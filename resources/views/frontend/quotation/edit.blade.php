@@ -3,14 +3,16 @@
 @php
 @endphp
 <style>
-    #add_quotation{
-        background: green;
-        padding: 5px 6px 6px 5px;
-        border-radius: 14px;
-        color: white;
+    #add_quotation{background: green;padding: 5px 6px 6px 5px;border-radius: 14px;color: white;}
+
+    .qty_input .qty .scpv-minus {
+        cursor: pointer;display: inline-block;vertical-align: top;color: #169e88;width: 30px;height: 30px;
+        font: 30px / 0.9 "Noto Sans", sans-serif, sans-serif;text-align: center;background-clip: padding-box;
     }
-    #revision_number{
-        }
+    .qty_input .qty .scpv-plus {
+        cursor: pointer;display: inline-block;vertical-align: top;color: #169e88;width: 30px;height: 30px;
+        font: 30px / 0.9 "Noto Sans", sans-serif, sans-serif;text-align: center;
+    }
 </style>
 <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
 <!-- mid section start-->
@@ -64,294 +66,373 @@
                             </thead>
                             @if($quotation != "")
                             <tbody>
-                            @if($controlPanelCartData->isNotEmpty())
-                            @foreach($controlPanelCartData as $key=> $val)
-                                <tr id="control_panel_data-{{$val['id']}}">
-                                <td>
-                                    <a class="detail-modal" href="javascript:void(0)">
-                                        {{$val->applications['value'] }} {{$val->noofpumps['value'] }} x {{ $val->powers['value'] }} {{$val->starter_code}}
-                                    </a>
-                                </td>
-                                <td><a class="detail-modal" href="javascript:void(0)">
-                                        {{$val['full_article_number']}}
-                                    </a>
-                                </td>
-                                <td>Control Panel </td>
 
-                                <td>{{ App\Helpers\CurrencyHelper::withCurrency($val['price'])}}</td>
-                                <td>
-                                    <div class="qty_input">
-                                        <div class="qty">
-                                            <span class="minus qtyBtn">-</span>
-                                            <input type="number" class="icount quantity"  id="quantity" name="quantity" value="{{$val->qty}}"  min="1" max="" />
-                                            <span class="plus qtyBtn">+</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <input type="hidden" class="cp-id" value="{{$val['id']}}">
-                                <input type="hidden"  id="cp-{{$val['id']}}" >
-                                <input type="hidden" class="total-price-input" name="" value="{{$val->total_price}}"  min="1" max="" />
-                                <td class="total-price">{{ App\Helpers\CurrencyHelper::withCurrency($val->price*$val->qty) }}</td>
-                                <td>
-                                    <a href="{{ URL::to('controlpanel/cart-item/'.$val['id'] )}}" target="_blank"><img src="{{asset('fassets/images/viewIcon.png')}}" />
-                                    </a>
-                                    <button class="delete_controlpanel_item">
-                                        <img src="{{asset('fassets/images/delIcon.png')}}" /> 
-                                    </button>
-                                </td>
-                                </tr>
-                                <?php $totalPrice += round($val->price * $val->qty); ?>
-                            @endforeach
-                            @endif
-                            @if($atmosCartData->isNotEmpty())
-                            @foreach($atmosCartData as $key=> $val)
-                                <tr id = "atmos_cart_item-{{$val['id']}}">
-                                    <td style="display: none;"><input type="checkbox" checked name="atmos_checked_id" value="{{$val['id']}}"></td>
-                                    <td>
+                                @if($controlPanelCartData->isNotEmpty())
+                                @foreach($controlPanelCartData as $key=> $val)
+                                    <tr id="control_panel_data-{{$val['id']}}">                                       
 
-                                        <a class="detail-modal" href="javascript:void(0)">
-                                            {{$val->pump_name }} x {{ $val->brand }} x {{$val->power}}
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <a class="detail-modal" href="javascript:void(0)">
-										{{--{{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}--}}
-										@if(auth()->user() && auth()->user()->country_id == "6")
-                                            @if($val['country_origin'] != null && $val['country_origin'] == "ksa")
-                                            {{ !empty($val['ksa_full_article_number']) ? $val['ksa_full_article_number'] : '--' }}
-                                            @else
-                            				{{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
-                                            @endif 
-                                        @else
-                                        {{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
-                                        @endif
-                                        @if($val->bare_shaft_article_number != null)
-                                            <br>
-                                            [Bare Shaft Article Number: {{$val->bare_shaft_article_number}}]
-                                        @endif
-                                        </a>
-                                    </td>
-                                    <td>Atmos Giga</td>
-                                    <td>
-                                        @if($val['is_bareshaft_selection'] != "1")
-                                            {{ App\Helpers\CurrencyHelper::withCurrency($val['price'])}}
-                                        @else
-                                            {{ App\Helpers\CurrencyHelper::withCurrency($val['bare_pump_price'])}}
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <div class="qty_input">
-                                            <div class="qty">
-                                                <span class="atmos-minus qtyBtn">-</span>
-                                                <input type="number" class="icount quantity"  id="quantity" name="quantity" value="{{$val->qty}}"  min="1" max="" />
-                                                <span class="atmos-plus qtyBtn">+</span>
-                                            </div>
-                                        </div>
-                                    </td>
-
-                                <input type="hidden" class="atmos-cart-id" value="{{$val['id']}}">
-                                <input type="hidden"  id="at-{{$val['id']}}" >
-                                <input type="hidden" class="total-price-input" name="" value="{{$val->total_price}}"  min="1" max="" />
-                                <td class="total-price">
-                                    @if($val['is_bareshaft_selection'] != "1")
-                                        {{ App\Helpers\CurrencyHelper::withCurrency($val->price*$val->qty) }}
-                                    @else
-                                        {{ App\Helpers\CurrencyHelper::withCurrency($val->bare_pump_price*$val->qty) }}
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($val['is_accesories_manual'])
-                                    <a href="javascript:void(0)">
-                                        @else
-                                        <a href="{{ URL::to('atmos/cart-item/'.$val['id'] )}}" target="_blank">
-                                            @endif
-                                            <img src="{{asset('fassets/images/viewIcon.png')}}" />
-                                        </a>
-                                        <button class="delete_atmos_item">
-                                            <img src="{{asset('fassets/images/delIcon.png')}}" />
-                                        </button>
-                                        <!--<button><img src="{{asset('fassets/images/downloadIcon.png')}}" /></button>-->
-                                </td>
-                                </tr>
-                                <?php $totalPrice += round($val->price * $val->qty); ?>
-                            @endforeach
-                            @endif
-                            @if($scpCartData->isNotEmpty())
-                            @foreach($scpCartData as $key=> $val)
-                                <tr id = "scp_cart_item-{{$val['id']}}">
-                                    <td style="display: none;"><input type="checkbox" checked name="scp_checked_id" value="{{$val['id']}}"></td>
-                                    <td>
-                                        <a class="detail-modal" href="javascript:void(0)">
-                                            {{$val->pump_name }} x {{ $val->brand }} x {{$val->power}}
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <a class="detail-modal" href="javascript:void(0)">
-										{{--{{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}--}}
-										@if(auth()->user() && auth()->user()->country_id == "6")
-                @if($val['country_origin'] != null && $val['country_origin'] == "ksa")
-                {{ !empty($val['ksa_full_article_number']) ? $val['ksa_full_article_number'] : '--' }}
-                @else
-				{{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
-                @endif 
-            @else
-            {{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
-            @endif
-                                        </a>
-                                    </td>
-                                    <td>Scp</td>
-                                    <td>{{ App\Helpers\CurrencyHelper::withCurrency($val['price'])}}</td>
-                                    <td>
-                                        <div class="qty_input">
-                                            <div class="qty">
-                                                <span class="scp-minus qtyBtn">-</span>
-                                                <input type="number" class="icount quantity"  id="quantity" name="quantity" value="{{$val->qty}}"  min="1" max="" />
-                                                <span class="scp-plus qtyBtn">+</span>
-                                            </div>
-                                        </div>
-                                    </td>
-
-                                <input type="hidden" class="scp-cart-id" value="{{$val['id']}}">
-                                <input type="hidden" class="total-price-input" name="" value="{{$val->total_price}}"  min="1" max="" />
-                                <input type="hidden"  id="scp-{{$val['id']}}" >
-                                <td class="total-price">{{ App\Helpers\CurrencyHelper::withCurrency($val->price*$val->qty) }}</td>
-                                <td>
-                                    @if($val['is_accesories_manual'])
-                                    <a href="javascript:void(0)">
-                                        @else
-                                        <a href="{{ URL::to('scp/cart-item/'.$val['id'] )}}" target="_blank">
-                                            @endif
-                                            <img src="{{asset('fassets/images/viewIcon.png')}}" />
-                                        </a>
-                                        <button class="delete_scp_item">
-                                            <img src="{{asset('fassets/images/delIcon.png')}}" />
-                                        </button>
-                                </td>
-                                </tr>
-                                <?php $totalPrice += round($val->price * $val->qty); ?>
-                            @endforeach
-                            @endif
-                            {{--  booster cart starts--}}
-                            @if($boosterCartData->isNotEmpty())
-                            @foreach($boosterCartData as $key=> $val)
-                                <tr id = "booster_cart_data-{{$val['id']}}">
-                                    <td style="display: none;"><input type="checkbox" checked name="booster_checked_id" value="{{$val['id']}}"></td>
-                                    <td>
-                                        <a class="detail-modal-booster" href="javascript:void(0)">
-                                            @php
-                                                $const =null;
-                                                // dd(str_starts_with($val->boosterCpData[0]->table_name, 'standard_'));
-                                                if(str_starts_with($val->boosterCpData[0]->table_name, 'basic_')  == true)
-                                                    $const = "COE";
-                                                else{
-                                                    $const = 'CO';
-                                                    $array_check = array(3,4,7);
-                                                    if(in_array($val->boosterCpData[0]->stater_type_id,$array_check) ){
-                                                        $const = 'COR';
-                                                    }
-                                                }
-                                            @endphp
-                                            {{$const}} {{$val->boosterCpData[0]->noofpumps['value'] }} {{$val->model_no }}/{{$val->boosterCpData[0]->starter_code}}/AE
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <a class="detail-modal" href="javascript:void(0)">
-										{{--{{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}--}}
-										@if(auth()->user() && auth()->user()->country_id == "6")
-                @if($val['country_origin'] != null && $val['country_origin'] == "ksa")
-                {{ !empty($val['ksa_full_article_number']) ? $val['ksa_full_article_number'] : '--' }}
-                @else
-				{{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
-                @endif 
-            @else
-            {{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
-            @endif
-                                        </a>
-                                    </td>
-                                    <td>
-                                        Booster
-                                    </td>
-
-                                    <td>{{ App\Helpers\CurrencyHelper::withCurrency($val['price'])}}
-                                         <span style = "">
-                                            <br>[Electrical : {{App\Helpers\CurrencyHelper::withCurrency($val['electrical_items_price'])}} ]
-                                            <br>[Mechanical : {{App\Helpers\CurrencyHelper::withCurrency($val['mechanical_items_price'])}} ]
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="qty_input">
-                                            <div class="qty">
-                                                <span class="booster-minus qtyBtn">-</span>
-                                                <input type="number" class="icount quantity"  id="quantity" name="quantity" value="{{$val->qty}}"  min="1" max="" />
-                                                <span class="booster-plus qtyBtn">+</span>
-                                            </div>
-                                        </div>
-                                    </td>
-
-                                <input type="hidden" class="booster-cart-id" value="{{$val['id']}}">
-                                <input type="hidden" class="total-price-input" name="" value="{{$val->total_price}}"  min="1" max="" />
-                                <input type="hidden"  id="booster-{{$val['id']}}" >
-                                <td class="total-price">{{ App\Helpers\CurrencyHelper::withCurrency($val->price*$val->qty) }}</td>
-                                <td>
-                                    <a href="{{ URL::to('booster-set/cart-item/'.$val['id'] )}}" target="_blank">
-                                        <img src="{{asset('fassets/images/viewIcon.png')}}" />
-                                    </a>
-
-                                    <button class="delete_booster_item">
-                                        <img src="{{asset('fassets/images/delIcon.png')}}" />
-                                    </button>
-                                    <!--<button><img src="{{asset('fassets/images/downloadIcon.png')}}" /></button>-->
-                                </td>
-
-                                </tr>
-                                <?php $totalPrice += round($val->price * $val->qty); ?>
-                            @endforeach
-                            @endif
-                            {{-- booster cart ends--}}
-                            {{-- Fire Fighting Pump Start --}}
-                            @if($firefightingCartData->isNotEmpty())
-                                @foreach($firefightingCartData as $key=> $val)
-                                    <tr>
+                                        <!-- A Code: 01-04-2026 End - Model not Open -->
                                         <td>
-                                            <a class="detail-modal" href="javascript:void(0)">
-                                            {{ ucwords(str_replace('-pump', '', $val->category)) }} - {{ $val->pump_models }}/AE
+                                            <a class="detail-modal-cp" href="javascript:void(0)">
+                                                {{$val->applications['value'] }} {{$val->noofpumps['value'] }} x {{ $val->powers['value'] }} {{$val->starter_code}}
+                                            </a>
+                                        </td>                                        
+                                        <td><a class="detail-modal-cp" href="javascript:void(0)">
+                                                {{$val['full_article_number']}}
                                             </a>
                                         </td>
-                                        <td>
-                                            <a class="detail-modal" href="javascript:void(0)">
-                                                {{ !empty($val->full_article_number) ? $val->full_article_number : '--' }}
-                                            </a>
-                                        </td>
-                                        <td>{{ ucwords(str_replace('-pump', '', $val->category)) }} Pump</td>
+                                        <!-- A Code: 01-04-2026 End - Model not Open -->
+
+                                        <td>Control Panel </td>
+
                                         <td>{{ App\Helpers\CurrencyHelper::withCurrency($val['price'])}}</td>
                                         <td>
                                             <div class="qty_input">
                                                 <div class="qty">
-                                                    <span class="firefighting-qtyBtn qtyBtn" data-pump_type="{{ $val->category }}" data-id="{{ $val->id }}" data-qty="minus">-</span>
+                                                    <span class="minus qtyBtn">-</span>
                                                     <input type="number" class="icount quantity"  id="quantity" name="quantity" value="{{$val->qty}}"  min="1" max="" />
-                                                    <span class="firefighting-qtyBtn qtyBtn" data-pump_type="{{ $val->category }}" data-id="{{ $val->id }}" data-qty="plus">+</span>
+                                                    <span class="plus qtyBtn">+</span>
                                                 </div>
                                             </div>
-                                            <!-- start - 20250106 edit model not open -->
-                                            <input type="hidden" class="cp-id" value="{{$val->id}}">
-                                            <input type="hidden"  id="cp-{{$val->id}}" >
-                                            <input type="hidden" class="total-price-input" name="" value="{{$val->total_price}}"  min="1" max="" />
-                                            <!-- end - 20250106 edit model not open -->
                                         </td>
+                                        <input type="hidden" class="cp-id" value="{{$val['id']}}">
+                                        <input type="hidden"  id="cp-{{$val['id']}}" >
+                                        <input type="hidden" class="total-price-input" name="" value="{{$val->total_price}}"  min="1" max="" />
                                         <td class="total-price">{{ App\Helpers\CurrencyHelper::withCurrency($val->price*$val->qty) }}</td>
                                         <td>
-                                            <a href="{{ URL::to('firefighting-set/cart-item/'.$val['id'] )}}" target="_blank">
+                                            <a href="{{ URL::to('controlpanel/cart-item/'.$val['id'] )}}" target="_blank">
                                                 <img src="{{asset('fassets/images/viewIcon.png')}}" />
                                             </a>
-                                            <a href="{{ URL::to('firefighting-set/cart-item/'.$val['id'].'/excel' )}}" target="_blank">
-                                                Excel
-                                            </a>
+                                            <button class="delete_controlpanel_item">
+                                                <img src="{{asset('fassets/images/delIcon.png')}}" /> 
+                                            </button>
                                         </td>
                                     </tr>
                                     <?php $totalPrice += round($val->price * $val->qty); ?>
                                 @endforeach
-                            @endif
-                            {{-- Fire Fighting Pump End --}}
+                                @endif
+
+                                @if($atmosCartData->isNotEmpty())
+                                @foreach($atmosCartData as $key=> $val)
+                                    <tr id = "atmos_cart_item-{{$val['id']}}">
+                                        <td style="display: none;"><input type="checkbox" checked name="atmos_checked_id" value="{{$val['id']}}"></td>
+                                        <td>
+
+                                            <a class="detail-modal" href="javascript:void(0)">
+                                                {{$val->pump_name }} x {{ $val->brand }} x {{$val->power}}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a class="detail-modal" href="javascript:void(0)">
+                                            {{--{{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}--}}
+                                            @if(auth()->user() && auth()->user()->country_id == "6")
+                                                @if($val['country_origin'] != null && $val['country_origin'] == "ksa")
+                                                {{ !empty($val['ksa_full_article_number']) ? $val['ksa_full_article_number'] : '--' }}
+                                                @else
+                                                {{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
+                                                @endif 
+                                            @else
+                                            {{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
+                                            @endif
+                                            @if($val->bare_shaft_article_number != null)
+                                                <br>
+                                                [Bare Shaft Article Number: {{$val->bare_shaft_article_number}}]
+                                            @endif
+                                            </a>
+                                        </td>
+                                        <td>Atmos Giga</td>
+                                        <td>
+                                            @if($val['is_bareshaft_selection'] != "1")
+                                                {{ App\Helpers\CurrencyHelper::withCurrency($val['price'])}}
+                                            @else
+                                                {{ App\Helpers\CurrencyHelper::withCurrency($val['bare_pump_price'])}}
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <div class="qty_input">
+                                                <div class="qty">
+                                                    <span class="atmos-minus qtyBtn">-</span>
+                                                    <input type="number" class="icount quantity"  id="quantity" name="quantity" value="{{$val->qty}}"  min="1" max="" />
+                                                    <span class="atmos-plus qtyBtn">+</span>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <input type="hidden" class="atmos-cart-id" value="{{$val['id']}}">
+                                        <input type="hidden"  id="at-{{$val['id']}}" >
+                                        <input type="hidden" class="total-price-input" name="" value="{{$val->total_price}}"  min="1" max="" />
+                                        <td class="total-price">
+                                            @if($val['is_bareshaft_selection'] != "1")
+                                                {{ App\Helpers\CurrencyHelper::withCurrency($val->price*$val->qty) }}
+                                            @else
+                                                {{ App\Helpers\CurrencyHelper::withCurrency($val->bare_pump_price*$val->qty) }}
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($val['is_accesories_manual'])
+                                            <a href="javascript:void(0)">
+                                            @else
+                                            <a href="{{ URL::to('atmos/cart-item/'.$val['id'] )}}" target="_blank">
+                                            @endif
+                                                <img src="{{asset('fassets/images/viewIcon.png')}}" />
+                                            </a>
+                                            <button class="delete_atmos_item">
+                                                <img src="{{asset('fassets/images/delIcon.png')}}" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <?php $totalPrice += round($val->price * $val->qty); ?>
+                                @endforeach
+                                @endif
+
+                                @if($scpCartData->isNotEmpty())
+                                @foreach($scpCartData as $key=> $val)
+                                    <tr id = "scp_cart_item-{{$val['id']}}">
+                                        <td style="display: none;"><input type="checkbox" checked name="scp_checked_id" value="{{$val['id']}}"></td>
+                                        <!-- A Code: 27-02-2026 Start - Model not Open -->
+                                        <td>
+                                            <a class="detail-modal-scp" href="javascript:void(0)">
+                                                {{$val->pump_name }} x {{ $val->brand }} x {{$val->power}}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a class="detail-modal-scp" href="javascript:void(0)">
+                                                @if(auth()->user() && auth()->user()->country_id == "6")
+                                                    @if($val['country_origin'] != null && $val['country_origin'] == "ksa")
+                                                    {{ !empty($val['ksa_full_article_number']) ? $val['ksa_full_article_number'] : '--' }}
+                                                    @else
+                                                    {{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
+                                                    @endif 
+                                                @else
+                                                    {{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
+                                                @endif
+                                            </a>
+                                        </td>
+                                        <!-- A Code: 27-02-2026 End - Model not Open -->
+                                        <td>Scp</td>
+                                        <td>{{ App\Helpers\CurrencyHelper::withCurrency($val['price'])}}</td>
+                                        <td>
+                                            <div class="qty_input">
+                                                <div class="qty">
+                                                    <span class="scp-minus qtyBtn">-</span>
+                                                    <input type="number" class="icount quantity"  id="quantity" name="quantity" value="{{$val->qty}}"  min="1" max="" />
+                                                    <span class="scp-plus qtyBtn">+</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <input type="hidden" class="cp-id" value="{{$val['id']}}">
+                                        <input type="hidden" class="scp-cart-id" value="{{$val['id']}}">
+                                        <input type="hidden" class="total-price-input" name="" value="{{$val->total_price}}"  min="1" max="" />
+                                        <input type="hidden"  id="scp-{{$val['id']}}" >
+                                        <td class="total-price">{{ App\Helpers\CurrencyHelper::withCurrency($val->price*$val->qty) }}</td>
+                                        <td>
+                                            {{--
+                                            @if($val['is_accesories_manual'])
+                                            <a href="javascript:void(0)">
+                                            @else
+                                            <a href="{{ URL::to('scp/cart-item/'.$val['id'] )}}" target="_blank">
+                                            @endif
+                                                <img src="{{asset('fassets/images/viewIcon.png')}}" />
+                                            </a>
+                                            --}}
+                                           
+                                            <a href="{{ URL::to('scp/cart-item/'.$val['id'] )}}" target="_blank">                                         
+                                                <img src="{{asset('fassets/images/viewIcon.png')}}" />
+                                            </a>
+
+                                            <button class="delete_scp_item">
+                                                <img src="{{asset('fassets/images/delIcon.png')}}" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <?php $totalPrice += round($val->price * $val->qty); ?>
+                                @endforeach
+                                @endif
+
+                                <!-- A Code: 25-02-2026 Start -->
+                                @if($scpvCartData->isNotEmpty())
+                                @foreach($scpvCartData as $key=> $val)
+                                    <tr id = "scpv_cart_item-{{$val['id']}}">
+                                        <td style="display: none;"><input type="checkbox" checked name="scpv_checked_id" value="{{$val['id']}}"></td>
+                                        <!-- A Code: 27-02-2026 Start - Model not Open -->
+                                        <td>
+                                            <a class="detail-modal-scpv" href="javascript:void(0)">
+                                                {{$val->pump_name }} x {{ $val->brand }} x {{$val->power}}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a class="detail-modal-scpv" href="javascript:void(0)">
+                                                @if(auth()->user() && auth()->user()->country_id == "6")
+                                                    @if($val['country_origin'] != null && $val['country_origin'] == "ksa")
+                                                    {{ !empty($val['ksa_full_article_number']) ? $val['ksa_full_article_number'] : '--' }}
+                                                    @else
+                                                    {{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
+                                                    @endif 
+                                                @else
+                                                    {{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
+                                                @endif
+                                            </a>
+                                        </td>
+                                        <!-- A Code: 27-02-2026 End - Model not Open -->
+                                        <td>Scpv</td>
+                                        <td>{{ App\Helpers\CurrencyHelper::withCurrency($val['price'])}}</td>
+                                        <td>
+                                            <div class="qty_input">
+                                                <div class="qty">
+                                                    <span class="scpv-minus qtyBtn">-</span>
+                                                    <input type="number" class="icount quantity"  id="quantity" name="quantity" value="{{$val->qty}}"  min="1" max="" />
+                                                    <span class="scpv-plus qtyBtn">+</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <input type="hidden" class="cp-id" value="{{$val['id']}}">
+                                        <input type="hidden" class="scpv-cart-id" value="{{$val['id']}}">
+                                        <input type="hidden" class="total-price-input" name="" value="{{$val->total_price}}"  min="1" max="" />
+                                        <input type="hidden"  id="scpv-{{$val['id']}}" >
+                                        <td class="total-price">{{ App\Helpers\CurrencyHelper::withCurrency($val->price*$val->qty) }}</td>
+                                        <td>
+                                            {{--
+                                            @if($val['is_accesories_manual'])
+                                            <a href="javascript:void(0)">
+                                            @else
+                                            <a href="{{ URL::to('scpv/cart-item/'.$val['id'] )}}" target="_blank">
+                                            @endif
+                                                <img src="{{asset('fassets/images/viewIcon.png')}}" />
+                                            </a>
+                                            --}}
+                                            
+                                            <a href="{{ URL::to('scpv/cart-item/'.$val['id'] )}}" target="_blank">                                          
+                                                <img src="{{asset('fassets/images/viewIcon.png')}}" />
+                                            </a>
+                                            <button class="delete_scpv_item">
+                                                <img src="{{asset('fassets/images/delIcon.png')}}" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <?php $totalPrice += round($val->price * $val->qty); ?>
+                                @endforeach
+                                @endif
+                                <!-- A Code: 25-02-2026 End -->
+
+                                {{--  booster cart starts--}}
+                                @if($boosterCartData->isNotEmpty())
+                                @foreach($boosterCartData as $key=> $val)
+                                    <tr id = "booster_cart_data-{{$val['id']}}">
+                                        <td style="display: none;"><input type="checkbox" checked name="booster_checked_id" value="{{$val['id']}}"></td>
+                                        <td>
+                                            <a class="detail-modal-booster" href="javascript:void(0)">
+                                                @php
+                                                    $const =null;
+                                                    // dd(str_starts_with($val->boosterCpData[0]->table_name, 'standard_'));
+                                                    if(str_starts_with($val->boosterCpData[0]->table_name, 'basic_')  == true)
+                                                        $const = "COE";
+                                                    else{
+                                                        $const = 'CO';
+                                                        $array_check = array(3,4,7);
+                                                        if(in_array($val->boosterCpData[0]->stater_type_id,$array_check) ){
+                                                            $const = 'COR';
+                                                        }
+                                                    }
+                                                @endphp
+                                                {{$const}} {{$val->boosterCpData[0]->noofpumps['value'] }} {{$val->model_no }}/{{$val->boosterCpData[0]->starter_code}}/AE
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a class="detail-modal" href="javascript:void(0)">
+                                                {{--{{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}--}}
+                                                @if(auth()->user() && auth()->user()->country_id == "6")
+                                                    @if($val['country_origin'] != null && $val['country_origin'] == "ksa")
+                                                    {{ !empty($val['ksa_full_article_number']) ? $val['ksa_full_article_number'] : '--' }}
+                                                    @else
+                                                    {{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
+                                                    @endif 
+                                                @else
+                                                    {{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
+                                                @endif
+                                            </a>
+                                        </td>
+                                        <td>
+                                            Booster
+                                        </td>
+
+                                        <td>{{ App\Helpers\CurrencyHelper::withCurrency($val['price'])}}
+                                            <span style = "">
+                                                <br>[Electrical : {{App\Helpers\CurrencyHelper::withCurrency($val['electrical_items_price'])}} ]
+                                                <br>[Mechanical : {{App\Helpers\CurrencyHelper::withCurrency($val['mechanical_items_price'])}} ]
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="qty_input">
+                                                <div class="qty">
+                                                    <span class="booster-minus qtyBtn">-</span>
+                                                    <input type="number" class="icount quantity"  id="quantity" name="quantity" value="{{$val->qty}}"  min="1" max="" />
+                                                    <span class="booster-plus qtyBtn">+</span>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <input type="hidden" class="booster-cart-id" value="{{$val['id']}}">
+                                        <input type="hidden" class="total-price-input" name="" value="{{$val->total_price}}"  min="1" max="" />
+                                        <input type="hidden"  id="booster-{{$val['id']}}" >
+                                        <td class="total-price">{{ App\Helpers\CurrencyHelper::withCurrency($val->price*$val->qty) }}</td>
+                                        <td>
+                                            <a href="{{ URL::to('booster-set/cart-item/'.$val['id'] )}}" target="_blank">
+                                                <img src="{{asset('fassets/images/viewIcon.png')}}" />
+                                            </a>
+                                            <button class="delete_booster_item">
+                                                <img src="{{asset('fassets/images/delIcon.png')}}" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <?php $totalPrice += round($val->price * $val->qty); ?>
+                                @endforeach
+                                @endif
+
+                                {{-- booster cart ends--}}
+                                {{-- Fire Fighting Pump Start --}}
+                                @if($firefightingCartData->isNotEmpty())
+                                    @foreach($firefightingCartData as $key=> $val)
+                                        <tr>
+                                            <td>
+                                                <a class="detail-modal" href="javascript:void(0)">
+                                                {{ ucwords(str_replace('-pump', '', $val->category)) }} - {{ $val->pump_models }}/AE
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a class="detail-modal" href="javascript:void(0)">
+                                                    {{ !empty($val->full_article_number) ? $val->full_article_number : '--' }}
+                                                </a>
+                                            </td>
+                                            <td>{{ ucwords(str_replace('-pump', '', $val->category)) }} Pump</td>
+                                            <td>{{ App\Helpers\CurrencyHelper::withCurrency($val['price'])}}</td>
+                                            <td>
+                                                <div class="qty_input">
+                                                    <div class="qty">
+                                                        <span class="firefighting-qtyBtn qtyBtn" data-pump_type="{{ $val->category }}" data-id="{{ $val->id }}" data-qty="minus">-</span>
+                                                        <input type="number" class="icount quantity"  id="quantity" name="quantity" value="{{$val->qty}}"  min="1" max="" />
+                                                        <span class="firefighting-qtyBtn qtyBtn" data-pump_type="{{ $val->category }}" data-id="{{ $val->id }}" data-qty="plus">+</span>
+                                                    </div>
+                                                </div>
+                                                <!-- start - 20250106 edit model not open -->
+                                                <input type="hidden" class="cp-id" value="{{$val->id}}">
+                                                <input type="hidden"  id="cp-{{$val->id}}" >
+                                                <input type="hidden" class="total-price-input" name="" value="{{$val->total_price}}"  min="1" max="" />
+                                                <!-- end - 20250106 edit model not open -->
+                                            </td>
+                                            <td class="total-price">{{ App\Helpers\CurrencyHelper::withCurrency($val->price*$val->qty) }}</td>
+                                            <td>
+                                                <a href="{{ URL::to('firefighting-set/cart-item/'.$val['id'] )}}" target="_blank">
+                                                    <img src="{{asset('fassets/images/viewIcon.png')}}" />
+                                                </a>
+                                                <a href="{{ URL::to('firefighting-set/cart-item/'.$val['id'].'/excel' )}}" target="_blank">
+                                                    Excel
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        <?php $totalPrice += round($val->price * $val->qty); ?>
+                                    @endforeach
+                                @endif
+                                {{-- Fire Fighting Pump End --}}
                             </tbody>
                             @endif
                         </table>
@@ -389,9 +470,7 @@
 <!-- mid section end -->
 
 <div id="detail-control-panel-modal" class="modal">
-    <!-- Modal content -->
     <div class="modal-content">
-      <!-- <span class="close">&times;</span> -->
         <div class="modal-body" id="detail-control-panel-modal-body">
             <!--Table-->
         </div>
@@ -399,7 +478,6 @@
             <span class="close-detail-control-panel-modal" >Close</span>
         </div>
     </div>
-
 </div>
 <input id="quotation-number" type="hidden" value="{{$quotation->quotation_number}}"/>
 @endsection
@@ -429,6 +507,7 @@
             }
         });
     });
+
     $(document).on('click', '.firefighting-qtyBtn', function () {
         var qty = $(this).parent('.qty').find('input[name="quantity"]').val();
         var qty_plus_minus = $(this).data('qty');
@@ -651,6 +730,52 @@
 
     });
 
+    // A Code: 25-02-2026 Start
+
+    //Scpv
+    $(".scpv-plus").on("click", function () {
+        var scpv_cart_id = $(this).closest('tr').find('.scpv-cart-id').val();
+        var qty = parseInt($(this).closest('tr').find('.quantity').val()) + 1;
+        var totalPrice = parseFloat($(this).closest('tr').find('.total-price-input').val());
+       
+        if (qty >= 1) {
+            $.ajax({
+                type: "get",
+                url: "{{url('scpv/ajax-qty-update')}}",
+                data: {qty: qty, scpv_cart_id: scpv_cart_id},
+                success: function (response) {
+                    $("#scpv-" + response.data.id).closest('tr').find('.total-price').html(response.data.total_price_update)
+                    UpdatedTotalPriceQuotation();
+                },
+                error: function () {
+                }
+            });
+        }
+    });
+
+    $(".scpv-minus").on("click", function () {
+        var scpv_cart_id = $(this).closest('tr').find('.scpv-cart-id').val();
+        var qty = parseInt($(this).closest('tr').find('.quantity').val()) - 1;
+        var totalPrice = parseFloat($(this).closest('tr').find('.total-price-input').val());
+       
+        if (qty >= 1) {
+            $.ajax({
+                type: "get",
+                url: "{{url('scpv/ajax-qty-update')}}",
+                data: {qty: qty, scpv_cart_id: scpv_cart_id},
+                success: function (response) {
+                    $("#scpv-" + response.data.id).closest('tr').find('.total-price').html(response.data.total_price_update)
+                    UpdatedTotalPriceQuotation();
+
+                },
+                error: function () {
+                }
+            });
+        }
+    });
+
+    // A Code: 25-02-2026 End
+
     $(".detail-modal").on("click", function () {
         var cp_id = $(this).closest('tr').find('.cp-id').val();
         
@@ -660,20 +785,75 @@
             data: {cp_id: cp_id},
             success: function (response) {
                 if (response.data.html) {
-
                     $("#detail-control-panel-modal-body").html('');
                     $("#detail-control-panel-modal-body").html(response.data.html);
                     $("#detail-control-panel-modal").show();
                 }
             },
             error: function () {
-
             }
-
         });
-
-
     });
+
+    // A Code: 27-02-2026 Start - Model not Open
+    $(".detail-modal-scpv").on("click", function () {
+        var scpv_id = $(this).closest('tr').find('.scpv-cart-id').val();
+        $.ajax({
+            type: "get",
+            url: "{{url('scpv/ajax-detail-modal-scpv')}}",
+            data: {scpv_id: scpv_id},
+            success: function (response) {
+                if (response.data.html) {
+                    $("#detail-control-panel-modal-body").html('');
+                    $("#detail-control-panel-modal-body").html(response.data.html);
+                    $("#detail-control-panel-modal").show();
+                }
+            },
+            error: function () {
+            }
+        });
+    });
+    // A Code: 27-02-2026 End - Model not Open
+
+    // A Code: 27-02-2026 Start - Model not Open
+    $(".detail-modal-scp").on("click", function () {
+        var scp_id = $(this).closest('tr').find('.scp-cart-id').val();
+        $.ajax({
+            type: "get",
+            url: "{{url('scp/ajax-detail-modal-scp')}}",
+            data: {scp_id: scp_id},
+            success: function (response) {
+                if (response.data.html) {
+                    $("#detail-control-panel-modal-body").html('');
+                    $("#detail-control-panel-modal-body").html(response.data.html);
+                    $("#detail-control-panel-modal").show();
+                }
+            },
+            error: function () {
+            }
+        });
+    });
+    // A Code: 27-02-2026 End - Model not Open
+
+    // A Code: 01-04-2026 Start - Model not Open
+    $(".detail-modal-cp").on("click", function () {
+        var cp_id = $(this).closest('tr').find('.cp-id').val();
+        $.ajax({
+            type: "get",
+            url: "{{url('controlpanel/ajax-detail-modal-cp')}}",
+            data: {cp_id: cp_id},
+            success: function (response) {
+                if (response.data.html) {
+                    $("#detail-control-panel-modal-body").html('');
+                    $("#detail-control-panel-modal-body").html(response.data.html);
+                    $("#detail-control-panel-modal").show();
+                }
+            },
+            error: function () {
+            }
+        });
+    });
+    // A Code: 01-04-2026 End - Model not Open
 
     //BOOSTER
     $(".booster-plus").on("click", function () {
@@ -779,7 +959,7 @@
             }
         });
     });
-    </script>
+</script>
 
 <script src="http://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.2/js/toastr.min.js"></script>
 <script>
@@ -897,5 +1077,34 @@
             }
         });
     });
+
+    // A Code: 25-02-2026 Start
+    $(".delete_scpv_item").on("click",function(){
+        var quotation_number = `<?php echo $quotation->quotation_number; ?>`;
+        var cp_scpv_cart_id = $(this).closest('tr').find('.scpv-cart-id').val();
+        $.ajax({
+            type:"get",
+            url : "{{route('deleteSCPVItemFromEditQuotation')}}",
+            data : {
+                quotation_number:quotation_number,
+                cp_scpv_cart_id:cp_scpv_cart_id
+            },
+            success:function( message ){
+                if(message.status == "success")
+                {
+                    toastr.success( message.message );
+                    $("#scpv_cart_item-"+cp_scpv_cart_id).remove();
+                    UpdatedTotalPriceQuotation();
+                }
+                else{
+                    toastr.success( message.message );
+                }
+            },
+            error:function(){
+                alert("error");
+            }
+        });
+    });
+    // A Code: 25-02-2026 End
 </script>
 @endsection

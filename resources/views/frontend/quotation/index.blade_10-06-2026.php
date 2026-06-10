@@ -91,16 +91,8 @@
                             <tbody>
                                 @if($controlPanelCartData->isNotEmpty())
                                 @foreach($controlPanelCartData as $key=> $val)
-                                <tr>                                   
-                                    <!-- A Code: 01-04-2026 Start - Model not Open -->
-                                    <td>
-                                        <a class="detail-modal-cp" href="javascript:void(0)">
-                                            Control Panel {{$val->noofpumps['value'] }} x {{ $val->powers['value'] }}KW {{$val->starter_code}}/AE
-                                        </a>
-                                        <input type="hidden" class="cp-cart-id" value="{{$val['id']}}">
-                                    </td>
-                                    <!-- A Code: 01-04-2026 Start - Model not Open -->
-
+                                <tr>
+                                    <td>Control Panel {{$val->noofpumps['value'] }} x {{ $val->powers['value'] }}KW {{$val->starter_code}}/AE</td>
                                     <td>{{$val['full_article_number']}}</td>
                                     <td>Control Panel </td>
                                     <td>{{ App\Helpers\CurrencyHelper::withCurrency($val['price'])}}</td>
@@ -109,15 +101,15 @@
                                     </td>
                                     <td class="total-price">{{App\Helpers\CurrencyHelper::withCurrency($val->price*$val->qty)}}</td>
                                     <td>
-                                        <a href="{{ URL::to('controlpanel/cart-item/'.$val['id'] )}}" target="_blank">
-                                            <img src="{{asset('fassets/images/viewIcon.png')}}" />
+                                        <a href="{{ URL::to('controlpanel/cart-item/'.$val['id'] )}}" target="_blank"><img src="{{asset('fassets/images/viewIcon.png')}}" />
                                         </a>
+                                        <!--<button><img src="{{asset('fassets/images/downloadIcon.png')}}" /></button>-->
                                     </td>
+
                                 </tr>
                                 <?php $totalPrice += round($val->price * $val->qty); ?>
                                 @endforeach
                                 @endif
-
                                 @if($atmosCartData->isNotEmpty())
                                 @foreach($atmosCartData as $key=> $val)
                                 @php
@@ -156,7 +148,11 @@
                                             {{ App\Helpers\CurrencyHelper::withCurrency($val['bare_pump_price'])}}
                                         @endif
                                     </td>
-                                    <td>{{$val->qty}}</td>
+                                    <td>
+                                        {{$val->qty}}
+                                    </td>
+
+
                                     <td class="total-price">
                                         @if($val['is_bareshaft_selection'] != "1")
                                             {{ App\Helpers\CurrencyHelper::withCurrency($val->price*$val->qty) }}
@@ -170,8 +166,10 @@
                                         @else
                                             <a href="{{ URL::to('atmos/cart-item/'.$val['id'] )}}" target="_blank">
                                         @endif
-                                                <img src="{{asset('fassets/images/viewIcon.png')}}" />                                            
+                                            <img src="{{asset('fassets/images/viewIcon.png')}}" />
+                                            
                                             </a>
+
                                     </td>
                                 </tr>
                                 @if($val['is_bareshaft_selection'] != "1")
@@ -185,115 +183,59 @@
                                 @if($scpCartData->isNotEmpty())
                                 @foreach($scpCartData as $key=> $val)
                                 @php
-                                    $short_code = DB::table('scp_materials')->where('id',$val->material_id)->pluck("short_code")->first();
+
+                                $short_code = DB::table('scp_materials')->where('id',$val->material_id)->pluck("short_code")->first();
+
+
                                 @endphp
                                 <tr>
-                                    <!-- A Code: 27-02-2026 Start - Model not Open -->
                                     <td>
-                                        <a class="detail-modal-scp" href="javascript:void(0)">
-                                            {{$val->pump_name }} -{{$short_code}}/{{$val->power}}KW/{{$val->no_of_pole}}/AE
+                                        <a class="detail-modal" href="javascript:void(0)">
+                                        {{$val->pump_name }} -{{$short_code}}/{{$val->power}}KW/{{$val->no_of_pole}}/AE
                                         </a>
                                     </td>
                                     <td>
-                                        <a class="detail-modal-scp" href="javascript:void(0)">
+                                        <a class="detail-modal" href="javascript:void(0)">
+										{{--{{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}--}}
 										@if(auth()->user() && auth()->user()->country_id == "6")
                                                 @if($val['country_origin'] != null && $val['country_origin'] == "ksa")
                                                     {{ !empty($val['ksa_full_article_number']) ? $val['ksa_full_article_number'] : '--' }}
-                                                @else
+@else
                                                     {{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
-                                                @endif 
-                                        @else
-                                            {{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
-                                        @endif
+                                                    @endif 
+                                            @else
+{{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
+                                            @endif
                                         </a>
                                     </td>
-                                    <!-- A Code: 27-02-2026 End - Model not Open -->
-                                     
                                     <td>Scp Pump</td>
                                     <td>{{ App\Helpers\CurrencyHelper::withCurrency($val['price'])}}</td>
-                                    <td>{{$val->qty}}</td>
+                                    <td>
+
+                                        {{$val->qty}}
+
+                                    </td>
                                     <td class="total-price">{{ App\Helpers\CurrencyHelper::withCurrency($val->price*$val->qty) }}</td>
                                     <td>
-                                        <!-- @if($val['is_accesories_manual'])
-                                            <a href="javascript:void(0)" >
-                                        @else
-                                            <a href="{{ URL::to('scp/cart-item/'.$val['id'] )}}" target="_blank">
-                                        @endif
-                                                <img src="{{asset('fassets/images/viewIcon.png')}}" />                                                
-                                            </a>  -->
-                                            
-                                        <!-- A Code: 27-02-2026 Start - Model not Open -->
-                                            <a href="{{ URL::to('scp/cart-item/'.$val['id'] )}}" target="_blank">
-                                                <img src="{{asset('fassets/images/viewIcon.png')}}" />                                                
-                                            </a> 
-                                            <input type="hidden" class="scp-cart-id" value="{{$val['id']}}">
-                                        <!-- A Code: 27-02-2026 End - Model not Open -->
-                                                                           
-                                    </td>
-                                </tr>
-                                    @if($val['is_bareshaft_selection'] != "1")
-                                        <?php $totalPrice += round($val->price * $val->qty); ?>
-                                    @else
-                                        <?php $totalPrice += round($val->bare_pump_price * $val->qty); ?>
-                                    @endif
-                                @endforeach
-                                @endif
-
-                                <!-- A Code: 24-02-2026 Start -->
-                                @if($scpvCartData->isNotEmpty())
-                                @foreach($scpvCartData as $key=> $val)
-                                @php
-                                    $short_code = DB::table('scpv_materials')->where('id',$val->material_id)->pluck("short_code")->first();
-                                @endphp
-                                <tr>
-                                    <!-- A Code: 27-02-2026 Start - Model not Open -->
-                                    <td>                                        
-                                        <a class="detail-modal-scpv" href="javascript:void(0)">                                        
-                                            {{$val->pump_name }} -{{$short_code}}/{{$val->power}}KW/{{$val->no_of_pole}}/AE
-                                        </a>                                        
-                                    </td>
-                                    <td>
-                                        <a class="detail-modal-scpv" href="javascript:void(0)">
-										@if(auth()->user() && auth()->user()->country_id == "6")
-                                            @if($val['country_origin'] != null && $val['country_origin'] == "ksa")
-                                                {{ !empty($val['ksa_full_article_number']) ? $val['ksa_full_article_number'] : '--' }}
+                                        @if($val['is_accesories_manual'])
+                                        <a href="javascript:void(0)" >
                                             @else
-                                                {{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
-                                            @endif 
-                                        @else
-                                            {{ !empty($val['full_article_number']) ? $val['full_article_number'] : '--' }}
-                                        @endif
-                                        </a>
-                                    </td>
-                                    <!-- A Code: 27-02-2026 End - Model not Open -->
-                                    <td>Scpv Pump</td>
-                                    <td>{{ App\Helpers\CurrencyHelper::withCurrency($val['price'])}}</td>
-                                    <td>{{$val->qty}}</td>
-                                    <td class="total-price">{{ App\Helpers\CurrencyHelper::withCurrency($val->price*$val->qty) }}</td>
-                                    <td>      
-                                        <!-- @if($val['is_accesories_manual'])
-                                            <a href="javascript:void(0)">
-                                        @else
-                                            <a href="{{ URL::to('scpv/cart-item/'.$val['id'] )}}" target="_blank">
-                                        @endif -->
+                                            <a href="{{ URL::to('scp/cart-item/'.$val['id'] )}}" target="_blank">
+                                                @endif
+                                                <img src="{{asset('fassets/images/viewIcon.png')}}" />
+                                                
+                                            </a>
 
-                                       <!-- A Code: 27-02-2026 Start - Model not Open -->
-                                            <a href="{{ URL::to('scpv/cart-item/'.$val['id'] )}}" target="_blank">
-                                                <img src="{{asset('fassets/images/viewIcon.png')}}" />                                                
-                                            </a>                                      
-                                     
-                                            <input type="hidden" class="scpv-cart-id" value="{{$val['id']}}">
-                                        <!-- A Code: 27-02-2026 End - Model not Open --> 
                                     </td>
                                 </tr>
-                                    @if($val['is_bareshaft_selection'] != "1")
-                                        <?php $totalPrice += round($val->price * $val->qty); ?>
-                                    @else
-                                        <?php $totalPrice += round($val->bare_pump_price * $val->qty); ?>
-                                    @endif
+                                @if($val['is_bareshaft_selection'] != "1")
+                                <?php $totalPrice += round($val->price * $val->qty); ?>
+                               @else
+                                <?php $totalPrice += round($val->bare_pump_price * $val->qty); ?>
+                            @endif
                                 @endforeach
                                 @endif
-                                <!-- A Code: 24-02-2026 End -->
+
 
                                 {{--booster cart starts--}}
                                 @if($boosterCartData->isNotEmpty())
@@ -350,14 +292,16 @@
                                     <td class="total-price">{{  App\Helpers\CurrencyHelper::withCurrency($val->price*$val->qty) }}
                                     </td>
                                     <td>  
-                                        <a href="{{ URL::to('booster-set/cart-item/'.$val['id'] )}}" target="_blank"> <img src="{{asset('fassets/images/viewIcon.png')}}" /></a>                                        
+                                        <a href="{{ URL::to('booster-set/cart-item/'.$val['id'] )}}" target="_blank"> <img src="{{asset('fassets/images/viewIcon.png')}}" /></a>
+                                        
                                     </td>
+
+
                                 </tr>
                                 <?php $totalPrice += round($val->price * $val->qty); ?>
                                 @endforeach
                                 @endif
-                                {{-- booster cart ends--}}
-
+                                {{--                                booster cart ends--}}
 								{{-- Fire Fighting Pump Start --}}
                                 @if($firefightingCartData->isNotEmpty())
                                     @foreach($firefightingCartData as $key=> $val)
@@ -391,7 +335,6 @@
                                         <?php $totalPrice += round($val->price * $val->qty); ?>
                                     @endforeach
                                 @endif
-
                             </tbody>
                         </table>
                         <div class="text-left" id=""><h4>Total Price: </h4><span class="" id="total-price-updated"> {{App\Helpers\CurrencyHelper::withCurrency($totalPrice) }}</span></div>
@@ -457,74 +400,15 @@
                 }
             },
             error: function () {
+
             }
+
         });
     });
     $(document).on("click", '.close-detail-control-panel-modal', function (event) {
         $("#detail-control-panel-modal").hide();
     });
     //end - 20250106 edit model not open
-
-    // A Code: 27-02-2026 Start - Model not Open
-    $(".detail-modal-scpv").on("click", function () {
-        var scpv_id = $(this).closest('tr').find('.scpv-cart-id').val();
-        $.ajax({
-            type: "get",
-            url: "{{url('scpv/ajax-detail-modal-scpv')}}",
-            data: {scpv_id: scpv_id},
-            success: function (response) {
-                if (response.data.html) {
-                    $("#detail-control-panel-modal-body").html('');
-                    $("#detail-control-panel-modal-body").html(response.data.html);
-                    $("#detail-control-panel-modal").show();
-                }
-            },
-            error: function () {
-            }
-        });
-    });
-    // A Code: 27-02-2026 End - Model not Open
-
-    // A Code: 27-02-2026 Start - Model not Open
-    $(".detail-modal-scp").on("click", function () {
-        var scp_id = $(this).closest('tr').find('.scp-cart-id').val();
-        $.ajax({
-            type: "get",
-            url: "{{url('scp/ajax-detail-modal-scp')}}",
-            data: {scp_id: scp_id},
-            success: function (response) {
-                if (response.data.html) {
-                    $("#detail-control-panel-modal-body").html('');
-                    $("#detail-control-panel-modal-body").html(response.data.html);
-                    $("#detail-control-panel-modal").show();
-                }
-            },
-            error: function () {
-            }
-        });
-    });
-    // A Code: 27-02-2026 End - Model not Open
-
-    // A Code: 01-04-2026 Start - Model not Open
-    $(".detail-modal-cp").on("click", function () {
-        var cp_id = $(this).closest('tr').find('.cp-cart-id').val();
-        $.ajax({
-            type: "get",
-            url: "{{url('controlpanel/ajax-detail-modal-cp')}}",
-            data: {cp_id: cp_id},
-            success: function (response) {
-                if (response.data.html) {
-                    $("#detail-control-panel-modal-body").html('');
-                    $("#detail-control-panel-modal-body").html(response.data.html);
-                    $("#detail-control-panel-modal").show();
-                }
-            },
-            error: function () {
-            }
-        });
-    });
-    // A Code: 01-04-2026 End - Model not Open
-
     $(".detail-modal-booster").on("click", function () {
         var booster_id = $(this).closest('tr').find('.booster-cart-id').val();
         $.ajax({

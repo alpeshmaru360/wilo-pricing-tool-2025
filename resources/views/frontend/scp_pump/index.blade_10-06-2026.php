@@ -10,42 +10,84 @@
 
 <style>
     /* Float cancel and delete buttons and add an equal width */
-    .error{ outline: 1px solid red;}
-    .cancelbtn, 
-    .deletebtn {float: left;width: 50%;}
-    .cancelbtn {background-color: #ccc;color: black;}
-    .deletebtn {background-color: #f44336;}
-    .modal {display: none;position: fixed;z-index: 1;left: 0;top: 0;width: 100%;height: 100%;overflow: auto;background-color: #474e5d;padding-top: 50px;}
+    .error{
+        outline: 1px solid red;
+    }
+    .cancelbtn, .deletebtn {
+        float: left;
+        width: 50%;
+    }
+
+    /* Add a color to the cancel button */
+    .cancelbtn {
+        background-color: #ccc;
+        color: black;
+    }
+
+    /* Add a color to the delete button */
+    .deletebtn {
+        background-color: #f44336;
+    }
+
+    /* The Modal (background) */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: #474e5d;
+        padding-top: 50px;
+    }
+
+    /* Modal Content/Box */
     .modal-content {
         background-color: #fefefe;
         margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
         border: 1px solid #888;
         width: 80%; /* Could be more or less, depending on screen size */
     }
-    hr {border: 1px solid #f1f1f1;margin-bottom: 25px;}
-    .close {position: absolute;right: 35px;top: 15px;font-size: 40px;font-weight: bold;color: #f1f1f1;}
+
+    /* Style the horizontal ruler */
+    hr {
+        border: 1px solid #f1f1f1;
+        margin-bottom: 25px;
+    }
+
+    /* The Modal Close Button (x) */
+    .close {
+        position: absolute;
+        right: 35px;
+        top: 15px;
+        font-size: 40px;
+        font-weight: bold;
+        color: #f1f1f1;
+    }
+
     .close:hover,
-    .close:focus {color: #f44336;cursor: pointer;}
+    .close:focus {
+        color: #f44336;
+        cursor: pointer;
+    }
 
     /* Clear floats */
-    .clearfix::after {content: "";clear: both;display: table;}
-    li.error {color: red;}
-    .pump_model_manual_add {
-        width: 30px;height: 30px;background: #169e88;display: block;text-align: center;color: white;font-weight: bold;
-        position: absolute;right: -2.5rem;top: 0.5rem;border-radius: 100%;cursor: pointer;
+    .clearfix::after {
+        content: "";
+        clear: both;
+        display: table;
     }
-    .pump_model_manual_add:hover{color: white !important;}
-    .modalBtnsManual{margin-top: 15px !important;}
-    .manual_modal_btn{width: 25% !important;}
-    .col-4 {flex: 0 0 40%;max-width: 40%;box-sizing: border-box;padding: 5px;}
-    .col-6 input {width: 100%;padding: 5px;box-sizing: border-box;}
-    .row {display: flex;flex-wrap: wrap;margin-bottom: 10px;}
-    #impeller_material_manual{appearance: auto !important;width: 100%;padding: 6px;}
+    li.error {
+        color: red;
+    }
 
     /* Change styles for cancel button and delete button on extra small screens */
     @media screen and (max-width: 300px) {
-        .cancelbtn, 
-        .deletebtn {width: 100%;}
+        .cancelbtn, .deletebtn {
+            width: 100%;
+        }
     }
 </style>
 
@@ -83,25 +125,18 @@
                             <input type="text" class="formInput" name="full_article_number" id="full_article_number" placeholder="Full Article Number">
                         </div>
 
-                        <div class="formFields"  id="bareshaft_pump_article_number_section" style="display: none;">
+                        <div class="formFields"  id="bareshaft_pump_article_number_section"  style="display: none;">
                             <div class="helpBtnWrap" style="position: relative;">
                                 <a href="" class="helpBtn">?</a>
                                 <div class="popper-content hide"></div>
                             </div>
                             <input type="text" class="formInput" name="bareshaft_pump_article_number" id="bareshaft_pump_article_number" placeholder="Bareshaft Pump Article Number">
                         </div>
-                        
+
                         <div class="formFields">
                             <div class="helpBtnWrap" style="position: relative;">
                                 <a href="" class="helpBtn">?</a>
-                                <!-- <a class="pump_model_manual_add d-none" id="pump_model_manual_add" style="right:-4.5rem!important;">+</a>
-                                <div class="popper-content hide">{{$tool_tip[0]->pump_model ?? ""}}</div> -->
-
-                                <!-- A Code: 19-03-2026 Start -->
                                 <div class="popper-content hide">{{$tool_tip[0]->pump_model ?? ""}}</div>
-                                <a class="pump_model_manual_add d-none" id="pump_model_manual_add" style="left:110% !important;">+</a>
-                                <!-- A Code: 19-03-2026 End -->
-
                             </div>
                             <span class="formArrowIcon"><img src="{{asset('fassets/images/arrowDownIcon.png')}}" /></span>
                             <select name="pump_model" id="pump_model" class="formInput">
@@ -110,7 +145,7 @@
                                 <option value={{$pt->id}}>{{$pt->name}}</option>
                                 @endforeach
                             </select>
-                        </div>                      
+                        </div>
 
                         <div class="formFields">
                             <div class="helpBtnWrap" style="position: relative;">
@@ -124,9 +159,9 @@
                                 <option value={{$am->id}}>{{$am->name}}</option>
                                 @endforeach
                             </select>
-                        </div>                    
+                        </div>
 
-                        <!-- R Code: 19-03-2026 Start -->
+                        <!--  -->
                         <div class="formFields" style="display:none;" id="pump_model_flow_head">
                             <input type="text" name="pump_model_flow" id="pump_model_flow" class="formInput" placeholder="Flow*" style="margin-right: 10px;">
                             <input type="text" class="formInput" placeholder="-m³/h" style="margin-right: 10px; width:30%;" readonly>
@@ -135,14 +170,12 @@
                         </div>
 
                         <div class="formFields" style="display:none;" id="pump_model_impeller_required">
-                            <input type="text" name="pump_model_impeller_size" id="pump_model_impeller_size" 
-                            class="formInput" placeholder="Impeller standard size*" style="margin-right: 10px;" readonly>
+                            <input type="text" name="pump_model_impeller_size" id="pump_model_impeller_size" class="formInput" placeholder="Impeller standard size*" style="margin-right: 10px;" readonly>
                             <input type="text" class="formInput" placeholder="- mm" style="margin-right: 10px; width:30%;" readonly>
-                            <input type="text" name="pump_model_required_size" id="pump_model_required_size" 
-                            class="formInput" placeholder="Required impeller size*" style="margin-right: 10px;">
+                            <input type="text" name="pump_model_required_size" id="pump_model_required_size" class="formInput" placeholder="Required impeller size*" style="margin-right: 10px;">
                             <input type="text" class="formInput" placeholder="- mm" style="width:30%;" readonly>
                         </div>
-                        <!-- R Code: 19-03-2026 End -->
+                    <!--  -->
 
                         <div class="formFields">
                             <div class="helpBtnWrap" style="position: relative;">
@@ -255,31 +288,11 @@
                                 @endforeach
                             </select>
                         </div>
-
-                        <!-- A Code: 19-03-2026 Start -->
-                        <input type="hidden" name='origin_country' id="origin_country" class="origin_country">  
-                        <!-- A Code: 19-03-2026 End -->
 						
                         <input type="hidden" name='bare_shaft_price' id="price_hidden" class="price_hidden">
                         <input type="hidden" name='is_bare_shaft_price_manual' id="is_bare_shaft_price_manual" value="0">
-
-                        <!-- A Code: 19-03-2026 Start -->
-                        <input type="hidden" name='is_shipping_charge_manual' id="is_shipping_charge_manual" value="0">
-                        <input type="hidden" name='shipping_price_manual' id="shipping_price_manual_hidden" class="shipping_price_manual_hidden">    
-                        <!-- A Code: 19-03-2026 End -->
-
                         <input type="hidden" name='acessories_price' id="acessories_price_hidden" class="acessories_price_hidden">
-
-                        <!-- A Code: 19-03-2026 Start -->
-                        <input type="hidden" name='manual_acessories_price' id="manual_acessories_price_hidden" class="manual_acessories_price_hidden">
-                        <!-- A Code: 19-03-2026 End --> 
-
                         <input type="hidden" name='is_acessories_price_manual' id="is_acessories_price_manual" value="0">
-
-                        <!-- A Code: 19-03-2026 Start -->
-                        <input type="hidden" name='is_acessories_price_manual1' id="is_acessories_price_manual1" value="0">
-                        <!-- A Code: 19-03-2026 End -->
-
                         <input type="hidden" name='motor_price' id="motor_price_hidden" class="motor_price_hidden">
                         <input type="hidden" name='frame_size' id="frame_size" class="frame_size">
                         <input type="hidden" name='master_price_id' id="master_price_id" class="master_price_id">
@@ -288,12 +301,7 @@
                         <input type="hidden" name='total_price' id="total-price">
 
                         <input type="hidden" name='impeller_minimum_size' id="impeller_minimum_size">
-                        <input type="hidden" name='impeller_maximum_size' id="impeller_maximum_size">
-
-                        <!-- A Code: 19-03-2026 Start -->
-                        <input type="hidden" name='is_bare_shaft_article_number_method' id="is_bare_shaft_article_number_method" value="manual">
-                        <!-- A Code: 19-03-2026 End --> 
-
+                    <input type="hidden" name='impeller_maximum_size' id="impeller_maximum_size">
                     </form>
                 </div>
                 <div class="optBtn"><a href="javascript:void(0)" id="optional-button">Optional</a></div>
@@ -556,7 +564,7 @@
                 type: 'hidden',
                 id: 'hidden_impeller_material',
                 name: 'impeller_material'
-            }).appendTo('#scp_form'); // A Code: 19-03-2026
+            }).appendTo('#atmos_form');
         }
         $("#hidden_impeller_material").val(impeller_material_val);
 
@@ -565,7 +573,7 @@
                 type: 'hidden',
                 id: 'hidden_pump_model',
                 name: 'pump_model'
-            }).appendTo('#scp_form'); // A Code: 19-03-2026
+            }).appendTo('#atmos_form');
         }
         $("#hidden_pump_model").val(pump_model_val);
         $("#motor_power").removeAttr('disabled');
@@ -642,13 +650,10 @@
         $("#manual_acessories_price_modal").hide();
         $("#is_acessories_price_manual").val(1);
     });
-    
-    // This is new code to upload Date : 30-10-2025 Code starts
+
     $("#motor_power").on('change', function (e) {
-        let motorPower = $(this).val();
-        $("#power_supply").removeAttr('disabled');
-        $("#frequency, #poles, #efficiency, #motor_brand, #application").attr('disabled', 'disabled');
-        $('#power_supply,#frequency,#poles, #efficiency, #motor_brand, #application').prop('selectedIndex', 0);
+        $(this).val() == "" ? $("#power_supply").attr('disabled', 'disabled')
+                : $("#power_supply").removeAttr('disabled');
     });
 
     $("#power_supply").on('change', function (e) {
@@ -663,29 +668,21 @@
         $(this).val() == "" ? $("#frequency").attr('disabled', 'disabled')
                 : $("#frequency").removeAttr('disabled');
 
-        $("#poles, #efficiency, #motor_brand, #application").attr('disabled', 'disabled');
-        $('#frequency,#poles, #efficiency, #motor_brand, #application').prop('selectedIndex', 0);
     });
 
     $("#frequency").on('change', function (e) {
         $(this).val() == "" ? $("#poles").attr('disabled', 'disabled')
                 : $("#poles").removeAttr('disabled');
-        $("#efficiency, #motor_brand, #application").attr('disabled', 'disabled');
-        $('#poles, #efficiency, #motor_brand, #application').prop('selectedIndex', 0);
     });
 
     $("#poles").on('change', function (e) {
         $(this).val() == "" ? $("#efficiency").attr('disabled', 'disabled')
                 : $("#efficiency").removeAttr('disabled');
-        $("#motor_brand, #application").attr('disabled', 'disabled');
-        $('#efficiency, #motor_brand, #application').prop('selectedIndex', 0);
     });
 
     $("#efficiency").on('change', function (e) {
         $(this).val() == "" ? $("#motor_brand").attr('disabled', 'disabled')
                 : $("#motor_brand").removeAttr('disabled');
-        $("#application").attr('disabled', 'disabled');
-        $('#motor_brand, #application').prop('selectedIndex', 0);
     });
 
     $("#motor_brand").on('change', function (e) {
@@ -713,13 +710,7 @@
                     $("#application").removeAttr('disabled');
                     $("#frame_size").val(res.frame_size);
                     $("#master_price_id").val(res.id);
-
-                    //get_accessories(res);
-                    // A Code Test: 18-03-2026 Start
-                    if($("#is_acessories_price_manual1").val() == "0"){
-                        get_accessories(res);
-                    }
-                    // A Code Test: 18-03-2026 End
+                    get_accessories(res);
                 } else {
                     var pole = $('#poles option:selected').val();
                     var voltage = $('#power_supply option:selected').val();
@@ -735,85 +726,7 @@
             }
         });
 
-    });    
-    // This is new code to upload Date : 30-10-2025 Code ends
-
-    // $("#motor_power").on('change', function (e) {
-    //     $(this).val() == "" ? $("#power_supply").attr('disabled', 'disabled')
-    //             : $("#power_supply").removeAttr('disabled');
-    // });
-
-    // $("#power_supply").on('change', function (e) {
-    //     var power_supply = $(this).children("option:selected").val();
-    //     if(power_supply == 400){
-    //         $("#60").attr('disabled', 'disabled');
-    //         $("#50").removeAttr('disabled');        
-    //     }else{
-    //         $("#50").attr('disabled', 'disabled');
-    //         $("#60").removeAttr('disabled');
-    //     }
-    //     $(this).val() == "" ? $("#frequency").attr('disabled', 'disabled')
-    //             : $("#frequency").removeAttr('disabled');
-
-    // });
-
-    // $("#frequency").on('change', function (e) {
-    //     $(this).val() == "" ? $("#poles").attr('disabled', 'disabled')
-    //             : $("#poles").removeAttr('disabled');
-    // });
-
-    // $("#poles").on('change', function (e) {
-    //     $(this).val() == "" ? $("#efficiency").attr('disabled', 'disabled')
-    //             : $("#efficiency").removeAttr('disabled');
-    // });
-
-    // $("#efficiency").on('change', function (e) {
-    //     $(this).val() == "" ? $("#motor_brand").attr('disabled', 'disabled')
-    //             : $("#motor_brand").removeAttr('disabled');
-    // });
-
-    // $("#motor_brand").on('change', function (e) {
-    //     $("#loader").show();
-    //     ajax_data = {
-    //         'poles': $("#poles").val(),
-    //         'motor_brand': $(this).val(),
-    //         'frequency': $("#frequency").val(),
-    //         'motor_power': $("#motor_power").val(),
-    //         'effieciency': $("#efficiency").val(),
-    //         'power_supply': $("#power_supply").val()
-    //     };
-    //     var url = "{{url('get_scp_frame')}}";
-    //     $.ajax({
-    //         type: "post",
-    //         url: url,
-    //         headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-    //         data: ajax_data,
-
-    //         success: function (res) {
-    //             if (res != 0) {
-    //                 $(document).ajaxComplete(function () {
-    //                     $("#loader").hide();
-    //                 });
-    //                 $("#application").removeAttr('disabled');
-    //                 $("#frame_size").val(res.frame_size);
-    //                 $("#master_price_id").val(res.id);
-    //                 get_accessories(res);
-    //             } else {
-    //                 var pole = $('#poles option:selected').val();
-    //                 var voltage = $('#power_supply option:selected').val();
-    //                 var motor_power = $('#motor_power option:selected').val();
-    //                 error = pole + "pole - " + motor_power + "kW product is not avilable .";
-    //                 jQuery.noConflict();
-    //                 $("#error_statement").text(error);
-    //                 $('#alert_data').show();
-    //                 $( "#refresh_close" ).click(function() {
-    //                     location.reload();
-    //                 });
-    //             }
-    //         }
-    //     });
-
-    // });
+    });
 
     function refresh()
     {
@@ -843,16 +756,7 @@
                     $("#is_acessories_price_manual").val(0);
 
                 } else {
-                    //$('#manual_acessories_price_modal').show();
-
-                    // A Code: 06-03-2026 Start
-                    var bareshaft_pump_full_pump = $('#bareshaft_pump_full_pump').val();
-                    //alert(bareshaft_pump_full_pump);
-                    if(bareshaft_pump_full_pump != 'manual'){
-                        $('#manual_acessories_price_modal').show();
-                    }
-                    // A Code: 06-03-2026 End
-
+                    $('#manual_acessories_price_modal').show();
                 }
             }
         });
@@ -1067,7 +971,7 @@
         $("#adder-optional-modal").hide();
         if (adderIds.length >= 1) {
             var master_id = $("#master_price_id").val();
-            var url = "{{url('scp/ajax-optional-selected-adder')}}"; // A Code: 19-03-2026
+            var url = "{{url('atmos/ajax-optional-selected-adder')}}";
             $.ajax({
                 type: "post",
                 url: url,
@@ -1095,25 +999,25 @@
                 e.preventDefault();
                 var full_article_number = $("#full_article_number").val();
                 $.ajax({
-                    type: "get",
-                    url: "{{route('scp.searchbyarticle')}}",
-                    data: {full_article_number: full_article_number},
-                    success: function (response){
-                        if(response.data.cp_records_html) {
-                            $(document).ajaxComplete(function () {
-                                $("#loader").hide();
-                            });
-                            $("#price").html('');
-                            $("#price").html(response.data.cp_price + '$');
-                            $("#total-price").val(response.data.total_price);
-                            $("#master-price-record").html('');
-                            $("#master-price-record").html(response.data.cp_records_html);
-                            $("#myModal").show();
-                        }else {
-
-                            $("#error-modal").show();
-                            $("#error-modal-body").html(response.data.cp_records_html_error);
-                        }
+                type: "get",
+                url: "{{route('scp.searchbyarticle')}}",
+                data: {full_article_number: full_article_number},
+                success: function (response){
+                    if(response.data.cp_records_html) {
+                    $(document).ajaxComplete(function () {
+                        $("#loader").hide();
+                    });
+                    $("#price").html('');
+                    $("#price").html(response.data.cp_price + '$');
+                    $("#total-price").val(response.data.total_price);
+                    $("#master-price-record").html('');
+                    $("#master-price-record").html(response.data.cp_records_html);
+                    $("#myModal").show();
+                    }
+                    else {
+                        $("#error-modal").show();
+                        $("#error-modal-body").html(response.data.cp_records_html_error);
+                    }
                     },
                     error:function(data){
 
@@ -1122,59 +1026,5 @@
             }
         }
     });
-
-    // $(document).on("change","#bareshaft_pump_full_pump",function(){
-    //     var value = $(this).val();
-    //     if(value == "full_pump" || value == "both_pump"){
-    //         // $("#full_article_number_section").css('display','block');
-    //         // $("#bareshaft_pump_article_number_section").css('display','none');
-    //         // $("#pump_model_manual_add").css('display','block');
-    //     }
-    //     else if(value == "bareshaft_pump"){
-    //         $("#full_article_number_section").css('display','none');
-    //         $("#bareshaft_pump_article_number_section").css('display','block');
-    //         $("#pump_model_manual_add").css('display','none ');
-    //     }
-    //     else if(value == "manual"){
-    //         $("#full_article_number_section").css('display','block');
-    //         $("#bareshaft_pump_article_number_section").css('display','none');
-    //         $("#pump_model_manual_add").css('display','block');
-    //         $("#pump_model, #impeller_material").attr('disabled', 'disabled');
-    //     }
-    //     else{
-    //         $("#full_article_number_section").css('display','block');
-    //         $("#bareshaft_pump_article_number_section").css('display','none');
-    //         $("#pump_model_manual_add").css('display','block');
-    //     }
-    // });
-
-    // A Code: 19-03-2026 Start
-    $(document).on("change", "#bareshaft_pump_full_pump", function () {
-        var value = $(this).val();
-        if (value === "full_pump" || value === "both_pump") {          
-            $("#pump_model").val("").trigger("change");
-            $("#full_article_number_section").show();
-            $("#pump_model_manual_add").hide();
-            $("#pump_model").prop('disabled', false);
-        } 
-        else if (value === "bareshaft_pump") {
-            $("#full_article_number_section").hide();
-            $("#bareshaft_pump_article_number_section").show();
-            $("#pump_model_manual_add").hide();
-        } 
-        else if (value === "manual") {
-            $("#full_article_number_section").show();
-            $("#bareshaft_pump_article_number_section").hide();
-            $("#pump_model_manual_add").show();
-            $("#pump_model, #impeller_material").prop('disabled', true);
-        } 
-        else {
-            $("#full_article_number_section").show();
-            $("#bareshaft_pump_article_number_section").hide();
-            $("#pump_model_manual_add").show();
-        }
-    });
-    // A Code: 19-03-2026 End
-
 </script>
 @stop

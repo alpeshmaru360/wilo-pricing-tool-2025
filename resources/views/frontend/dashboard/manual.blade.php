@@ -21,25 +21,26 @@
 
                                 </thead>
                                 <tbody>
+
+                                    {{--
                                     @if($cp['data']->isNotEmpty())
-{{--                                    @foreach($cp['data'] as $key=> $val)--}}
                                         <tr>
                                             <td>{{$cp['module_name']}} </td>
                                             <td>
                                                 @if(empty($cp['data']))
                                                     <a href="javascript:void(0)">
-                                                        @else
-                                                            @foreach($cp['data'] as $key=>$d)
-                                                                <a href="{{ URL::to('public/manuals/'.$d->file_name )}}" target="_blank">
-                                                                    <img src="{{asset('public/assets/icons/file.svg')}}" /> {{$d->file_name}} <br>
-                                                                    @endforeach
-                                                                    @endif
-                                                                </a>
+                                                @else
+                                                    @foreach($cp['data'] as $key=>$d)
+                                                    <a href="{{ URL::to('public/manuals/'.$d->file_name )}}" target="_blank">
+                                                        <img src="{{asset('public/assets/icons/file.svg')}}" /> {{$d->file_name}} <br>
+                                                    @endforeach
+                                                @endif
                                                     </a>
+                                                </a>                                            
                                             </td>
-
                                         </tr>
-                            @endif
+                                    @endif
+                                   
                                     @if($scp['data']->isNotEmpty())
                                     <tr>
                                         <td>{{$scp['module_name']}} </td>
@@ -49,7 +50,7 @@
                                                     @else
                                                         @foreach($scp['data'] as $key=>$d)
                                                             <a href="{{ URL::to('public/manuals/'.$d->file_name )}}" target="_blank">
-                                                                <img src="{{asset('public/assets/icons/file.svg')}}" /> {{$d->file_name}} <br>
+                                                                <img src="{{asset('assets/icons/file.svg')}}" /> {{$d->file_name}} <br>
                                                                 @endforeach
                                                                 @endif
                                                             </a>
@@ -57,9 +58,9 @@
                                         </td>
 
                                         </tr>
-                                    @endif
-                                    @if($atmos['data']->isNotEmpty())
+                                    @endif                                                                       
 
+                                    @if($atmos['data']->isNotEmpty())
                                         <tr>
                                             <td>{{$atmos['module_name']}} </td>
                                             <td>
@@ -68,19 +69,17 @@
                                                         @else
                                                             @foreach($atmos['data'] as $key=>$d)
                                                                 <a href="{{ URL::to('public/manuals/'.$d->file_name )}}" target="_blank">
-                                                                    <img src="{{asset('public/assets/icons/file.svg')}}" /> {{$d->file_name}} <br>
+                                                                    <img src="{{asset('assets/icons/file.svg')}}" /> {{$d->file_name}} <br>
                                                                     @endforeach
                                                                     @endif
                                                                 </a>
                                                     </a>
                                             </td>
-
                                         </tr>
                                     @endif
 
                                     @if($booster['data']->isNotEmpty())
-
-                                            <tr>
+                                        <tr>
                                             <td>{{$booster['module_name']}} </td>
                                             <td>
                                                 @if(empty($booster['data']))
@@ -88,17 +87,89 @@
                                                         @else
                                                             @foreach($booster['data'] as $key=>$d)
                                                                 <a href="{{ URL::to('public/manuals/'.$d->file_name )}}" target="_blank">
-                                                                    <img src="{{asset('public/assets/icons/file.svg')}}" /> {{$d->file_name}} <br>
+                                                                    <img src="{{asset('assets/icons/file.svg')}}" /> {{$d->file_name}} <br>
                                                                     @endforeach
                                                                     @endif
                                                                 </a>
                                                     </a>
                                             </td>
-
                                         </tr>
                                     @endif
 
-                                    {{--                                    @endforeach--}}
+                                    --}} 
+
+                                    <!-- A Code: 20-02-2026 Start -->
+                                    @if(!empty($cp['data']) && $cp['data']->isNotEmpty())
+                                        <tr>
+                                            <td>{{ $cp['module_name'] }}</td>
+                                            <td>
+                                                @foreach($cp['data'] as $d)
+                                                    <a href="{{ URL::to('public/manuals/' . $d->file_name) }}" target="_blank" class="d-block mb-1">
+                                                        <img src="{{ asset('assets/icons/file.svg') }}" alt="file" />
+                                                        {{ $d->file_name }}
+                                                    </a> <br>
+                                                @endforeach
+                                            </td>
+                                        </tr>
+                                    @endif
+
+                                    @if(!empty($scp['data']) && $scp['data']->isNotEmpty())
+                                        <tr>
+                                            <td>{{ $scp['module_name'] }}</td>
+                                            <td>
+                                                @foreach($scp['data'] as $d)
+                                                    <a href="{{ URL::to('public/manuals/' . $d->file_name) }}" target="_blank" class="d-block mb-1">
+                                                        <img src="{{ asset('assets/icons/file.svg') }}" alt="file" />
+                                                        {{ $d->file_name }}
+                                                    </a> <br>
+                                                @endforeach
+                                            </td>
+                                        </tr>
+                                    @endif
+                                    
+                                    @if(!empty($scpv['data']) && $scpv['data']->isNotEmpty())
+                                        <tr>
+                                            <td>{{ $scpv['module_name'] }}</td>
+                                            <td>
+                                                @foreach($scpv['data'] as $d)
+                                                    <a href="{{ URL::to('public/manuals/' . $d->file_name) }}" target="_blank" class="d-block mb-1">
+                                                        <img src="{{ asset('assets/icons/file.svg') }}" alt="file" />
+                                                        {{ $d->file_name }}
+                                                    </a> <br>
+                                                @endforeach
+                                            </td>
+                                        </tr>
+                                    @endif
+
+                                    @if(!empty($atmos['data']) && $atmos['data']->isNotEmpty())
+                                        <tr>
+                                            <td>{{ $atmos['module_name'] }}</td>
+                                            <td>
+                                                @foreach($atmos['data'] as $d)
+                                                    <a href="{{ URL::to('public/manuals/' . $d->file_name) }}" target="_blank" class="d-block mb-1">
+                                                        <img src="{{ asset('assets/icons/file.svg') }}" alt="file" />
+                                                        {{ $d->file_name }}
+                                                    </a> <br>
+                                                @endforeach
+                                            </td>
+                                        </tr>
+                                    @endif
+
+                                    @if(!empty($booster['data']) && $booster['data']->isNotEmpty())
+                                        <tr>
+                                            <td>{{ $booster['module_name'] }}</td>
+                                            <td>
+                                                @foreach($booster['data'] as $d)
+                                                    <a href="{{ URL::to('public/manuals/' . $d->file_name) }}" target="_blank" class="d-block mb-1">
+                                                        <img src="{{ asset('assets/icons/file.svg') }}" alt="file">
+                                                        {{ $d->file_name }}
+                                                    </a> <br>
+                                                @endforeach
+                                            </td>
+                                        </tr>
+                                    @endif
+                                    <!-- A Code: 20-02-2026 Start -->
+
                                 </tbody>
                             </table>
 

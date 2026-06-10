@@ -10,7 +10,13 @@
             <h1 class="m-0 text-dark">{{ trans('OTP Margin For ') }}{{"Atmos Giga"}}</h1>
         @elseif($part_id == 3)
             <h1 class="m-0 text-dark">{{ trans('OTP Margin For ') }}{{"Scp Pump Assembly"}}</h1>
-			@elseif($part_id == 5)
+            
+        {{-- A Code: 31-10-2025 Start --}}
+        @elseif($part_id == 6)            
+            <h1 class="m-0 text-dark">{{ trans('OTP Margin For ') }}{{"Scpv Pump Assembly"}}</h1>
+        {{-- A Code: 31-10-2025 End --}}
+
+		@elseif($part_id == 5)
             <h1 class="m-0 text-dark">{{ trans('OTP Margin For ') }}{{"Fire fighting"}}</h1>
         @elseif($part_id == 2)
             <h1 class="m-0 text-dark">{{ trans('OTP Margin For ') }}{{"Control Panel"}}</h1>
@@ -30,8 +36,8 @@
 <section class="content">
 @include('layouts.message')
 
-<div class="card-body">
-        <form action="{{ route("admin.otp_margin_post") }}" method="POST">
+    <div class="card-body">
+        <form action="{{ route('admin.otp_margin_post') }}" method="POST">
               @csrf
               <input type="hidden" name="part_id" value="{{$part_id}}">
               @foreach($current_data as $cd)

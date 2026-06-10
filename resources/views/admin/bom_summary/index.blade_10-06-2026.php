@@ -68,6 +68,7 @@
             </div>
 
             <div class="card-body project_bg">
+                <!-- Alpesh Maru Date : 09-09-2025 Code Start -->
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped table-hover datatable">
                             <thead>
@@ -118,7 +119,6 @@
                                             $url = match($row['Module']) {
                                                 'controlpanel' => url('controlpanel/cart-item/' . $row['ItemWiseId']),
                                                 'scp' => url('scp/cart-item/' . $row['ItemWiseId']),
-                                                'scpv' => url('scpv/cart-item/' . $row['ItemWiseId']), // A Code: 23-02-2026
                                                 'atmos' => url('atmos/cart-item/' . $row['ItemWiseId']),
                                                 'booster' => url('booster-set/cart-item/' . $row['ItemWiseId']),
                                                 'firefighting' => url('firefighting-set/cart-item/' . $row['ItemWiseId']),
@@ -167,6 +167,7 @@
 @section('scripts')
 @parent
 <script>
+    // Alpesh Maru Date : 22-09-2025 Code Start
     function download_csv() {
         var $form = $('#filter_form');
         // Temporarily change action to export route
@@ -193,6 +194,7 @@
             });
         }
     });
+    // Alpesh Maru Date : 22-09-2025 Code End
 </script>
 
 <!-- Flatpickr JS -->

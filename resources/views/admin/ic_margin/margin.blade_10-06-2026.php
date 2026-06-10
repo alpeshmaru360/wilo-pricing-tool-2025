@@ -10,13 +10,7 @@
             <h1 class="m-0 text-dark">{{ trans('Inter Country Margin For ') }}{{"Atmos Giga"}}</h1>
         @elseif($part_id == 3)
             <h1 class="m-0 text-dark">{{ trans('Inter Country Margin For ') }}{{"Scp Pump Assembly"}}</h1>
-
-        {{-- A Code: 03-11-2025 Start --}}
-        @elseif($part_id == 6)
-            <h1 class="m-0 text-dark">{{ trans('Inter Country Margin For ') }}{{"Scpv Pump Assembly"}}</h1>
-        {{-- A Code: 03-11-2025 End --}}
-
-		@elseif($part_id == 5)
+			@elseif($part_id == 5)
             <h1 class="m-0 text-dark">{{ trans('Inter Country Margin For ') }}{{"Fire fighting"}}</h1>
         @elseif($part_id == 2)
             <h1 class="m-0 text-dark">{{ trans('Inter Country Margin For ') }}{{"Control Panel"}}</h1>
