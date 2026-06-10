@@ -7,7 +7,6 @@
 
     </thead>
     <tbody>
-
         <tr>
             <td>Number Of Pump</td>
             <td>{{ $controlPanelData->noofpumps['value']}}</td>

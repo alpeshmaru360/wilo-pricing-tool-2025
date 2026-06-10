@@ -16,8 +16,6 @@
                                     <!--<th width="5%"></th>-->
                                     <th width="15%">Item Description</th>
                                     <th width="15%">Article Number</th>
-
-
                                     <th width="10%">Unit Price</th>
                                     <th width="10%">Qty</th>
                                     <th width="10%">Total Price</th>
@@ -27,8 +25,6 @@
                             </thead>
                             <tbody>
                                 @foreach($controlPanelCartData as $key=> $val)
-
-
                                 <tr>
                                     <td style="display: none;"><input type="checkbox" checked name="cart_id" value="{{$val['id']}}"></td>
                                     <td>
@@ -51,15 +47,17 @@
                                             </div>
                                         </div>
                                     </td>
-                            <input type="hidden" class="cp-id" value="{{$val['id']}}">
-                            <input type="hidden" class="total-price-input" name="" value="{{$val->total_price}}"  min="1" max="" />
-                            <td class="total-price">{{$val->total_price*$val->qty }}</td>
-                            <td><a href="{{ URL::to('controlpanel/cart-item/'.$val['id'] )}}" target="_blank"><img src="{{asset('fassets/images/viewIcon.png')}}" />
-                                </a>
-                                <!--<button><img src="{{asset('fassets/images/downloadIcon.png')}}" /></button>-->
-                            </td>
-                            <td><button class="delete-cart"><img src="{{asset('fassets/images/delIcon.png')}}" /></button></td>
-                            </tr>
+                                    <input type="hidden" class="cp-id" value="{{$val['id']}}">
+                                    <input type="hidden" class="total-price-input" name="" value="{{$val->total_price}}"  min="1" max="" />
+                                    <td class="total-price">{{$val->total_price*$val->qty }}</td>
+                                    <td>
+                                        <a href="{{ URL::to('controlpanel/cart-item/'.$val['id'] )}}" target="_blank">
+                                            <img src="{{asset('fassets/images/viewIcon.png')}}" />
+                                        </a>
+                                        <!--<button><img src="{{asset('fassets/images/downloadIcon.png')}}" /></button>-->
+                                    </td>
+                                    <td><button class="delete-cart"><img src="{{asset('fassets/images/delIcon.png')}}" /></button></td>
+                                </tr>
                             @endforeach
                             </tbody>
                         </table>

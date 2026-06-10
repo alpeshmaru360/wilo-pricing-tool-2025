@@ -20,15 +20,10 @@
                                     <th width="8%">Adder Code</th>
                                     @if (auth()->user()->isAdmin())
                                     <th width="10%">Unit Price</th>
-
-
                                     @endif
-
                                     <th width="12%">Qty</th>
                                     @if (auth()->user()->isAdmin())
                                     <th width="10%">Total Price</th>
-
-
                                     @endif
 
                                 </tr>
@@ -52,18 +47,13 @@
                                     </td>
                                     @if (auth()->user()->isAdmin())
                                     <td>{{$item->price}}</td>
-
-
                                     @endif
                                     <td>
                                         {{$item->qty}}
                                     </td>
                                     @if (auth()->user()->isAdmin())
                                     <td>{{$item->price*$item->qty }}</td>
-
                                     @endif
-
-
                                 </tr>
                                 @endforeach
                             </tbody>
