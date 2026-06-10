@@ -39,7 +39,6 @@ class User extends Authenticatable
         'email_verified_at',
         'atmos_access',
         'scp_access',
-        'scpv_access',
         'fire_fighting_access',
         'booster_access',
         'sch_access',
@@ -119,11 +118,6 @@ class User extends Authenticatable
     protected function ic_margin_scp(){
         return DB::table('ic_margin')->where('country_id',auth()->user()->country_id)->where('part_id',3)->pluck('value')[0];
     }
-    // A Code: 04-11-2025 Start
-    protected function ic_margin_scpv(){
-        return DB::table('ic_margin')->where('country_id',auth()->user()->country_id)->where('part_id',6)->pluck('value')[0];
-    }
-    // A Code: 04-11-2025 End
     protected function ic_margin_atmos(){
         return DB::table('ic_margin')->where('country_id',auth()->user()->country_id)->where('part_id',4)->pluck('value')[0];
     }

@@ -17,11 +17,9 @@ use App\Models\FireFighting\DieselPump;
 use App\Models\FireFighting\JockeyPump;
 use App\AtmosItem;
 use App\ScpCart;
-use App\ScpvCart; // A Code: 26-02-2026
 use App\Models\BoosterCart;
 use App\AtmosPump;
 use App\ScpPumpType;
-use App\ScpvPumpType; // A Code: 26-02-2026
 
 class Quotation extends Model
 {
@@ -264,8 +262,7 @@ class Quotation extends Model
                 $data['ip_rating'] = $value->CIpRating;
                 $data['components'] = $value->CComponent;
                 $data['Enclosure'] = $value->CEnclosure;
-            } 
-            elseif ($value->cart_model_name == 'scp') {
+            } elseif ($value->cart_model_name == 'scp') {
                 $data['simple_article_no'] = $value->SArticleNumber;
                 $data['article_no'] = $value->SFullArticleNumber;
                 $short_code = static::atmos_short_code($value->AMaterialId);
@@ -290,17 +287,13 @@ class Quotation extends Model
                 }
                 $data['no_of_pumps'] = '1';
                 $data['manifold_material'] = '-';
-
-                // A Code: 26-02-2026 Start
                 if ($value->SSealGlandPackId == '1') {
-                    $data['Seal/gland pack'] = 'Mechanical seal';
+                    $data['Seal/gland pack'] = 'Seal';
                 } elseif ($value->SSealGlandPackId == '2') {
-                    $data['Seal/gland pack'] = 'Gland Pack';
+                    $data['Seal/gland pack'] = 'Gland';
                 } else {
                     $data['Seal/gland pack'] = 'Other';
                 }
-                // A Code: 26-02-2026 End
-                
                 $data['pump_description'] = $value->SPumpName;
                 $data['motor_power'] = $value->SPower;
                 $data['voltage'] = $value->SVoltage;
@@ -343,85 +336,7 @@ class Quotation extends Model
                 $data['ip_rating'] = '-';
                 $data['components'] = '-';
                 $data['Enclosure'] = '-';
-            }    
-            // A Code: 26-02-2026 Start
-            elseif ($value->cart_model_name == 'scpv') {
-                $data['simple_article_no'] = $value->SVArticleNumber;
-                $data['article_no'] = $value->SVFullArticleNumber;
-                $short_code = static::atmos_short_code($value->AMaterialId);
-                if ($short_code == "-") {
-                    $data['description'] = $value->SVPumpName . '/' . $value->SVPower . 'KW' . '/' . $value->SVNoOfPole . '/AE';
-                } else {
-                    $data['description'] = $value->SVPumpName . '-' . $short_code . '/' . $value->SVPower . 'KW/' . $value->SVNoOfPole . '/AE';
-                }
-                $data['qty'] = $value->SVQty;
-                $data['unit_price'] = $value->SVUnitPrice;
-                $data['total_price'] = $value->SVTotalPrice;
-                $data['pump_type'] = '-';
-                $data['system_pressure'] = '-';
-                if ($value->SVMaterialId == '1') {
-                    $data['impeller_material'] = 'Cast Iron';
-                } elseif ($value->SVMaterialId == '2') {
-                    $data['impeller_material'] = 'Bronze';
-                } elseif ($value->SVMaterialId == '3') {
-                    $data['impeller_material'] = 'Stainless steel';
-                } else {
-                    $data['impeller_material'] = 'Other';
-                }
-                $data['no_of_pumps'] = '1';
-                $data['manifold_material'] = '-';
-                if ($value->SVSealGlandPackId == '1') {
-                    $data['Seal/gland pack'] = 'Mechanical seal';
-                } elseif ($value->SVSealGlandPackId == '2') {
-                    $data['Seal/gland pack'] = 'Gland Pack';
-                } else {
-                    $data['Seal/gland pack'] = 'Other';
-                }
-                $data['pump_description'] = $value->SVPumpName;
-                $data['motor_power'] = $value->SVPower;
-                $data['voltage'] = $value->SVVoltage;
-                $data['frequency'] = $value->SVFrequency;
-                $data['no_of_poles'] = $value->SVNoOfPole;
-                $data['efficicency'] = $value->SVEfficiency;
-                $data['motor_brand'] = $value->SVBrand;
-                if ($value->SVApplication == '1') {
-                    $data['application'] = 'Constant';
-                } elseif ($value->SVApplication == '2') {
-                    $data['application'] = 'Variable';
-                } else {
-                    $data['application'] = 'Other';
-                }
-                $data['adder_ids'] =  is_null($value->SVAdderIds) ? '-' : $value->SVAdderIds;
-                $data['adder_ids_data'] = '-';
-                $data['shipping_cost'] = $value->SVShippingCostPrice;
-                $data['packing_charge'] = $value->SVPackingCharge;
-                $data['painting_charge'] = $value->SVPaintingCharge;
-                $data['assembly_charge'] = $value->SVAssemblyCharge;
-                $data['insulate_bearing_price'] = $value->SVInsulateBearingPrice;
-                $data['accesories_price'] = $value->SVAssesoriesPrice;
-                $data['inter_company_margin_price'] = $value->SVInterCompanyMargin;
-                $data['overhead'] = $value->SVOverHead;
-                $data['mechanical_total_adder_id_price'] = '-';
-                $data['total_adders_ids_price'] = '-';
-                $data['CP Price'] = '-';
-                $data['Cable Price'] = '-';
-                $data['Mechnical System price'] = '-';
-                if ($value->SVPumpPrice == "0.00") {
-                    $data['Pump price'] = "0.00";
-                } else {
-                    $data['Pump price'] = $value->SVPumpPrice;
-                }
-                $pump_article_number = static::scpv_pump_article_number($value->SVPumpName);
-                $data['pump_article_number'] = $pump_article_number;
-                $data['ambient_temp'] = '-';
-                $data['starter_type'] = '-';
-                $data['commication_protocal'] = '-';
-                $data['ip_rating'] = '-';
-                $data['components'] = '-';
-                $data['Enclosure'] = '-';
-            }             
-            // A Code: 26-02-2026 End
-            elseif ($value->cart_model_name == 'firefighting') {
+            } elseif ($value->cart_model_name == 'firefighting') {
                 $firefightingCart = FireFightingCarts::where('quotation_no', $value->quotation_number)->where('id', $value->cp_cart_id)->first();
 
                 $firefightingCartnull = FireFightingCarts::where('quotation_no', '!=', $value->quotation_number)
@@ -571,21 +486,6 @@ class Quotation extends Model
         }
         return $article;
     }
-
-    // A Code: 26-02-2026 Start
-    public static function scpv_pump_article_number($pump_name)
-    {
-        $article = ScpvPumpType::select('bare_shaft_article_number')
-            ->where('name', '=', $pump_name)
-            ->first();
-        if ($article) {
-            $article = $article->bare_shaft_article_number;
-        } else {
-            $article = '-';
-        }
-        return $article;
-    }
-    // A Code: 26-02-2026 End
 
     public static function cp_table_name($cp_id)
     {

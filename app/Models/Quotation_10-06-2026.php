@@ -24,7 +24,7 @@ class Quotation extends Model
     ];
 
     /**
-     * Quotation belongs to a User
+     * 🔹 Quotation belongs to a User
      */
     public function user()
     {
@@ -32,7 +32,7 @@ class Quotation extends Model
     }
 
     /**
-     * Quotation belongs to a Customer
+     * 🔹 Quotation belongs to a Customer
      */
     public function customer()
     {
@@ -40,7 +40,7 @@ class Quotation extends Model
     }
 
     /**
-     * Quotation belongs to Booster Cart
+     * 🔹 Quotation belongs to Booster Cart
      */
     public function boosterCart()
     {
@@ -48,7 +48,7 @@ class Quotation extends Model
     }
 
     /**
-     * Quotation belongs to Atmos Cart
+     * 🔹 Quotation belongs to Atmos Cart
      */
     public function atmosCart()
     {
@@ -56,27 +56,15 @@ class Quotation extends Model
     }
 
     /**
-     * Quotation belongs to SCP Cart
+     * 🔹 Quotation belongs to SCP Cart
      */
     public function scpCart()
     {
         return $this->belongsTo(ScpCart::class, 'cp_cart_id');
     }
 
-    // A Code: 23-02-2026 Start
-
     /**
-     * Quotation belongs to SCPV Cart
-     */
-    public function scpvCart()
-    {
-        return $this->belongsTo(ScpvCart::class, 'cp_cart_id');
-    }
-    
-    // A Code: 23-02-2026 End
-
-    /**
-     * Quotation belongs to Control Panel Cart
+     * 🔹 Quotation belongs to Control Panel Cart
      */
     public function controlPanelCart()
     {
@@ -84,7 +72,7 @@ class Quotation extends Model
     }
 
     /**
-     * Quotation belongs to Firefighting Cart
+     * 🔹 Quotation belongs to Firefighting Cart
      */
     public function firefightingCart()
     {

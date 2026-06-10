@@ -15,7 +15,6 @@ use App\AtmosCart;
 use App\AtmosItem;
 use App\Models\FireFighting\FireFightingCarts;
 use App\ScpCart;
-use App\ScpvCart; // A Code: 26-02-2026
 use App\Models\BoosterCart;
 use App\QuotationCounter;
 
@@ -35,7 +34,6 @@ class QuotationExcel implements FromView
         $ids = [];
         $atmosIds = [];
         $scpIds = [];
-        $scpvIds = []; // A Code: 26-02-2026
         $boosterIds = [];
         $firefightingIds = [];
 
@@ -47,17 +45,13 @@ class QuotationExcel implements FromView
             if ($quotation->cart_model_name == 'atmos') {
                 $atmosIds[] = $quotation->cp_cart_id;
             }
-            if ($quotation->cart_model_name == 'scp') {
+             if ($quotation->cart_model_name == 'scp') {
                 $scpIds[] = $quotation->cp_cart_id;
             }
-            // A Code: 26-02-2026 Start
-            if ($quotation->cart_model_name == 'scpv') {
-                $scpvIds[] = $quotation->cp_cart_id;
-            }
-            // A Code: 26-02-2026 End
-            if ($quotation->cart_model_name == 'booster') {
+              if ($quotation->cart_model_name == 'booster') {
                 $boosterIds[] = $quotation->cp_cart_id;
             }
+
             if ($quotation->cart_model_name == 'firefighting') {
                 $firefightingIds[] = $quotation->cp_cart_id;
             }
@@ -85,14 +79,11 @@ class QuotationExcel implements FromView
 
         $atmosCartData = AtmosCart::cartDataByQuotation($atmosIds);
         $scpCartData = ScpCart::cartDataByQuotation($scpIds);
-        $scpvCartData = ScpvCart::cartDataByQuotation($scpvIds); // A Code: 26-02-2026
         $boosterCartData = BoosterCart::cartDataByQuotation($boosterIds);
         $firefightingCartData = FireFightingCarts::cartDataByQuotation($firefightingIds);
 
-        return view('frontend.pdf.quotation_excel', compact('quotations', 'quotations_revision_no', 'customer', 'controlPanelCartData', 
-        'atmosCartData', 'scpCartData', 'scpvCartData', 'boosterCartData', 'firefightingCartData')); // A Code: 26-02-2026
+        return view('frontend.pdf.quotation_excel', compact('quotations', 'quotations_revision_no','customer', 'controlPanelCartData', 'atmosCartData','scpCartData','boosterCartData','firefightingCartData'));
     }
-
     public function collection()
     {
     }
