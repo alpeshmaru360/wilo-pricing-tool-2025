@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ScvpAssemblyCostPcPk extends Model
+class ScpvAdder extends Model
 {
     //
 }
