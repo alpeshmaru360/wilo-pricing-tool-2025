@@ -22,12 +22,11 @@ class checkifadmin
         if (Auth::check() && $user_role != 'User') {
             return $next($request);
         }
-        elseif (Auth::check() && $user_role == 'Admin' || $user_role == 'Supervisor') {
+        elseif (Auth::check() && $user_role == 'Admin') {
             return redirect('/admin');
         }
         else {
-            return redirect('/admin/login');
+            return redirect('/login');
         }
-            
     }
 }

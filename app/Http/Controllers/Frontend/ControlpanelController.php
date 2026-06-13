@@ -38,7 +38,6 @@ class ControlpanelController extends Controller{
         return view('frontend.controlpanel.index', compact('numberOfPumps', 'electricalLists'));
     }
 
-    //here
     public function ajaxFilter(Request $request) {
         $idberOfPumps = NumberOfPump::select('id', 'value')->get();
        //DB::enableQueryLog(); // Enable query log
@@ -190,6 +189,8 @@ class ControlpanelController extends Controller{
                                     ->where($columnName, '!=', 0)
                                     ->where('function_code','=','1')
                                     ->count();
+
+
                         $arrayResult = json_decode(json_encode($cpRecords), true);
                         if($arrayResult){
                             $trim_height = trim($arrayResult[0]['item_description'], 'Enclosure ');
@@ -204,8 +205,7 @@ class ControlpanelController extends Controller{
                                 $cp_width = 0;
                             }
                             //here ajax calculate
-                            $enclourse_exist = $this->calculatePriceInItem($request, $columnName,$cpRecords1,$arrayResult[0]);
-                            
+                            $enclourse_exist = $this->calculatePriceInItem($arrayResult[0], $request, $columnName,$cpRecords1);
                             if($enclourse_exist == 0.0)
                             {
                                 $data['enclourse_exist'] = null;
@@ -214,43 +214,42 @@ class ControlpanelController extends Controller{
                             else
                             {
                                 foreach($arrayResult as $key => $val) {
-                                    // $price += $this->calculatePriceInItem($val, $request, $columnName,$cpRecords1);  13-12-2024 price issue
-                                    $price += $this->calculatePriceInItem($request, $columnName, $cpRecords1,$val);
+                                    $price += $this->calculatePriceInItem($val, $request, $columnName,$cpRecords1);
                                 }
                                 $price1 = $price;
-                                    $data['control_panel_price_for_booster'] = $price1;
-                                    if($request->code_price && $request->code_price != '') {
-                                            $price = $price + $request->code_price;
-                                        }
-                                        $tax = Tax::where('id', 1)->get()[0]->amount;
-                                        $data['cp_price_booster'] = number_format($price, 2);
-                                        $price = ($price * ControlPanel::controlpanel_over_head()) / User::ic_margin_control_panel();
-                                    $data['cp_price'] = number_format($price, 2);
-                                    $cpRecordsData[$key + 1]['price'] = number_format($price, 2);
-                                    $cpRecordsData[$key + 1]['range_id'] = $range;
-                                    $cpRecordsData[$key + 1]['tax'] = $tax;
-                                    $controlPanelId = $data['controlPanel'][0]->id;
-                                    $starter = $data['controlPanel'][0]->startertypes['value'];
-                                    $application = $data['controlPanel'][0]->applications['value'];
-                                    $noOfPump = $data['controlPanel'][0]->noofpumps['value'];
-                                    $power = $data['controlPanel'][0]->powers['value'];
-                                    $returnHTML = view('frontend.controlpanel.table')->with('cpRecordsData', $controlPanelId)
-                                            ->with('tax', $tax)
-                                            ->with('price', $price)
-                                            ->with('starter', $starter)
-                                            ->with('application', $application)
-                                            ->with('noOfPump', $noOfPump)
-                                            ->with('power', $power)
-                                            ->with('starterCode', $starterCode)
-                                            ->render();
-                                    $data['cp_records_html'] = $returnHTML;
-                                    $data['cp_id'] = $data['controlPanel'][0]->id;
-                                    $data['table_name'] = $tableName;
-                                    $data['column_name'] = $columnName;
-                                    $data['total_price'] = $price;
-                                    $data['cp_height'] = $cp_height;
-                                    $data['cp_width'] = $cp_width;
-                                    $data['enclourse_exist'] = 1;
+                                $data['control_panel_price_for_booster'] = $price1;
+                                if($request->code_price && $request->code_price != '') {
+                                        $price = $price + $request->code_price;
+                                    }
+                                    $tax = Tax::where('id', 1)->get()[0]->amount;
+                                    $data['cp_price_booster'] = number_format($price, 2);
+                                    $price = ($price * ControlPanel::controlpanel_over_head()) / User::ic_margin_control_panel();
+                                $data['cp_price'] = number_format($price, 2);
+                                $cpRecordsData[$key + 1]['price'] = number_format($price, 2);
+                                $cpRecordsData[$key + 1]['range_id'] = $range;
+                                $cpRecordsData[$key + 1]['tax'] = $tax;
+                                $controlPanelId = $data['controlPanel'][0]->id;
+                                $starter = $data['controlPanel'][0]->startertypes['value'];
+                                $application = $data['controlPanel'][0]->applications['value'];
+                                $noOfPump = $data['controlPanel'][0]->noofpumps['value'];
+                                $power = $data['controlPanel'][0]->powers['value'];
+                                $returnHTML = view('frontend.controlpanel.table')->with('cpRecordsData', $controlPanelId)
+                                        ->with('tax', $tax)
+                                        ->with('price', $price)
+                                        ->with('starter', $starter)
+                                        ->with('application', $application)
+                                        ->with('noOfPump', $noOfPump)
+                                        ->with('power', $power)
+                                        ->with('starterCode', $starterCode)
+                                        ->render();
+                                $data['cp_records_html'] = $returnHTML;
+                                $data['cp_id'] = $data['controlPanel'][0]->id;
+                                $data['table_name'] = $tableName;
+                                $data['column_name'] = $columnName;
+                                $data['total_price'] = $price;
+                                $data['cp_height'] = $cp_height;
+                                $data['cp_width'] = $cp_width;
+                                $data['enclourse_exist'] = 1;
                                 $data['control_panel_price_for_booster'] = $price1;
                             }
                         }
@@ -274,7 +273,6 @@ class ControlpanelController extends Controller{
         }
     }
 
-    //here
     public function searchAjaxFilter(Request $request) {
         $idberOfPumps = NumberOfPump::select('id', 'value')->get();
         //$BoosterCartData = BoosterCart::where('full_article_number','=',$request->full_article_number)->first();
@@ -437,6 +435,7 @@ class ControlpanelController extends Controller{
                 $data['ranges'] = array_values($ranges);
                 $data['pump_model'] = $pump_model;
                 $data['full_article_number']= $full_article_number;
+
                 if(isset($request->enclosure) && !empty($request->enclosure)){
                     if (isset($data['controlPanel'][0]) && !empty($data['controlPanel'][0])) {
                         $idberOfPump = $data['controlPanel'][0]->noofpumps['value'];
@@ -476,88 +475,84 @@ class ControlpanelController extends Controller{
                         }
                     }
                     //add ends
-                    if($arrayResult){
-                        $trim_height = trim($arrayResult[0]['item_description'], 'Enclosure ');
-                        $height_exist = str_contains($trim_height, 'H');
-                        if ($height_exist){
-                            $cp_height = substr($trim_height, 0, strpos($trim_height, "H"));
-                            $trim_width = trim($trim_height, $cp_height);
-                            $cp_width = substr($trim_width, 0, strpos($trim_width, "W"));
-                            $s = trim($cp_width, 'H x ');
-                        } else{
-                            $cp_height = 0;
-                            $cp_width = 0;
-                        }
-                        // 
-                        // dd($data['controlPanel'][0]->components['id'], $data['controlPanel'][0]->enclousres['id'], $data['controlPanel'][0]->startertypes['id'], $enclousreAdderItemData, $columnName,$cpRecords1,$arrayResult[0]);
-                        //here search ajax calculate
-                        $enclourse_exist = $this->searchByArticleCalculatePriceInItem($data['controlPanel'][0]->components['id'], $data['controlPanel'][0]->enclousres['id'], $data['controlPanel'][0]->startertypes['id'], $enclousreAdderItemData, $columnName,$cpRecords1,$arrayResult[0]);
-                        if($enclourse_exist == 0.0)
-                        {
-                            $data['enclourse_exist'] = null;
-                            $price = 0.0;
-                        }
-                        else
-                        {
-                            foreach($arrayResult as $key => $val) {
-                                $price += $this->searchByArticleCalculatePriceInItem($data['controlPanel'][0]->components['id'], $data['controlPanel'][0]->enclousres['id'], $data['controlPanel'][0]->startertypes['id'], $enclousreAdderItemData, $columnName,$cpRecords1,$val);
-                                // dump($price);
-                            }
-                            // exit();
-                            $price1 = $price;
-                            $data['control_panel_price_for_booster'] = $price1;
-                            if($request->code_price && $request->code_price != '') {
-                                    $price = $price + $request->code_price;
-                                }
-                                $tax = Tax::where('id', 1)->get()[0]->amount;
-                                $data['cp_price_booster'] = number_format($price, 2);
-                                $price = ($price * ControlPanel::controlpanel_over_head()) / User::ic_margin_control_panel();
+                            if($arrayResult){
+                                    $trim_height = trim($arrayResult[0]['item_description'], 'Enclosure ');
+                                    $height_exist = str_contains($trim_height, 'H');
+                                    if ($height_exist){
+                                        $cp_height = substr($trim_height, 0, strpos($trim_height, "H"));
+                                        $trim_width = trim($trim_height, $cp_height);
+                                        $cp_width = substr($trim_width, 0, strpos($trim_width, "W"));
+                                        $cp_width = trim($cp_width, 'H x ');
+                                    } else{
+                                        $cp_height = 0;
+                                        $cp_width = 0;
+                                    }
+                                    //here search ajax calculate
+                                    $enclourse_exist = $this->searchByArticleCalculatePriceInItem($arrayResult[0], $data['controlPanel'][0]->components['id'], $data['controlPanel'][0]->enclousres['id'], $data['controlPanel'][0]->startertypes['id'], $enclousreAdderItemData, $columnName,$cpRecords1);
+                                    if($enclourse_exist == 0.0)
+                                    {
+                                        $data['enclourse_exist'] = null;
+                                        $price = 0.0;
+                                    }
+                                    else
+                                    {
+                                        foreach($arrayResult as $key => $val) {
+                                            $price += $this->searchByArticleCalculatePriceInItem($val, $data['controlPanel'][0]->components['id'], $data['controlPanel'][0]->enclousres['id'], $data['controlPanel'][0]->startertypes['id'], $enclousreAdderItemData, $columnName,$cpRecords1);
+                                        }
+                                        $price1 = $price;
+                                        $data['control_panel_price_for_booster'] = $price1;
+                                        if($request->code_price && $request->code_price != '') {
+                                                $price = $price + $request->code_price;
+                                            }
+                                            $tax = Tax::where('id', 1)->get()[0]->amount;
+                                            $data['cp_price_booster'] = number_format($price, 2);
+                                            $price = ($price * ControlPanel::controlpanel_over_head()) / User::ic_margin_control_panel();
 
-                            $data['cp_price'] = number_format($price, 2);
-                            $cpRecordsData[$key + 1]['price'] = number_format($price, 2);
-                            $cpRecordsData[$key + 1]['range_id'] = $range;
-                            $cpRecordsData[$key + 1]['tax'] = $tax;
-                            $controlPanelId = $data['controlPanel'][0]->id;
-                            $starter = $data['controlPanel'][0]->startertypes['value'];
-                            $application = $data['controlPanel'][0]->applications['value'];
-                            $noOfPump = $data['controlPanel'][0]->noofpumps['value'];
-                            $power = $data['controlPanel'][0]->powers['value'];
-                            $returnHTML = view('frontend.controlpanel.table')->with('cpRecordsData', $controlPanelId)
-                                    ->with('tax', $tax)
-                                    ->with('price', $price)
-                                    ->with('starter', $starter)
-                                    ->with('application', $application)
-                                    ->with('noOfPump', $noOfPump)
-                                    ->with('power', $power)
-                                    ->with('starterCode', $starterCode)
-                                    ->render();
-                            $data['cp_records_html'] = $returnHTML;
-                            $data['cp_id'] = $data['controlPanel'][0]->id;
-                            $data['table_name'] = $tableName;
-                            $data['column_name'] = $columnName;
-                            $data['total_price'] = $price;
-                            $data['cp_height'] = $cp_height;
-                            $data['cp_width'] = $cp_width;
-                            $data['enclourse_exist'] = 1;
-                            $data['control_panel_price_for_booster'] = $price1;
-                            if ($enclousreAdderItemData) {
-                                $data['enclousreItem'] = $enclousreAdderItemData;
+                                        $data['cp_price'] = number_format($price, 2);
+                                        $cpRecordsData[$key + 1]['price'] = number_format($price, 2);
+                                        $cpRecordsData[$key + 1]['range_id'] = $range;
+                                        $cpRecordsData[$key + 1]['tax'] = $tax;
+                                        $controlPanelId = $data['controlPanel'][0]->id;
+                                        $starter = $data['controlPanel'][0]->startertypes['value'];
+                                        $application = $data['controlPanel'][0]->applications['value'];
+                                        $noOfPump = $data['controlPanel'][0]->noofpumps['value'];
+                                        $power = $data['controlPanel'][0]->powers['value'];
+                                        $returnHTML = view('frontend.controlpanel.table')->with('cpRecordsData', $controlPanelId)
+                                                ->with('tax', $tax)
+                                                ->with('price', $price)
+                                                ->with('starter', $starter)
+                                                ->with('application', $application)
+                                                ->with('noOfPump', $noOfPump)
+                                                ->with('power', $power)
+                                                ->with('starterCode', $starterCode)
+                                                ->render();
+                                        $data['cp_records_html'] = $returnHTML;
+                                        $data['cp_id'] = $data['controlPanel'][0]->id;
+                                        $data['table_name'] = $tableName;
+                                        $data['column_name'] = $columnName;
+                                        $data['total_price'] = $price;
+                                        $data['cp_height'] = $cp_height;
+                                        $data['cp_width'] = $cp_width;
+                                        $data['enclourse_exist'] = 1;
+                                        $data['control_panel_price_for_booster'] = $price1;
+                                        if ($enclousreAdderItemData) {
+                                            $data['enclousreItem'] = $enclousreAdderItemData;
+                                        }
+                                    }
+                                }
+                            } else {
+                                $data['cp_records_html'] = '404 error May be Column is not found!';
                             }
+                        } else {
+                            $data['cp_records_html'] = 'No Record Found!';
+                            $data['cp_price'] = number_format($price, 2);
                         }
-                    }
-                    } else {
-                        $data['cp_records_html'] = '404 error May be Column is not found!';
-                    }
+                        return response()->json(array('success' => true, 'data' => $data));
                     } else {
                         $data['cp_records_html'] = 'No Record Found!';
-                        $data['cp_price'] = number_format($price, 2);
+                        $data['cp_price'] = 0.00;
+                        return response()->json(array('success' => true, 'data' => $data));
                     }
-                    return response()->json(array('success' => true, 'data' => $data));
-                } else {
-                    $data['cp_records_html'] = 'No Record Found!';
-                    $data['cp_price'] = 0.00;
-                    return response()->json(array('success' => true, 'data' => $data));
-                }
                 } else {
                     $data['cp_records_html'] = 'No Record Found!';
                     $data['cp_price'] = 0.00;
@@ -576,7 +571,6 @@ class ControlpanelController extends Controller{
     }
 
     public function getMasterSheetPriceData($brand_code, $function_code, $range) {
-        // dd($brand_code, $function_code, $range);
         $masterData = DB::table('master_price_sheet_electrical_components')->select('price')
                 ->where('brand_code', $brand_code)
                 ->where('function_code', $function_code)
@@ -653,98 +647,91 @@ class ControlpanelController extends Controller{
         return 0;
     }
 
-    public function calculatePriceInItem($request, $columnName,$enclosure_count,$val = []) {  
-        // dd($request, $columnName,$enclosure_count,$val = []);
+    public function calculatePriceInItem($val = [], $request, $columnName,$enclosure_count) {      
         $price = 0.00;
-        if(isset($request->enclousreItem)){
+        $enclousreItem = json_decode($request->enclousreItem, true);
+        if ($request->enclousreItem && !empty($request->enclousreItem) && $request->enclosure == 2 ) {
+            //yes
             $enclousreItem = json_decode($request->enclousreItem, true);
-            if ($request->enclousreItem && !empty($request->enclousreItem) && $request->enclosure == 2 ) {
-                //yes
-                $enclousreItem = json_decode($request->enclousreItem, true);
-                if ($val['brand_code'] == $enclousreItem['brand_code'] && $val['function_code'] == $enclousreItem['function_code']) 
+            if ($val['brand_code'] == $enclousreItem['brand_code'] && $val['function_code'] == $enclousreItem['function_code']) 
+            {
+                if($enclosure_count == "1")
                 {
-                    if($enclosure_count == "1")
-                    {
-                        $val['range'] = $enclousreItem['range'];
-                    }
-                    $price = $this->getMasterSheetPriceData($val['brand_code'], $val['function_code'], $val['range']) * $val[$columnName]; //Qty * price // 2 parameter is equal to brand code
+                    $val['range'] = $enclousreItem['range'];
                 }
+                $price = $this->getMasterSheetPriceData($val['brand_code'], $val['function_code'], $val['range']) * $val[$columnName]; //Qty * price // 2 parameter is equal to brand code
             }
-
-            if($request->enclousreItem && !empty($request->enclousreItem) && $request->enclosure == 4)  
-            {
-                $enclousreItem = json_decode($request->enclousreItem, true);
-                if ($val['brand_code'] == $enclousreItem['brand_code'] && $val['function_code'] == $enclousreItem['function_code']) {
-                    if($enclosure_count == "1")
-                    {
-                        $val['range'] = $enclousreItem['range'];
-                    }
-                    $price = $this->getMasterSheetPriceData($val['brand_code'], $val['function_code'], $val['range']) * $val[$columnName];
-                     //Qty * price // 2 parameter is equal to brand code
-                    $unitPrice = $this->getMasterSheetPriceData($val['brand_code'], $val['function_code'], $val['range']);
-                }
-            }
-
-            if($request->enclousreItem && !empty($request->enclousreItem) && $request->enclosure == 3)  
-            {
-                $enclousreItem = json_decode($request->enclousreItem, true);
-                if ($val['brand_code'] == $enclousreItem['brand_code'] && $val['function_code'] == $enclousreItem['function_code']) {
-                    if($enclosure_count == "1")
-                    {
-                        $val['range'] = $enclousreItem['range'];
-                    }
-                    $price = $this->getMasterSheetPriceData($val['brand_code'], $val['function_code'], $val['range']) * $val[$columnName]; //Qty * price // 2 parameter is equal to brand code
-                    $unitPrice = $this->getMasterSheetPriceData($val['brand_code'], $val['function_code'], $val['range']);
-                }
-            }    
         }
-        
-        if(isset($request->component)){
-            if ($request->component == 2 && $val['brand_code'] == 1){ 
-                // component 2 =  Economic
-                if($this->getMasterSheetPriceData(2, $val['function_code'], $val['range'])){
-                $price = $this->getMasterSheetPriceData(2, $val['function_code'], $val['range']) * $val[$columnName];
-                 //Qty * price // 2 parameter is equal to brand code
-                }
-                else {
-                    $price = $this->getMasterSheetPriceData($val['brand_code'], $val['function_code'], $val['range']) * $val[$columnName]; //Qty * price
-                }
-            } else if ($request->enclosure == 3 && $val['brand_code'] == 5 && $val['function_code'] == 1) { 
-                //3 equal GRP
-                if ($this->getMasterSheetPriceData(31, 63, $val['range'])) {
-                    $price = $this->getMasterSheetPriceData(31, 63, $val['range']) * $val[$columnName]; //Qty * price
-                    }
-                    else {
-                    $price = 0.00;
-                }
-            } 
 
-            else if($request->enclosure == 4 && $val['brand_code'] == 5 && $val['function_code'] == 1) {
-                 //4 equal Stainless
-                 if ($this->getMasterSheetPriceData(5, 64, $val['range'])){
-                     $price = $this->getMasterSheetPriceData(5, 64, $val['range']) * $val[$columnName];
-                     //Qty * price
-                    }
-                    else{
-                    $price = 0.00;
+        if($request->enclousreItem && !empty($request->enclousreItem) && $request->enclosure == 4)  
+        {
+            $enclousreItem = json_decode($request->enclousreItem, true);
+            if ($val['brand_code'] == $enclousreItem['brand_code'] && $val['function_code'] == $enclousreItem['function_code']) {
+                if($enclosure_count == "1")
+                {
+                    $val['range'] = $enclousreItem['range'];
                 }
-            }
-            else if($request->enclosure == 2  && $val['brand_code'] == 8 && $request->stater_type == 1 ) {
-                //2 equal METAL; stater_type =1 = XTREME
-                if ($this->getMasterSheetPriceData(32, $val['function_code'], $val['range'])) {
-                            $price = $this->getMasterSheetPriceData(32, $val['function_code'], $val['range']) * $val[$columnName];
-                             //Qty * price
-                        }
-                else {
-                    $price = 0.00;
-                }
-            } else {
                 $price = $this->getMasterSheetPriceData($val['brand_code'], $val['function_code'], $val['range']) * $val[$columnName];
-                 //Qty * price
+                 //Qty * price // 2 parameter is equal to brand code
+                $unitPrice = $this->getMasterSheetPriceData($val['brand_code'], $val['function_code'], $val['range']);
             }
         }
 
+        if($request->enclousreItem && !empty($request->enclousreItem) && $request->enclosure == 3)  
+        {
+            $enclousreItem = json_decode($request->enclousreItem, true);
+            if ($val['brand_code'] == $enclousreItem['brand_code'] && $val['function_code'] == $enclousreItem['function_code']) {
+                if($enclosure_count == "1")
+                {
+                    $val['range'] = $enclousreItem['range'];
+                }
+                $price = $this->getMasterSheetPriceData($val['brand_code'], $val['function_code'], $val['range']) * $val[$columnName]; //Qty * price // 2 parameter is equal to brand code
+                $unitPrice = $this->getMasterSheetPriceData($val['brand_code'], $val['function_code'], $val['range']);
+            }
+        }
 
+        if ($request->component == 2 && $val['brand_code'] == 1){ 
+            // component 2 =  Economic
+            if($this->getMasterSheetPriceData(2, $val['function_code'], $val['range'])){
+            $price = $this->getMasterSheetPriceData(2, $val['function_code'], $val['range']) * $val[$columnName];
+             //Qty * price // 2 parameter is equal to brand code
+            }
+            else {
+                $price = $this->getMasterSheetPriceData($val['brand_code'], $val['function_code'], $val['range']) * $val[$columnName]; //Qty * price
+            }
+        } else if ($request->enclosure == 3 && $val['brand_code'] == 5 && $val['function_code'] == 1) { 
+            //3 equal GRP
+            if ($this->getMasterSheetPriceData(31, 63, $val['range'])) {
+                $price = $this->getMasterSheetPriceData(31, 63, $val['range']) * $val[$columnName]; //Qty * price
+                }
+                else {
+                $price = 0.00;
+            }
+        } 
+
+        else if($request->enclosure == 4 && $val['brand_code'] == 5 && $val['function_code'] == 1) {
+             //4 equal Stainless
+             if ($this->getMasterSheetPriceData(5, 64, $val['range'])){
+                 $price = $this->getMasterSheetPriceData(5, 64, $val['range']) * $val[$columnName];
+                 //Qty * price
+                }
+                else{
+                $price = 0.00;
+            }
+            }
+        else if($request->enclosure == 2  && $val['brand_code'] == 8 && $request->stater_type == 1 ) {
+            //2 equal METAL; stater_type =1 = XTREME
+            if ($this->getMasterSheetPriceData(32, $val['function_code'], $val['range'])) {
+                        $price = $this->getMasterSheetPriceData(32, $val['function_code'], $val['range']) * $val[$columnName];
+                         //Qty * price
+                    }
+            else {
+                $price = 0.00;
+            }
+        } else {
+            $price = $this->getMasterSheetPriceData($val['brand_code'], $val['function_code'], $val['range']) * $val[$columnName];
+             //Qty * price
+        }
         return $price;
     }
 
@@ -1054,11 +1041,13 @@ class ControlpanelController extends Controller{
     
     //where('user_id', auth()->user()->id)->
     public function searchByArticleNumber(Request $request) {
+
         $controlPanelCartData = ControlPanelCart::where('full_article_number', $request->article_number)->first();
+
+
         //Booster electrical article number either manual or search code starts..!!
         if($controlPanelCartData == null && empty($controlPanelCartData)){
-            $controlPanelCartData =BoosterCart::where('electrical_article_number',$request->article_number)->first();
-            $controlPanelCartData->control_panel_id = $controlPanelCartData->cp_id;
+            $controlPanelCartData=BoosterCart::where('electrical_article_number',$request->article_number)->first();
         }
         //Booster electrical article number either manual or search code ends..!!
 
@@ -1076,6 +1065,7 @@ class ControlpanelController extends Controller{
                     ->with('comunicationprotocols')
                     ->with('ipratings')
                     ->get();
+
             //Booster electrical article number either manual or search code starts..!!
             if(count($controlPanelData) == 0){
                 $controlPanelData = ControlPanel::where('id', $controlPanelCartData->cp_id)
@@ -1189,7 +1179,7 @@ class ControlpanelController extends Controller{
                         }
                     }
                     foreach ($arrayResult as $key => $val) {
-                        $price += $this->searchByArticleCalculatePriceInItem($data['controlPanel'][0]->components['id'], $data['controlPanel'][0]->enclousres['id'], $data['controlPanel'][0]->startertypes['id'], $enclousreAdderItemData, $columnName,$cpRecords1,$val);
+                        $price += $this->searchByArticleCalculatePriceInItem($val, $data['controlPanel'][0]->components['id'], $data['controlPanel'][0]->enclousres['id'], $data['controlPanel'][0]->startertypes['id'], $enclousreAdderItemData, $columnName,$cpRecords1);
                     }
                     if ($codePrice > 0.00) {
                         $price = $price + $codePrice;
@@ -1407,29 +1397,10 @@ class ControlpanelController extends Controller{
         return AdderHelper::getClosestAmpere($code, $ampere);
     }
 
-    public function searchByArticleCalculatePriceInItem($component, $enclousre, $starterType, $enclousreItem, $columnName,$enclosure_count,$val = []) {
-        // dd($component, $enclousre, $starterType, $enclousreItem, $columnName,$enclosure_count,$val = []);
-        // $component = 1
-        // $enclousre = 2
-        // $starterType = 2
-        // $enclousreItem = null
-        // $columnName = 2x1__1kwx415v
-        // $enclosure_count = 1
-        // $val = [] = array:10 [
-                        //   "item_description" => "400Hx400Wx200D Compact Enclosure "
-                        //   "material_number" => ""
-                        //   "wilo_article_number" => ""
-                        //   "weight" => ""
-                        //   "brand_code" => "5"
-                        //   "function_code" => "1"
-                        //   "range" => "442"
-                        //   "unit_price" => ""
-                        //   "margin" => "1.00_"
-                        //   "2x1__1kwx415v" => 1
-                        // ]
+    public function searchByArticleCalculatePriceInItem($val = [], $component, $enclousre, $starterType, $enclousreItem, $columnName,$enclosure_count) {
         $price = 0.00;
                 if($enclousreItem && !empty($enclousreItem) && $enclousre == 2 ) {
-                    //    $enclousreItem = json_decode($enclousreItem, true);
+                //    $enclousreItem = json_decode($enclousreItem, true);
                     if($val['brand_code'] == $enclousreItem['brand_code'] && $val['function_code'] == $enclousreItem['function_code']) {
 
                     //$val['range'] = $enclousreItem['range'];
@@ -1518,8 +1489,6 @@ class ControlpanelController extends Controller{
                 $price = 0.00;
             }
         } else {
-            // dd("9");
-            // dd($val['brand_code'], $val['function_code'], $val['range'],$val[$columnName]);
             $price = $this->getMasterSheetPriceData($val['brand_code'], $val['function_code'], $val['range']) * $val[$columnName]; //Qty * price
             // echo "Normal  " . $val['brand_code'] . "  price == " . $this->getMasterSheetPriceData($val['brand_code'], $val['function_code'], $val['range']) * $val[$columnName] . "</br>";
         }

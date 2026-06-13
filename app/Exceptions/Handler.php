@@ -70,7 +70,7 @@ class Handler extends ExceptionHandler
         }
         else
         {
-            $login = 'loginform';
+            $login = 'login';
         }
 
         return redirect()->guest(route($login));

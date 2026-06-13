@@ -421,13 +421,21 @@ class BOMSummaryController extends Controller
 
                     $cart = $quotation->boosterCart;
 
-                    $articleNo   = $cart?->full_article_number ?? null;
-                    $description = $cart?->model_no ?? null;
-                    $qty         = $cart?->qty ?? 0;
-                    $unitPrice   = $cart?->price ?? 0;
-                    $totalPrice  = $cart?->total_price ?? 0;
-                    $interMargin = $cart?->inter_company_margin ?? 0;
-                    $overhead    = $cart?->booster_overhead ?? 0;
+                    // $articleNo   = $cart?->full_article_number ?? null;
+                    // $description = $cart?->model_no ?? null;
+                    // $qty         = $cart?->qty ?? 0;
+                    // $unitPrice   = $cart?->price ?? 0;
+                    // $totalPrice  = $cart?->total_price ?? 0;
+                    // $interMargin = $cart?->inter_company_margin ?? 0;
+                    // $overhead    = $cart?->booster_overhead ?? 0;
+
+                    $articleNo   = isset($cart) ? $cart->full_article_number : null;
+                    $description = isset($cart) ? $cart->model_no : null;
+                    $qty         = isset($cart) ? $cart->qty : 0;
+                    $unitPrice   = isset($cart) ? $cart->price : 0;
+                    $totalPrice  = isset($cart) ? $cart->total_price : 0;
+                    $interMargin = isset($cart) ? $cart->inter_company_margin : 0;
+                    $overhead    = isset($cart) ? $cart->booster_overhead : 0;
 
                     $cart_id = $quotation->boosterCart->id ?? '-'; 
 
@@ -445,15 +453,25 @@ class BOMSummaryController extends Controller
 
                     $cart = $quotation->atmosCart;
 
-                    $articleNo   = $cart?->full_article_number ?? null;
-                    $description = $cart?->pump_name ?? null;
-                    $qty         = $cart?->qty ?? 0;
-                    $unitPrice   = $cart?->price ?? 0;
-                    $totalPrice  = $cart?->total_price ?? 0;
-                    $interMargin = $cart?->inter_company_margin_price ?? 0;
-                    $overhead    = $cart?->overhead_price ?? 0;
+                    // $articleNo   = $cart?->full_article_number ?? null;
+                    // $description = $cart?->pump_name ?? null;
+                    // $qty         = $cart?->qty ?? 0;
+                    // $unitPrice   = $cart?->price ?? 0;
+                    // $totalPrice  = $cart?->total_price ?? 0;
+                    // $interMargin = $cart?->inter_company_margin_price ?? 0;
+                    // $overhead    = $cart?->overhead_price ?? 0;
 
-                    $cart_id = $cart?->id ?? '-'; 
+                    //$cart_id = $cart?->id ?? '-'; 
+
+                    $articleNo   = isset($cart) ? $cart->full_article_number : null;
+                    $description = isset($cart) ? $cart->pump_name : null;
+                    $qty         = isset($cart) ? $cart->qty : 0;
+                    $unitPrice   = isset($cart) ? $cart->price : 0;
+                    $totalPrice  = isset($cart) ? $cart->total_price : 0;
+                    $interMargin = isset($cart) ? $cart->inter_company_margin_price : 0;
+                    $overhead    = isset($cart) ? $cart->overhead_price : 0;                    
+
+                    $cart_id = isset($cart) ? $cart->id : '-'; 
 
                     $atmosGigaController = new AtmosGigaController();
                     $cartData = $atmosGigaController->cartItems($cart_id, true);
@@ -475,13 +493,21 @@ class BOMSummaryController extends Controller
 
                     $cart = $quotation->scpCart;
 
-                    $articleNo   = $cart?->full_article_number ?? null;
-                    $description = $cart?->pump_name ?? null;
-                    $qty         = $cart?->qty ?? 0;
-                    $unitPrice   = $cart?->price ?? 0;
-                    $totalPrice  = $cart?->total_price ?? 0;
-                    $interMargin = $cart?->inter_company_margin_price ?? 0;
-                    $overhead    = $cart?->overhead_price ?? 0;
+                    //$articleNo   = $cart?->full_article_number ?? null;
+                    //$description = $cart?->pump_name ?? null;
+                    //$qty         = $cart?->qty ?? 0;
+                    //$unitPrice   = $cart?->price ?? 0;
+                    //$totalPrice  = $cart?->total_price ?? 0;
+                    //$interMargin = $cart?->inter_company_margin_price ?? 0;
+                    //$overhead    = $cart?->overhead_price ?? 0;
+
+                    $articleNo   = isset($cart) ? $cart->full_article_number : null;
+                    $description = isset($cart) ? $cart->pump_name : null;
+                    $qty         = isset($cart) ? $cart->qty : 0;
+                    $unitPrice   = isset($cart) ? $cart->price : 0;
+                    $totalPrice  = isset($cart) ? $cart->total_price : 0;
+                    $interMargin = isset($cart) ? $cart->inter_company_margin_price : 0;
+                    $overhead    = isset($cart) ? $cart->overhead_price : 0;
 
                     $bomLabourCostAndCharges += ($quotation->scpCart->assembly_charge ?? 0) +
                                             ($quotation->scpCart->painting_charge ?? 0) +
@@ -493,13 +519,21 @@ class BOMSummaryController extends Controller
 
                     $cart = $quotation->scpvCart;
 
-                    $articleNo   = $cart?->full_article_number ?? null;
-                    $description = $cart?->pump_name ?? null;
-                    $qty         = $cart?->qty ?? 0;
-                    $unitPrice   = $cart?->price ?? 0;
-                    $totalPrice  = $cart?->total_price ?? 0;
-                    $interMargin = $cart?->inter_company_margin_price ?? 0;
-                    $overhead    = $cart?->overhead_price ?? 0;
+                    // $articleNo   = $cart?->full_article_number ?? null;
+                    // $description = $cart?->pump_name ?? null;
+                    // $qty         = $cart?->qty ?? 0;
+                    // $unitPrice   = $cart?->price ?? 0;
+                    // $totalPrice  = $cart?->total_price ?? 0;
+                    // $interMargin = $cart?->inter_company_margin_price ?? 0;
+                    // $overhead    = $cart?->overhead_price ?? 0;
+
+                    $articleNo   = isset($cart) ? $cart->full_article_number : null;
+                    $description = isset($cart) ? $cart->pump_name : null;
+                    $qty         = isset($cart) ? $cart->qty : 0;
+                    $unitPrice   = isset($cart) ? $cart->price : 0;
+                    $totalPrice  = isset($cart) ? $cart->total_price : 0;
+                    $interMargin = isset($cart) ? $cart->inter_company_margin_price : 0;
+                    $overhead    = isset($cart) ? $cart->overhead_price : 0;
 
                     $bomLabourCostAndCharges += ($quotation->scpvCart->assembly_charge ?? 0) +
                                             ($quotation->scpvCart->painting_charge ?? 0) +
@@ -511,13 +545,21 @@ class BOMSummaryController extends Controller
 
                     $cart = $quotation->controlPanelCart;
 
-                    $articleNo   = $cart?->full_article_number ?? null;
-                    $description = $cart?->article_number ?? null;
-                    $qty         = $cart?->qty ?? 0;
-                    $unitPrice   = $cart?->price ?? 0;
-                    $totalPrice  = $cart?->total_price ?? 0;
-                    $interMargin = $cart?->intercompany_margin ?? 0;
-                    $overhead    = $cart?->overhead ?? 0;
+                    // $articleNo   = $cart?->full_article_number ?? null;
+                    // $description = $cart?->article_number ?? null;
+                    // $qty         = $cart?->qty ?? 0;
+                    // $unitPrice   = $cart?->price ?? 0;
+                    // $totalPrice  = $cart?->total_price ?? 0;
+                    // $interMargin = $cart?->intercompany_margin ?? 0;
+                    // $overhead    = $cart?->overhead ?? 0;
+
+                    $articleNo   = isset($cart) ? $cart->full_article_number : null;
+                    $description = isset($cart) ? $cart->article_number : null;
+                    $qty         = isset($cart) ? $cart->qty : 0;
+                    $unitPrice   = isset($cart) ? $cart->price : 0;
+                    $totalPrice  = isset($cart) ? $cart->total_price : 0;
+                    $interMargin = isset($cart) ? $cart->intercompany_margin : 0;
+                    $overhead    = isset($cart) ? $cart->overhead : 0;
 
                     $cart_id = $quotation->controlPanelCart->id ?? '-'; 
 
@@ -537,13 +579,21 @@ class BOMSummaryController extends Controller
                     
                     $cart = $quotation->firefightingCart;
 
-                    $articleNo   = $cart?->full_article_number ?? null;
-                    $description = $cart?->pump_models ?? null;
-                    $qty         = $cart?->qty ?? 0;
-                    $unitPrice   = $cart?->price ?? 0;
-                    $totalPrice  = $cart?->total_price ?? 0;
-                    $interMargin = $cart?->inter_company_margin_price ?? 0;
-                    $overhead    = $cart?->overhead_price ?? 0;
+                    // $articleNo   = $cart?->full_article_number ?? null;
+                    // $description = $cart?->pump_models ?? null;
+                    // $qty         = $cart?->qty ?? 0;
+                    // $unitPrice   = $cart?->price ?? 0;
+                    // $totalPrice  = $cart?->total_price ?? 0;
+                    // $interMargin = $cart?->inter_company_margin_price ?? 0;
+                    // $overhead    = $cart?->overhead_price ?? 0;
+
+                    $articleNo   = isset($cart) ? $cart->full_article_number : null;
+                    $description = isset($cart) ? $cart->pump_models : null;
+                    $qty         = isset($cart) ? $cart->qty : 0;
+                    $unitPrice   = isset($cart) ? $cart->price : 0;
+                    $totalPrice  = isset($cart) ? $cart->total_price : 0;
+                    $interMargin = isset($cart) ? $cart->inter_company_margin_price : 0;
+                    $overhead    = isset($cart) ? $cart->overhead_price : 0;
 
                     $cart_id = $quotation->firefightingCart->id ?? '-'; 
                 }

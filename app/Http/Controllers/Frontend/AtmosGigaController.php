@@ -27,12 +27,9 @@ class AtmosGigaController extends Controller {
         $poles = DB::table('atmos_master_motor_prices')->distinct()->pluck('no_of_pole');
         $efficiency = DB::table('atmos_master_motor_prices')->distinct()->pluck('efficiency');
         return view('frontend.atmos_giga.index', compact('power', 'voltage', 'efficiency', 'poles', 'brand', 'frequency'))->with('pump_types', DB::table('atmos_pump_types')->get()
-                )->with('atmos_materials', DB::table('atmos_materials')->get()
+                )->with(
+                        'atmos_materials', DB::table('atmos_materials')->get()
         );
-    }
-
-    public function atmos_giga_maintance_mode() {
-        return view('frontend.atmos_giga.maintance');
     }
 
     public function get_price(Request $request) {
@@ -110,9 +107,7 @@ class AtmosGigaController extends Controller {
     public function check_for_column($request) {
         $request['frame'] = preg_replace('/(\d+)\s*([a-zA-Z]+)/', '$1$2', $request['frame']);
         $request['frame'] = strtolower($request['frame']);
-
         $columnName = $request['pump_id'] . 'x' . $request['frame'];
- 
         $tbls = DB::getSchemaBuilder()->getColumnListing('atmos_accessories_price');
         $new_col = array();
         foreach ($tbls as $tb) {
@@ -124,25 +119,17 @@ class AtmosGigaController extends Controller {
         if (in_array(strtolower($columnName), $new_col)) {
             return $columnName;
         } else {
-            
             sort($new_col);
-           
             $array_size = sizeof($new_col) - 1;
             $i = 0;
             do{
-                
                 $i++;
                 $col_name = (int)$request['pump_id'] + $i . 'x' . $request['frame'];
-                
                 $col_name = strtolower($col_name);
-                
                 if (in_array($col_name,$new_col)) {
-                   
                     return $col_name;
-
                 }
                 $pmp_present = explode('x',$new_col[$array_size]);
-               
             }while($i <= (int)$pmp_present[0]);
         }
     }
@@ -220,9 +207,11 @@ class AtmosGigaController extends Controller {
         }
         if($request->is_acessories_price_manual1 == "0" && $request->pump_model != "0"){
             $components_price = $this->insert_components_item($pump_model_name,$material_code);
-            if($request->searchByBarePumpArticleNumber == "1"){
+			
+            if($request->searchByBarePumpArticleNumber == "1" || $request->search_full_article_number == "1"){
                 return $components_price;
             }
+			
             $shippingCost = ($components_price + $request->acessories_price) * $shippingPercentage;
         }
         else{
@@ -360,7 +349,6 @@ class AtmosGigaController extends Controller {
         }
 
         if(($request->is_bare_shaft_price_manual == "" || $request->is_bare_shaft_price_manual == "0") && !is_null($request->full_article_number)){
-        // if($request->is_bare_shaft_price_manual == "" || $request->is_bare_shaft_price_manual == "0"){
             $request->is_bare_shaft_price_manual = $atmosGigaCart->is_bare_manual;
         }
         if($atmosGigaCart && $request->is_acessories_price_manual == "0"){
@@ -418,8 +406,6 @@ class AtmosGigaController extends Controller {
         $acessories_price = round($request->acessories_price, 2);
         $shipping_cost_price = round($shipping_cost_price, 1);
 
-        //$shipping_cost_price1 = round($atmosGigaCart->shipping_cost_price, 2);
-    
         if($request->is_shipping_charge_manual == 1){
             $shipping_cost_price1 = round($request->shipping_price_manual,2); 
         }else{
@@ -438,7 +424,6 @@ class AtmosGigaController extends Controller {
                     ->where('is_bare_manual', $request->is_bare_shaft_price_manual)
                     ->where('bare_pump_price', $bare_shaft_price)
                     ->where('accesories_price', $acessories_price)
-                    // ->where('shipping_cost_price', $shipping_cost_price)
                     ->where(function($query) use ($shipping_cost_price,$shipping_cost_price1){
                         $query->where('shipping_cost_price', $shipping_cost_price)
                                 ->orWhere('shipping_cost_price', $shipping_cost_price1);
@@ -456,7 +441,6 @@ class AtmosGigaController extends Controller {
                     ->where('is_bare_manual', $request->is_bare_shaft_price_manual)
                     ->where('bare_pump_price', $bare_shaft_price)
                     ->where('accesories_price', $acessories_price)
-                    // ->where('shipping_cost_price', $shipping_cost_price)
                     ->where(function($query) use ($shipping_cost_price,$shipping_cost_price1){
                         $query->where('shipping_cost_price', $shipping_cost_price)
                                 ->orWhere('shipping_cost_price', $shipping_cost_price1);
@@ -529,7 +513,6 @@ class AtmosGigaController extends Controller {
                         if($material_code == "08"){
                             $material_code = "8";
                         }
-                        // dd($pump_model_name,$material_code);
                         $cost = DB::table('atmos_pump_assembly_cost')
                                 ->where('model_name','like','%'.$pump_model_name.'%')
                                 ->where('impeller_material_code',$material_code)
@@ -661,7 +644,6 @@ class AtmosGigaController extends Controller {
                     ->where('user_id', auth()->user()->id)
                     ->orderBy('id', 'desc')
                     ->first();
-
             if($atmosCartData == null){
                 $atmosCartData1 = AtmosCart::where('pump_id', $request->pump_model)
                     ->where('material_id', $request->impeller_material)
@@ -679,6 +661,7 @@ class AtmosGigaController extends Controller {
                     ->whereNull('adder_ids')
                     ->orderBy('id', 'desc')
                     ->first();
+					
                 //query for find article number and full article number ends diff user id..!!
                 $atmosCart = new AtmosCart;
 				$new_ksa_article_number = '';
@@ -885,9 +868,14 @@ class AtmosGigaController extends Controller {
         $pump_columns = str_replace([' ', '-','/'], '_', $pump_columns);
         $pump_columns = str_replace('n', 'n_', $pump_columns);
         $pump_columns = $pump_columns.'_d_c10x'.$material_code.'x';
-        if($pump_columns != 0){
+
+        if(!empty($pump_columns)){
+			if (str_contains($pump_columns, '.')) {
+				$pump_columns = str_replace('.', '_', $pump_columns);
+			}
             $columns = DB::select("SHOW COLUMNS FROM atmos_bom LIKE '{$pump_columns}%'");
             $columns = $columns[0]->Field;
+
             $bom_records  = DB::table('atmos_bom')->where($columns,'>','0')->select('id','descriptionxx','china_article_numberxx','wme_article_numberxx',$columns)->get();
             foreach($bom_records  as $records){
                 $atmos_master_pump_price = DB::table('atmos_master_pump_price')->where('china_article_number','=',$records->china_article_numberxx)->first();
@@ -955,10 +943,16 @@ class AtmosGigaController extends Controller {
             $material_code = "8";
         }
         $pump_columns = $pump_columns.'_d_c10x'.$material_code.'x';
-        if($pump_columns != 0){
+        if(!empty($pump_columns)){
+		//if($pump_columns != 0){
+			if (str_contains($pump_columns, '.')) {
+				$pump_columns = str_replace('.', '_', $pump_columns);
+			}
             $columns = DB::select("SHOW COLUMNS FROM atmos_bom LIKE '{$pump_columns}%'");
             $columns = $columns[0]->Field;
+			
             $bom_records  = DB::table('atmos_bom')->where($columns,'>','0')->select('id','descriptionxx','china_article_numberxx','wme_article_numberxx',$columns)->get();
+			
             foreach($bom_records  as $records){
                 $atmos_master_pump_price = DB::table('atmos_master_pump_price')->where('china_article_number','=',$records->china_article_numberxx)->first();
                 if($atmos_master_pump_price){
@@ -976,7 +970,7 @@ class AtmosGigaController extends Controller {
         if($col_name != 0){
             $col = DB::table("atmos_accessories_price")->where($col_name, '>', 0)->select('description', 'unit_price', 'wilo_article_number', $col_name)->get();
             foreach($col->toArray() as $c){
-                 $atmos_master_pump_price = DB::table('atmos_master_pump_price')->where('china_article_number','=',$c->wilo_article_number)->first();
+                $atmos_master_pump_price = DB::table('atmos_master_pump_price')->where('china_article_number','=',$c->wilo_article_number)->first();
                 $atmosItem = new AtmosItem;
                 $atmosItem->atmos_cart_id = $atmosCartId;
                 $atmosItem->item_description = $c->description;
@@ -1073,7 +1067,6 @@ class AtmosGigaController extends Controller {
     public function removeCart($id) {
         $deleteAtmosCart = AtmosCart::where('id', $id)->delete();
         $deleteItem = AtmosItem::where('atmos_cart_id', $id)->delete();
-        $deleteBOMItem = AtmosBOMItems::where('atmos_cart_id', $id)->delete();
     }
 
     public function cartItems($cartId, $returnDataOnly = false) {
@@ -1168,7 +1161,7 @@ class AtmosGigaController extends Controller {
         }
         return view('frontend.atmos_giga.items', compact('items', 'adderData','cartId','is_manual','atmosBOMitems','atmosCart','otpMargin','atmosBOMitemsSupervisor'));
     }
-    
+
     public function ajaxDetailModalAtmos(Request $request) {
         $adderData = [];
         $atmos_id = $request->atmos_id;
@@ -1253,11 +1246,11 @@ class AtmosGigaController extends Controller {
             $request->pump_model = $atmosCartData->pump_id;
             $request->acessories_price = $atmosCartData->accesories_price;
             $request->impeller_material = $atmosCartData->material_id;
-
-            if($atmosCartData->pump_id != "0" && $request->searchByBarePumpArticleNumber == "1"){
+            $request->search_full_article_number = "1";
+ 
+            if($atmosCartData->pump_id != "0"){
                 $components_price = $this->ajaxCalculate($request);
             }
-
             $interCompanyMargin = User::ic_margin_atmos(); // This is temporary 
             $atmosGigaPrice = 0.00;
             $optionalPrice = 0.00; //Adders Code.
@@ -1331,14 +1324,15 @@ class AtmosGigaController extends Controller {
                 }
                 
                 if(auth()->user()->country_id == 6){
-                $atmosGigaPrice += ((($atmosCartData->bare_pump_price + $atmosCartData->accesories_price + $motor_price + $optionalPrice + $shippingCost) * $otpMargin) + $assemblyPrice) * $ksa_overHead / $interCompanyMargin;
+                    $atmosGigaPrice += ((($atmosCartData->bare_pump_price + $atmosCartData->accesories_price + $motor_price + $optionalPrice + $shippingCost) * $otpMargin) + $assemblyPrice) * $ksa_overHead / $interCompanyMargin;
                 }
                 elseif(auth()->user()->country_id == 9){
-                $atmosGigaPrice += ((($atmosCartData->bare_pump_price + $atmosCartData->accesories_price + $motor_price + $optionalPrice + $shippingCost) * $otpMargin) + $assemblyPrice) * $morrocco_overHead / $interCompanyMargin;
+                    $atmosGigaPrice += ((($atmosCartData->bare_pump_price + $atmosCartData->accesories_price + $motor_price + $optionalPrice + $shippingCost) * $otpMargin) + $assemblyPrice) * $morrocco_overHead / $interCompanyMargin;
                 }
                 else{
                 $atmosGigaPrice += (($atmosCartData->bare_pump_price + $atmosCartData->accesories_price + $motor_price + $optionalPrice + $assemblyPrice + $shippingCost) * $overHead) / $interCompanyMargin;
                 }
+				
                 if(!is_null($bareshaft_pump_article_number)){
                     $getMaterial = AtmosMaterial::where('id', $atmosCartData->material_id)->pluck('name')[0];
                     $data['cp_records_html'] = "getting";
@@ -1419,11 +1413,12 @@ class AtmosGigaController extends Controller {
     }
 
     public function get_bare_shaft_price($pump_model_name,$material_code,$pump_model_impeller_size,$pump_model_required_size){
-        $components_price =  "0";
+	    $components_price =  "0";
         $components_price = $this->insert_components_item($pump_model_name,$material_code);
         if($material_code == "08"){
             $material_code = "8";
         }
+		
         $cost = DB::table('atmos_pump_assembly_cost')
                     ->where('model_name','like','%'.$pump_model_name.'%')
                     ->where('impeller_material_code',$material_code)
@@ -1455,6 +1450,7 @@ class AtmosGigaController extends Controller {
                         ->where('user_id', auth()->user()->id)
                         ->orderBy('id', 'desc')
                         ->first();
+						
                  $pump_model_name = AtmosPumpType::where('id', $request->pump_model)->pluck('name')[0];
                  $material_code = AtmosMaterial::where('id',$request->impeller_material)->pluck('code')[0];
                  $atmosCart = new AtmosCart;
@@ -1543,6 +1539,7 @@ class AtmosGigaController extends Controller {
             $material_id = $atmosCart->material_id;
             $atmosCart_id = $atmosCart->id;
             $pump_id = $atmosCart->pump_model;
+			
             $supervisor_pump_model_price = ($bare_pump_price * $overHead) * $otpMargin;
             $assembly_cost = $this->getAssemblyCost($pump_model_name,$material_id);
             $testing_cost = $this->getTestingCost($pump_model_name,$material_id);

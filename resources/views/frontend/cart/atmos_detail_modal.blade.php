@@ -62,14 +62,10 @@
             <td>Manually Accessories Price</td>
             <td> {{ App\Helpers\CurrencyHelper::withCurrency($atmos_data->accesories_price)}}</td>
         </tr>
+
         @endif
 
-        @if($atmos_data->is_bare_manual && $atmos_data->is_accesories_manual)
-        <tr>
-            <td>Shipping Price</td>
-            <td> {{ App\Helpers\CurrencyHelper::withCurrency($atmos_data->shipping_cost_price)}}</td>
-        </tr>
-        @endif
+
     </tbody>
 </table>
 @if($adderData)

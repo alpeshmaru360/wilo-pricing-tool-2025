@@ -39,8 +39,7 @@ class BoosterMechanicalFileImportController extends Controller {
     }
 
     public function uploadMasterPriceSheet(Request $request) {
-        // require_once("../app/spreadsheetReader/php-excel-reader/excel_reader2.php");
-        require_once(base_path('app/spreadsheetReader/php-excel-reader/excel_reader2.php'));
+        require_once("../app/spreadsheetReader/php-excel-reader/excel_reader2.php");
 
         $validated = $request->validate([
             'file_import' => 'required',

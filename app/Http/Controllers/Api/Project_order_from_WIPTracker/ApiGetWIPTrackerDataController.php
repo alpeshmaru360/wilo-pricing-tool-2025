@@ -25,7 +25,6 @@ class ApiGetWIPTrackerDataController extends Controller
 {
     public function complete_order_from_wiptracker(Request $request){
         $witrack_no = $request->witrack_no;
-        // $status = AtmosCart::where('id',$witrack_no)->first();
         if($witrack_no){
             return response()->json(['status' => '1', 'message' => 'WITrack NO. get successfully..!!', 'data' => $witrack_no], 200); 
         }

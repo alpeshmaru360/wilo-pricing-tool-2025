@@ -107,14 +107,16 @@ class FireFightingPumpController extends Controller
     {
         switch ($id) {
             case 'jockey-pump':
-                    $data = JockeyPump::select('id', 'pump_article_no', 'description', 'power', 'frequency', 'unit_price')->get()->toArray();
+                    $data = JockeyPump::select('id', 'pump_article_no', 'description', 'power', 'voltage' ,'frequency', 'unit_price')->get()->toArray();
                     return $data;
                 break;
             
+            // A Code: 10-03-2026 Start
             case 'electrical-pump':
-                    $data = ElectricalPump::select('id', 'wilo_pump_models', 'pump_type', 'frequency', 'pump_approval', 'flow', 'head', 'speed_rpm', 'unit_price','motor_power')->get()->toArray();
+                    $data = ElectricalPump::select('id', 'wilo_pump_models', 'pump_type', 'voltage', 'frequency', 'pump_approval', 'flow', 'head', 'speed_rpm', 'unit_price','motor_power')->get()->toArray();
                     return $data;
                 break;
+            // A Code: 10-03-2026 End
             
             case 'diesel-pump':
                     $data = DieselPump::select('id', 'pump_models', 'pump_type', 'frequency', 'pump_approval', 'engine_approval', 'flow', 'head', 'speed_rpm', 'unit_price')->get()->toArray();
@@ -122,21 +124,127 @@ class FireFightingPumpController extends Controller
                 break;
 
             // Full Articles Number
+            // case 'electrical-pump-articles':
+            //         $data = FireFightingCarts::select('id', 'quotation_no', 'article_number', 'full_article_number', 'pump_id', 'category', 'all_prices', 'field_val')->where('category', 'electrical')->get()->toArray();
+            //         return $data;
+            //     break;
+
+            // A Code: 06-05-2026 Start    
             case 'electrical-pump-articles':
-                    $data = FireFightingCarts::select('id', 'quotation_no', 'article_number', 'full_article_number', 'pump_id', 'category', 'all_prices', 'field_val')->where('category', 'electrical')->get()->toArray();
-                    return $data;
-                break;
+
+                $records = FireFightingCarts::select(
+                    'id',
+                    'quotation_no',
+                    'article_number',
+                    'full_article_number',
+                    'pump_id',
+                    'category',
+                    'all_prices',
+                    'field_val',
+                    'power',
+                    'frequency',
+                    'voltage'
+                )
+                ->where('category', 'electrical')
+                ->get();
+
+                foreach ($records as $record) {
+                    $fieldVal = $record->field_val ?? [];
+
+                    $hasElectricalSpeed = false;
+                    $hasMotorPower = false;
+
+                    foreach ($fieldVal as &$item) {
+                        
+                        // Updated logic for Soft Starter (both cases)
+                        if (isset($item['electrical_control_panel_type'])) {
+                            $type = $item['electrical_control_panel_type'];
+
+                            if ($type === "Soft Starter") {
+                                $item['electrical_control_panel_type'] = "SoftStarter";
+                            } 
+                            elseif ($type === "Soft Starter + ATS") {
+                                $item['electrical_control_panel_type'] = "SoftStarter + ATS";
+                            }
+                        }
+
+                        // Check for existing keys
+                        if (isset($item['electrical_speed'])) {
+                            $hasElectricalSpeed = true;
+                        }
+                        if (isset($item['electrical_motor_power'])) {
+                            $hasMotorPower = true;
+                        }
+                    }
+
+                    // Add electrical_motor_power if conditions are met
+                    if (!$hasMotorPower && $hasElectricalSpeed && !empty($record->power)) {
+                        $fieldVal[] = [
+                            'electrical_motor_power' => $record->power
+                        ];
+                    }
+
+                    // Assign modified data back
+                    $record->field_val = $fieldVal;
+                }
+
+                return $records->toArray();
+
+            break;
+            // A Code: 06-05-2026 End
                 
+            // case 'diesel-pump-articles':
+            //         $data = FireFightingCarts::select('id', 'quotation_no', 'article_number', 'full_article_number', 'pump_id', 'category', 'all_prices', 'field_val')->where('category', 'diesel')->get()->toArray();
+            //         return $data;
+            //     break;
+
+            // A Code: 21-05-2026 Start 
             case 'diesel-pump-articles':
-                    $data = FireFightingCarts::select('id', 'quotation_no', 'article_number', 'full_article_number', 'pump_id', 'category', 'all_prices', 'field_val')->where('category', 'diesel')->get()->toArray();
-                    return $data;
-                break;
+
+                $records = FireFightingCarts::select(
+                    'id',
+                    'quotation_no',
+                    'article_number',
+                    'full_article_number',
+                    'pump_id',
+                    'category',
+                    'all_prices',
+                    'field_val'
+                )
+                ->where('category', 'diesel')
+                ->get();
+
+                foreach ($records as $record) {
+                    $fieldVal = $record->field_val ?? [];
+
+                    foreach ($fieldVal as &$item) {
+                        
+                        // Fix diesel_engine_approval: UL&FM → UL/FM
+                        if (isset($item['diesel_engine_approval']) && $item['diesel_engine_approval'] === 'UL&FM') {
+                            $item['diesel_engine_approval'] = 'UL/FM';
+                        }
+
+                        // Optional: You can also make diesel_pump_approval consistent if needed
+                        if (isset($item['diesel_pump_approval']) && $item['diesel_pump_approval'] === 'UL&FM') {
+                            $item['diesel_pump_approval'] = 'UL/FM';
+                        }
+                    }
+
+                    // Assign modified field_val back to the record
+                    $record->field_val = $fieldVal;
+                }
+
+                return $records->toArray();
+            break;
+            // A Code: 21-05-2026 End
+
             /** start 20241231 for jockey pump form auto fill***********/
             case 'jockey-pump-articles':
                     $data = FireFightingCarts::select('id', 'pump_models','pump_type','quotation_no', 'article_number', 'full_article_number', 'pump_id', 'category', 'all_prices', 'field_val','power','frequency','jockey_article_number')->where('category', 'jockey-pump')->latest('id')->first()->get()->toArray();//if multiple record then fetch latest one
                     return $data;
                 break;
             /** end 20241231 for jockey pump form auto fill*************/
+            
             // Adder Ids
             case 'adder-jockey-pump':
                     $data = FireFightingAdders::select('id', 'adder_list','version','code')->where('version', 'FireFighting/Jockey')->get()->toArray();
@@ -178,9 +286,10 @@ class FireFightingPumpController extends Controller
             //end - 20250108 add motor power field in electrical flow
 
             default:
-                    $data = [];
-                    return $data;
-                break;
+                $data = [];
+                return $data;
+            break;
+            
         }
     }
 
@@ -211,6 +320,11 @@ class FireFightingPumpController extends Controller
                     case 'diesel':
                     case 'electrical':
                             $html .= '<tr><td>Pump Type</td><td>'.$cart->pump_type.'</td></tr>';
+                            // A Code: 11-03-2026 Start
+                            if ($cart->category != 'diesel') {
+                                $html .= '<tr><td>Voltage</td><td>'.$cart->voltage.'</td></tr>';
+                            }
+                            // A Code: 11-03-2026 End
                             $html .= '<tr><td>Frequency</td><td>'.$cart->frequency.'</td></tr>';
                             $html .= '<tr><td>Pump Approval</td><td>'.$cart->pump_approval.'</td></tr>';
                             if ($cart->category == 'diesel') {
@@ -224,11 +338,10 @@ class FireFightingPumpController extends Controller
                         break;
                     //20250109 start - jockey not getting modal
                     case 'jockey-pump':
-
                             $html .= '<tr><td>Pump Artical Number</td><td>'.$cart->jockey_article_number.'</td></tr>';
                             $html .= '<tr><td>Frequency</td><td>'.$cart->frequency.'</td></tr>';
-                            
                             $html .= '<tr><td>Pump Power</td><td>'.$cart->power.'</td></tr>';
+                            $html .= '<tr><td>Voltage</td><td>'.$cart->voltage.'</td></tr>';
                         break;
                     //20250109 start - jockey not getting modal
                 }
@@ -313,7 +426,8 @@ class FireFightingPumpController extends Controller
                     $file = public_path('assets/fire-fighting/Electrical (Technical Data Sheet).xlsx');
 
                     $data = ElectricalPump::where('pump_type', $cart->pump_type)
-                        ->where('frequency', $cart->frequency)
+                        ->where('voltage', $cart->voltage) // A Code: 11-03-2026
+                        ->where('frequency', $cart->frequency)                        
                         ->where('pump_approval', $cart->pump_approval)
                         ->where('flow', $cart->flow)
                         ->where('head', $cart->head)
@@ -335,11 +449,20 @@ class FireFightingPumpController extends Controller
                     if (!is_null($data)) {
                         if(!empty( $pump_control_panel_type))
                         {
-                            $cp_master = ControlPanelMaster::where('category', 'Electrical')->where('motor_power', $data->motor_power)->where('frequency', $data->frequency)->where('type',$pump_control_panel_type)->first();
+                            $cp_master = ControlPanelMaster::where('category', 'Electrical')
+                                ->where('motor_power', $data->motor_power)
+                                ->where('voltage', $data->voltage) // A Code: 16-03-2026
+                                ->where('frequency', $data->frequency)
+                                ->where('type',$pump_control_panel_type)
+                                ->first();
                         }
                         else
                         {
-                            $cp_master = ControlPanelMaster::where('category', 'Electrical')->where('motor_power', $data->motor_power)->where('frequency', $data->frequency)->first();
+                            $cp_master = ControlPanelMaster::where('category', 'Electrical')
+                                ->where('motor_power', $data->motor_power)
+                                ->where('voltage', $data->voltage) // A Code: 16-03-2026
+                                ->where('frequency', $data->frequency)
+                                ->first();
                         }
 
 
@@ -351,57 +474,139 @@ class FireFightingPumpController extends Controller
                                 }
                                 return $carry;
                             });
-
+                            $control_panel_type_value = str_replace(" ", "", $control_panel_type_value); // A Code: 06-05-2026
                             if (!is_null($control_panel_type_value)) {
 
-                                $cp_master = ControlPanelMaster::where('category', 'Electrical')->where('motor_power', $data->motor_power)->where('frequency', $data->frequency)->where('type', $control_panel_type_value)->first();
+                                $cp_master = ControlPanelMaster::where('category', 'Electrical')
+                                    ->where('motor_power', $data->motor_power)
+                                    ->where('voltage', $data->voltage) // A Code: 16-03-2026
+                                    ->where('frequency', $data->frequency)
+                                    ->where('type', $control_panel_type_value)
+                                    ->first();
                             }
                         }
+                        // if (!is_null($cp_master)) {
+                        //     $control_panel_model_value = $cp_master->model;
+                        // }
+						// $voltage = $cp_master->voltage;
+                        // $approval = $cp_master->approval;
+
+                        // A Code: 05-05-2026 Start
                         if (!is_null($cp_master)) {
                             $control_panel_model_value = $cp_master->model;
+                            $voltage = $cp_master->voltage;
+                            $approval = $cp_master->approval;
+                        } else {
+                            // Handle the case when $cp_master is null
+                            $control_panel_model_value = null; // or default value
+                            $voltage = null;
+                            $approval = null;
                         }
-						$voltage = $cp_master->voltage;
-                        $approval = $cp_master->approval;
+                        // A Code: 05-05-2026 End
 
-						if (isset($cart->adder_ids)) {
+						// if (isset($cart->adder_ids)) {
                            
-                            $cp_master2 = FireFightingAdders::select('id', 'adder_list','version','code', 'type')->where('version', 'FireFighting/Electrical')->whereIn('id', $cart->adder_ids)->orderBy('id', 'DESC')->where('id','<=','8')->first();
-                            $cp_master1 = ControlPanelMaster::where('category', 'Electrical')->where('motor_power', $data->motor_power)->where('frequency', $data->frequency)->where('type', $control_panel_type_value)->first();
-                            $voltage = $cp_master1->voltage;
-                            $approval = $cp_master1->approval;
+                        //     $cp_master2 = FireFightingAdders::select('id', 'adder_list','version','code', 'type')
+                        //         ->where('version', 'FireFighting/Electrical')
+                        //         ->whereIn('id', $cart->adder_ids)
+                        //         ->orderBy('id', 'DESC')
+                        //         ->where('id','<=','8')
+                        //         ->first();
 
-                            if(!empty($cp_master2)){
-                                $cp_master->enclosure = $cp_master2->type;
-                            }
+                        //     $cp_master1 = ControlPanelMaster::where('category', 'Electrical')
+                        //         ->where('motor_power', $data->motor_power)
+                        //         ->where('voltage', $data->voltage) // A Code: 16-03-2026
+                        //         ->where('frequency', $data->frequency)
+                        //         ->where('type', $control_panel_type_value)
+                        //         ->first();
+
+                        //     $voltage = $cp_master1->voltage;
+                        //     $approval = $cp_master1->approval;
+
+                        //     if(!empty($cp_master2)){
+                        //         $cp_master->enclosure = $cp_master2->type;
+                        //     }
                             
-                            $cp_master2 = FireFightingAdders::select('id', 'adder_list','version','code', 'type')->where('version', 'FireFighting/Electrical')->whereIn('id', $cart->adder_ids)->orderBy('id', 'DESC')->where('id','9')->first();
-                            if(!empty($cp_master2->adder_list))
-                            {
+                        //     $cp_master2 = FireFightingAdders::select('id', 'adder_list','version','code', 'type')
+                        //                     ->where('version', 'FireFighting/Electrical')
+                        //                     ->whereIn('id', $cart->adder_ids)
+                        //                     ->orderBy('id', 'DESC')
+                        //                     ->where('id','9')
+                        //                     ->first();
+                        //     if(!empty($cp_master2->adder_list))
+                        //     {
+                        //         $data->motor_type = $cp_master2->adder_list;
+                        //     }
+                        // }
+
+                        // A Code: 06-05-2026 Start
+                        if (isset($cart->adder_ids)) {
+
+                            $cp_master = new \stdClass();
+
+                            $cp_master2 = FireFightingAdders::select('id', 'adder_list','version','code', 'type')
+                                ->where('version', 'FireFighting/Electrical')
+                                ->whereIn('id', $cart->adder_ids)
+                                ->where('id','<=','8')
+                                ->orderBy('id', 'DESC')
+                                ->first();
+
+                            $control_panel_type_value = str_replace(" ", "", $control_panel_type_value);
+
+                            $cp_master1 = ControlPanelMaster::where('category', 'Electrical')
+                                ->where('motor_power', $data->motor_power)
+                                ->where('voltage', $data->voltage)
+                                ->where('frequency', $data->frequency)
+                                ->where('type', $control_panel_type_value)
+                                ->first();
+
+                            $voltage  = $cp_master1->voltage ?? null;
+                            $approval = $cp_master1->approval ?? null;
+
+                            if (!empty($cp_master2)) {
+                                $cp_master->enclosure = $cp_master2->type ?? null;
+                            } else {
+                                $cp_master->enclosure = null;
+                            }
+
+                            $cp_master2 = FireFightingAdders::select('id', 'adder_list','version','code', 'type')
+                                ->where('version', 'FireFighting/Electrical')
+                                ->whereIn('id', $cart->adder_ids)
+                                ->where('id','9')
+                                ->first();
+
+                            if (!empty($cp_master2) && !empty($cp_master2->adder_list)) {
                                 $data->motor_type = $cp_master2->adder_list;
                             }
                         }
+                        // A Code: 06-05-2026 End
+
+
 					}
                 } else {
                     $file = public_path('assets/fire-fighting/Diesel (Technical Data Sheet).xlsx');
                     $data = DieselPump::where('pump_type', $cart->pump_type)
-                            ->where('frequency', $cart->frequency)
-                            ->where('pump_approval', $cart->pump_approval)
-                            ->where('engine_approval', $cart->engine_approval)
-                            ->where('flow', $cart->flow)
-                            ->where('head', $cart->head)
-                            ->where('speed_rpm', $cart->speed_rpm)
-                            ->first();
+                                //->where('voltage', $cart->voltage) // A Code: 11-03-2026 Comment
+                                ->where('frequency', $cart->frequency)
+                                ->where('pump_approval', $cart->pump_approval)
+                                ->where('engine_approval', $cart->engine_approval)
+                                ->where('flow', $cart->flow)
+                                ->where('head', $cart->head)
+                                ->where('speed_rpm', $cart->speed_rpm)
+                                ->first();
                     $filename = 'Diesel (Technical Data Sheet)';
                   
 				    if (!is_null($data)) {
                         if (isset($cart->adder_ids)) {
-                            $cp_master = FireFightingAdders::select('id', 'adder_list','version','code', 'type')->where('version', 'FireFighting/Diesel')->whereIn('id', $cart->adder_ids)->first();
+                            $cp_master = FireFightingAdders::select('id', 'adder_list','version','code', 'type')
+                                ->where('version', 'FireFighting/Diesel')
+                                ->whereIn('id', $cart->adder_ids)
+                                ->first();
 
                             $cp_master1 = ControlPanelMaster::where('category', 'Diesel')
-                                        // ->where('motor_power', $data->motor_power)
-                                        ->where('frequency', $data->frequency)
-                                        
-                                        ->first();
+                                            // ->where('motor_power', $data->motor_power)
+                                            ->where('frequency', $data->frequency)                                        
+                                            ->first();
 
                             $cp_master->model =  $data->control_panel_model;
 							$voltage = $cp_master1->voltage;
@@ -412,10 +617,10 @@ class FireFightingPumpController extends Controller
                         }
 						else{
                             $cp_master = ControlPanelMaster::where('category', 'Diesel')
-                            // ->where('motor_power', $data->motor_power)
-                            // ->where('motor_power', $data->engine_power)
-                            ->where('frequency', $data->frequency)->first();
-                            // dd($cp_master);
+                                // ->where('motor_power', $data->motor_power)
+                                // ->where('motor_power', $data->engine_power)
+                                ->where('frequency', $data->frequency)
+                                ->first();
                             $voltage = $cp_master->voltage;
                             $approval = $cp_master->approval;
 						}
@@ -446,7 +651,10 @@ class FireFightingPumpController extends Controller
 
                     'C16' => $data->motor_power ?? '-',
                     'E16' => $data->voltage ?? '-',
-                    'C17' => !is_null($data->no_of_phase) ? $data->no_of_phase . ' phase' : '',
+                    //'C17' => !is_null($data->no_of_phase) ? $data->no_of_phase . ' phase' : '',
+                    // A Code: 30-04-2026 Start
+                    'C17' => (!empty($data) && !is_null($data->no_of_phase)) ? $data->no_of_phase . ' phase' : '',
+                    // A Code: 30-04-2026 End
                     'E17' => $data->motor_type ?? '-',
                     'C18' => $data->frequency ?? '-',
                     'E18' => $data->motor_approval ?? '-',
@@ -480,8 +688,6 @@ class FireFightingPumpController extends Controller
                     // $cellData['B42'] = $data->terminal_box ?? '-';
                     // $cellData['B16'] = $data->engine_power ?? '-';
                 }
-
-                // dd($cart->category, $cart, $data, $cellData, $cp_master);
 
                 foreach ($cellData as $cell => $value) {
                     $spreadsheet->getActiveSheet()->setCellValue($cell, $value);
@@ -525,30 +731,51 @@ class FireFightingPumpController extends Controller
                         $data = JockeyPump::where('pump_article_no', $cart->jockey_article_number)->first();
                         $item_article_no = $data->pump_article_no;
                         if (!is_null($data)) {
-                            $cp_master = ControlPanelMaster::where('category', 'Jockey')->where('motor_power', $data->power)->where('frequency', $data->frequency)->first();
-                            $item_article_number = $cp_master->item_article_number;
+                            //here change of power
+                            //$cp_master = ControlPanelMaster::where('category', 'Jockey')->where('motor_power', $data->power)->where('frequency', $data->frequency)->first();
+                            //
+                                $power = $data->power * 1.341;
+                                $cp_master = ControlPanelMaster::where('category', 'Jockey')
+                                                ->orderByRaw('ABS(motor_power - ?)', [$power])
+                                                ->where('frequency', $data->frequency)
+                                                ->first();
+                                    
+                            //
+                            // $item_article_number = $cp_master->item_article_number;
+                            // if (!is_null($cp_master)) {
+                            //     $cp_master = 'Control Panel/'.$cp_master->model;
+                            // }
+
+                            // A Code: 24-04-2026 Start
                             if (!is_null($cp_master)) {
-                                $cp_master = 'Control Panel/'.$cp_master->model;
+                                $item_article_no = $cp_master->item_article_number;
+                                $cp_master = 'Control Panel/' . $cp_master->model;
+                            } else {
+                                $item_article_no = null;
                             }
+                            // A Code: 24-04-2026 End
+
                         }
                     break;
 
                     case 'diesel':
                         $data = DieselPump::where('pump_type', $cart->pump_type)
-                                ->where('frequency', $cart->frequency)
-                                ->where('pump_approval', $cart->pump_approval)
-                                ->where(function ($query) use ($cart) {
-                                    $normalized = str_replace(['/', '&'], '%', $cart->engine_approval); // Replace / or & with wildcard
-                                    $query->where('engine_approval', 'LIKE', '%' . $normalized . '%')
-                                        ->orWhere('engine_approval', 'LIKE', '%' . str_replace('/', '&', $cart->engine_approval) . '%')
-                                        ->orWhere('engine_approval', 'LIKE', '%' . str_replace('&', '/', $cart->engine_approval) . '%');
-                                })
-                                ->where('flow', $cart->flow)
-                                ->where('head', $cart->head)
-                                ->where('speed_rpm', $cart->speed_rpm)
-                                ->first();
+                                    //->where('voltage', $cart->voltage) // A Code: 11-03-2026 Comment
+                                    ->where('frequency', $cart->frequency)
+                                    ->where('pump_approval', $cart->pump_approval)
+                                    ->where(function ($query) use ($cart) {
+                                        $normalized = str_replace(['/', '&'], '%', $cart->engine_approval); // Replace / or & with wildcard
+                                        $query->where('engine_approval', 'LIKE', '%' . $normalized . '%')
+                                            ->orWhere('engine_approval', 'LIKE', '%' . str_replace('/', '&', $cart->engine_approval) . '%')
+                                            ->orWhere('engine_approval', 'LIKE', '%' . str_replace('&', '/', $cart->engine_approval) . '%');
+                                    })
+                                    ->where('flow', $cart->flow)
+                                    ->where('head', $cart->head)
+                                    ->where('speed_rpm', $cart->speed_rpm)
+                                    ->first();
 
-                            if (!is_null($data)) {
+                        if (!is_null($data)) 
+                        {
                             $cp_master = 'Control Panel/'.$data->control_panel_model;
                             $diesel_tank_us = $data->diesel_tank_us;
                             $diesel_tank_item_article_number = DieselTankMaster::where('tank_size',$diesel_tank_us)->value('item_article_number');
@@ -572,24 +799,24 @@ class FireFightingPumpController extends Controller
                             //diesel_pressure_releif_valve_article_number
 
                             $diesel_pressure_releif_valve_article_number = DB::table('firefighting_pressure_relief_valve')
-                                                                          ->where('size',$diesel_pressure_releif_valve)
-                                                                          ->value('item_article_number');
+                                                                            ->where('size',$diesel_pressure_releif_valve)
+                                                                            ->value('item_article_number');
                             
                             $diesel_flow_meter_size_article_number = DB::table('firefighting_flow_meter')
-                                                                          ->where('size',$diesel_flow_meter_size)
-                                                                          ->whereRaw('? BETWEEN min_gpm AND max_gpm', [$flow])
-                                                                          ->value('item_article_number'); 
+                                                                            ->where('size',$diesel_flow_meter_size)
+                                                                            ->whereRaw('? BETWEEN min_gpm AND max_gpm', [$flow])
+                                                                            ->value('item_article_number'); 
                                                                           
                             $diesel_waste_cone_brand_article_number = DB::table('firefighting_waste_cone')
-                                                                          ->where('size',$diesel_waste_cone_brand)
-                                                                          ->value('item_article_number');                                              
+                                                                            ->where('size',$diesel_waste_cone_brand)
+                                                                            ->value('item_article_number');                                              
                                                                           
                             //
                             //control_panel_price aricle number
                             $control_panel_aricle_number = ControlPanelMaster::where('category', 'Diesel')
-                                                                              ->where('frequency', $data->frequency)
-                                                                              ->where('model', $data->control_panel_model)
-                                                                              ->value('item_article_number');
+                                                                            ->where('frequency', $data->frequency)
+                                                                            ->where('model', $data->control_panel_model)
+                                                                            ->value('item_article_number');
                             if($control_panel_aricle_number)
                             { 
                                 $item_article_number = $control_panel_aricle_number;
@@ -608,12 +835,13 @@ class FireFightingPumpController extends Controller
 
                     case 'electrical':
                         $data = ElectricalPump::where('pump_type', $cart->pump_type)
-                            ->where('frequency', $cart->frequency)
-                            ->where('pump_approval', $cart->pump_approval)
-                            ->where('flow', $cart->flow)
-                            ->where('head', $cart->head)
-                            ->where('speed_rpm', $cart->speed_rpm)
-                            ->first();
+                                    ->where('voltage', $cart->voltage) // A Code: 11-03-2026
+                                    ->where('frequency', $cart->frequency)
+                                    ->where('pump_approval', $cart->pump_approval)
+                                    ->where('flow', $cart->flow)
+                                    ->where('head', $cart->head)
+                                    ->where('speed_rpm', $cart->speed_rpm)
+                                    ->first();
                         $pump_control_panel_type = "";
                        
                         foreach ($cart->field_val as $cart_field_val) {
@@ -629,11 +857,20 @@ class FireFightingPumpController extends Controller
                         if (!is_null($data)) {
                             if(!empty( $pump_control_panel_type))
                             {
-                                $cp_master = ControlPanelMaster::where('category', 'Electrical')->where('motor_power', $data->motor_power)->where('frequency', $data->frequency)->where('type',$pump_control_panel_type)->first();
+                                $cp_master = ControlPanelMaster::where('category', 'Electrical')
+                                    ->where('motor_power', $data->motor_power)
+                                    ->where('voltage', $data->voltage) // A Code: 17-03-2026
+                                    ->where('frequency', $data->frequency)
+                                    ->where('type',$pump_control_panel_type)
+                                    ->first();
                             }
                             else
                             {
-                                $cp_master = ControlPanelMaster::where('category', 'Electrical')->where('motor_power', $data->motor_power)->where('frequency', $data->frequency)->first();
+                                $cp_master = ControlPanelMaster::where('category', 'Electrical')
+                                    ->where('motor_power', $data->motor_power)
+                                    ->where('voltage', $data->voltage) // A Code: 17-03-2026
+                                    ->where('frequency', $data->frequency)
+                                    ->first();
                             }
 
                             if (!is_null($cart->field_val)) {
@@ -644,17 +881,25 @@ class FireFightingPumpController extends Controller
                                     }
                                     return $carry;
                                 });
-                                if (!is_null($control_panel_type_value)) {
-                                    $cp_master = ControlPanelMaster::where('category', 'Electrical')->where('motor_power', $data->motor_power)->where('frequency', $data->frequency)->where('type', $control_panel_type_value)->first();
-                                    $item_article_number = $cp_master->item_article_number;
+                                $control_panel_type_value = str_replace(" ", "", $control_panel_type_value); // A Code: 06-05-2026
+                                if (!is_null($control_panel_type_value)) {                                    
+                                    $cp_master = ControlPanelMaster::where('category', 'Electrical')
+                                        ->where('motor_power', $data->motor_power)
+                                        ->where('voltage', $data->voltage) // A Code: 17-03-2026
+                                        ->where('frequency', $data->frequency)
+                                        ->where('type', $control_panel_type_value)
+                                        ->first();
+                                    //$item_article_number = $cp_master->item_article_number;
+                                    $item_article_number = $cp_master->item_article_number ?? null; // A Code: 05-05-2026
                                 }
                             }
                             if (!is_null($cp_master)) {
-                                $cp_master = 'Control Panel/'.$cp_master->model;
+                                //$cp_master = 'Control Panel/'.$cp_master->model;
+                                $cp_master = $cp_master->description; // A Code: 17-03-2026
                                 $exptra_values[] = [
                                     'description' => 'Motor Power/'.$data->motor_power.'(HP)',
-                                   // 'article_number' => $cp_master->item_article_number ?? '--',
-                                   'article_number' => '' ,
+                                    // 'article_number' => $cp_master->item_article_number ?? '--',
+                                    'article_number' => '' ,
                                     'addder_code' => '',
                                     'unit_price' => '',
                                     'qty' => '',
@@ -674,6 +919,7 @@ class FireFightingPumpController extends Controller
                         $description = ucwords(str_replace('-pump', '', $cart->category)).' Pump/'.'('.$cart->pump_models.')';
 
                         $item_article_no = DieselPump::where('pump_type',$cart->pump_type)
+                                                        //->where('voltage', $cart->voltage) // A Code: 11-03-2026 Comment
                                                         ->where('frequency',$cart->frequency)
                                                         ->where('pump_approval',$cart->pump_approval)
                                                         ->where('engine_approval',$cart->engine_approval)
@@ -688,6 +934,7 @@ class FireFightingPumpController extends Controller
                     case 'electrical':
                             $description = ucwords(str_replace('-pump', '', $cart->category)).' Pump ('.$cart->pump_models.')';
                             $item_article_no = ElectricalPump::where('pump_type', $cart->pump_type)
+                                                ->where('voltage', $cart->voltage) // A Code: 11-03-2026
                                                 ->where('frequency', $cart->frequency)
                                                 ->where('pump_approval', $cart->pump_approval)
                                                 ->where('flow', $cart->flow)
@@ -722,7 +969,6 @@ class FireFightingPumpController extends Controller
                     'total_price' => $this->showAmount($prices['control_panel_price']),
                 ]);
             }
-
             if (array_key_exists('disel_tank_price', $prices)) {
                 array_push($items, [
                     'description' => 'Disel Tank'.(!is_null($diesel_tank_us) ? '/'.$diesel_tank_us.' (US - gallons)' : ''),
@@ -733,7 +979,6 @@ class FireFightingPumpController extends Controller
                     'total_price' => $this->showAmount($prices['disel_tank_price']),
                 ]);
             }
-
             if (array_key_exists('battery_orignal_price', $prices) && array_key_exists('battery_qty', $prices)) {
                 array_push($items, [
                     'description' => 'Battery'.($battery_qty ?? ''),
@@ -744,7 +989,6 @@ class FireFightingPumpController extends Controller
                     'total_price' => $this->showAmount($prices['battery_orignal_price']) * $prices['battery_qty'],
                 ]);
             }
-
             if (array_key_exists('adderprice', $prices) && (array_key_exists('adderpricelist', $prices) && is_array($prices['adderpricelist']))) {
                 foreach ($prices['adderpricelist'] as $k => $v) {
                     if ($v['list'] == 'Pressure relief valve') {
@@ -806,7 +1050,6 @@ class FireFightingPumpController extends Controller
                     }
                 }
             }
-
             if (count($exptra_values) > 0) {
                 foreach ($exptra_values as $k => $v) {
                     array_push($items, $v);
@@ -838,6 +1081,9 @@ class FireFightingPumpController extends Controller
             if($value['name'] == 'jockey_pumppower'){
                 $pumppower = $value['value'];
             }
+            if($value['name'] == 'jockey_voltage'){
+                $voltage = $value['value'];
+            }
             if($value['name'] == 'jockey_frequency'){
                 $frequency = $value['value'];
             }
@@ -847,7 +1093,6 @@ class FireFightingPumpController extends Controller
            
         }
         $pump_data = JockeyPump::where('pump_article_no', $article_number)->where('power', $pumppower)->where('frequency', $frequency)->first();
-
 
         if (!is_null($pump_data)) {
             $pump_price = $pump_data->unit_price;
@@ -861,7 +1106,9 @@ class FireFightingPumpController extends Controller
             $price = $this->jockeyPumpPriceCalculate($pump_price, $power, $frequency, $overhead, $ic_margin, $adder_ids);
 
             // Pump Data check in cart
-            $cart = FireFightingCarts::where('category', $request->pump_type)->where('pump_id', $pump_data->id)->where('jockey_article_number', $article_number)->where('power', $pumppower)->where('frequency', $frequency);
+            $cart = FireFightingCarts::where('category', $request->pump_type)->where('pump_id', $pump_data->id)
+                                        ->where('jockey_article_number', $article_number)->where('power', $pumppower)->where('frequency', $frequency);
+
             if (isset($request->adder_ids) && count($request->adder_ids) > 0) {
 
                 // Adder Ids Search
@@ -886,7 +1133,9 @@ class FireFightingPumpController extends Controller
             $cart = new FireFightingCarts();
 
             // Check same data in cart without userid or article number
-            $cart_check_other = FireFightingCarts::where('category', $request->pump_type)->where('pump_id', $pump_data->id)->where('jockey_article_number', $article_number)->where('power', $pumppower)->where('frequency', $frequency);
+            $cart_check_other = FireFightingCarts::where('category', $request->pump_type)->where('pump_id', $pump_data->id)
+                                                    ->where('jockey_article_number', $article_number)->where('power', $pumppower)->where('frequency', $frequency);
+
             if (isset($request->adder_ids) && count($request->adder_ids) > 0) {
 
                 // Adder Ids Search
@@ -910,6 +1159,7 @@ class FireFightingPumpController extends Controller
             $cart->jockey_article_number = $article_number;
             $cart->pump_models = $pump_data->description;
             $cart->power = $pumppower;
+            $cart->voltage = $voltage;
             $cart->frequency = $frequency;
             if (isset($request->adder_ids)) {
                 $cart->adder_ids = $request->adder_ids;
@@ -939,7 +1189,7 @@ class FireFightingPumpController extends Controller
 
     //here need to check
     public function electricalPumpAddToCard($request)
-    {
+    {        
         $ic_margin = User::ic_margin_fire_fighting();
         $overhead = current(\DB::table('setup_fields')->where('name','fire_fighting_over_head')->pluck('value')->toArray());
         $price_res = $this->electricalPumpPriceCalculate($request, $overhead, $ic_margin, true);
@@ -986,14 +1236,29 @@ class FireFightingPumpController extends Controller
             }
         }
         //end 20250107 taking filter for Control panel type
-        $cart = FireFightingCarts::where('category', $request->pump_type)->where('pump_id', $electrical->id)->where('pump_models', $pump_models)->where('power', $electrical->motor_power)->where('frequency', $electrical->frequency)->where('pump_approval', $electrical->pump_approval)->where('flow', $electrical->flow)->where('head', $electrical->head)->where('speed_rpm', $electrical->speed_rpm)->where('wilo_article_number', $electrical->wilo_article_number)->where('field_val', 'like','%{"electrical_control_panel_type":"'.$electrical_control_panel_type.'"}%');//start 20250107 taking filter for Control panel type
+        $cart = FireFightingCarts::where('category', $request->pump_type)
+                                    ->where('full_article_number',$request->electrical_article_number)
+                                    //->where('pump_id', $electrical->id) // A Code: 06-05-2026 Comment
+                                    ->where('pump_models', $pump_models) // A Code: 06-05-2026 Comment
+                                    ->where('power', $electrical->motor_power)
+                                    ->where('voltage', $electrical->voltage) // A Code: 12-03-2026
+                                    ->where('frequency', $electrical->frequency)
+                                    ->where('pump_approval', $electrical->pump_approval)
+                                    ->where('flow', $electrical->flow)
+                                    ->where('head', $electrical->head)
+                                    ->where('speed_rpm', $electrical->speed_rpm)
+                                    ->where('wilo_article_number', $electrical->wilo_article_number)
+                                    ->where('field_val', 'like','%{"electrical_control_panel_type":"'.$electrical_control_panel_type.'"}%');//start 20250107 taking filter for Control panel type
+
         if (count($adder_ids) > 0) {
 
             // Adder Ids Search
             $adder_ids_search = $adder_ids;
+
             $adder_ids_search = '[' . implode(',', array_map(function($value) {
                 return '"' . $value . '"';
             }, array_map('strval', $adder_ids_search))) . ']';
+
             $cart = $cart->where('adder_ids', $adder_ids_search);
         } else {
             $cart = $cart->whereNull('adder_ids');
@@ -1014,10 +1279,38 @@ class FireFightingPumpController extends Controller
             $control_panel_type_values = $request->data[$index]['value'];
         }
        
-        $cart_check_other = FireFightingCarts::where('category', $request->pump_type)->where('pump_id', $electrical->id)->where('pump_models', $pump_models)->where('power', $electrical->motor_power)->where('frequency', $electrical->frequency)->where('pump_approval', $electrical->pump_approval)->where('flow', $electrical->flow)->where('head', $electrical->head)->where('speed_rpm', $electrical->speed_rpm)->where('wilo_article_number', $electrical->wilo_article_number);
+        $cart_check_other = FireFightingCarts::where('category', $request->pump_type)
+                                                ->where('full_article_number',$request->electrical_article_number)
+                                                //->where('pump_id', $electrical->id) // A Code: 06-05-2026 Comment
+                                                //->where('pump_models', $pump_models) // A Code: 06-05-2026 Comment
+                                                ->where('power', $electrical->motor_power)
+                                                ->where('voltage', $electrical->voltage) // A Code: 12-03-2026
+                                                ->where('frequency', $electrical->frequency)
+                                                ->where('pump_approval', $electrical->pump_approval)
+                                                ->where('flow', $electrical->flow)
+                                                ->where('head', $electrical->head)
+                                                ->where('speed_rpm', $electrical->speed_rpm)
+                                                ->where('wilo_article_number', $electrical->wilo_article_number);
+
         //start 20250107 taking filter for Control panel type
         if ($electrical_control_panel_type != '') {
-            $cart_check_other = $cart_check_other->where('field_val', 'like', '%"electrical_control_panel_type":"'.$electrical_control_panel_type.'"%');
+            
+            //$cart_check_other = $cart_check_other->where('field_val', 'like', '%"electrical_control_panel_type":"'.$electrical_control_panel_type.'"%');
+            
+            // A Code: 06-05-2026 Start (Handle spaced and non-spaced versions of control panel type)
+            $cart_check_other = $cart_check_other->where(function($q) use ($electrical_control_panel_type) {
+                // Always search original value
+                $q->where('field_val', 'like', '%"electrical_control_panel_type":"'.$electrical_control_panel_type.'"%');
+                $q->orwhere('field_val', 'like', '%"electrical_control_panel_type": "'.$electrical_control_panel_type.'"%');
+                // Generate spaced version
+                $altValue = str_replace('SoftStarter', 'Soft Starter', $electrical_control_panel_type);
+                // Add second condition only if different
+                if ($altValue !== $electrical_control_panel_type) {
+                    $q->orWhere('field_val', 'like', '%"electrical_control_panel_type":"'.$altValue.'"%');
+                }
+            });
+            // A Code: 06-05-2026 End
+
         }
         //end 20250107 taking filter for Control panel type
         if (count($adder_ids) > 0) {
@@ -1032,6 +1325,9 @@ class FireFightingPumpController extends Controller
             $cart_check_other = $cart_check_other->whereNull('adder_ids');
         }
         $cart_check_other = $cart_check_other->first();
+
+        //dd($electrical->id,$electrical_control_panel_type,$cart_check_other->article_number ?? null,$cart_check_other->full_article_number ?? null);
+
         if (!is_null($cart_check_other)) {
             $cart->article_number = $cart_check_other->article_number;
             $cart->full_article_number = $cart_check_other->full_article_number;
@@ -1042,6 +1338,7 @@ class FireFightingPumpController extends Controller
         $cart->pump_models = $pump_models;
         $cart->pump_type = $electrical->pump_type;
         $cart->power = $electrical->motor_power;
+        $cart->voltage = $electrical->voltage; // A Code: 10-03-2026
         $cart->frequency = $electrical->frequency;
         $cart->pump_approval = $electrical->pump_approval;
         $cart->flow = $electrical->flow;
@@ -1080,7 +1377,6 @@ class FireFightingPumpController extends Controller
         if (!$price_res['success']) {
             return $price_res;
         }
-        // dd($price_res, $request->all());
 
         $price = $price_res['price_list'];
         $diesel = $price_res['diesel_data'];
@@ -1108,7 +1404,23 @@ class FireFightingPumpController extends Controller
         $pump_models .= '/'.$diesel->pump_approval;
 
         // Pump Data check in cart
-        $cart = FireFightingCarts::where('category', $request->pump_type)->where('pump_id', $diesel->id)->where('pump_models', $pump_models)->where('power', $diesel->engine_power)->where('frequency', $diesel->frequency)->where('pump_approval', $diesel->pump_approval)->where('engine_approval', $diesel->engine_approval)->where('flow', $diesel->flow)->where('head', $diesel->head)->where('speed_rpm', $diesel->speed_rpm)->where('wilo_article_number', $diesel->wilo_article_number);
+        $cart = FireFightingCarts::where('category', $request->pump_type)
+                                    ->where('pump_id', $diesel->id)
+                                    ->where('pump_models', $pump_models)
+                                    ->where('power', $diesel->engine_power)
+                                    ->where('frequency', $diesel->frequency)
+                                    ->where('pump_approval', $diesel->pump_approval)
+                                    ->where('engine_approval', $diesel->engine_approval)
+                                    //->where('engine_approval', $diesel->engine_approval) // A Code: 22-05-2026 Comment
+                                    ->where(function($q) use ($diesel) {
+                                        $q->where('engine_approval', $diesel->engine_approval)
+                                        ->orWhere('engine_approval', str_replace('/', '&', $diesel->engine_approval));
+                                    }) // A Code: 22-05-2026
+                                    ->where('flow', $diesel->flow)
+                                    ->where('head', $diesel->head)
+                                    ->where('speed_rpm', $diesel->speed_rpm)
+                                    ->where('wilo_article_number', $diesel->wilo_article_number);
+
         if (count($adder_ids) > 0) {
 
             // Adder Ids Search
@@ -1132,7 +1444,22 @@ class FireFightingPumpController extends Controller
         $cart = new FireFightingCarts();
 
         // Check if other data exist
-        $cart_check_other = FireFightingCarts::where('category', $request->pump_type)->where('pump_id', $diesel->id)->where('pump_models', $pump_models)->where('power', $diesel->engine_power)->where('frequency', $diesel->frequency)->where('pump_approval', $diesel->pump_approval)->where('engine_approval', $diesel->engine_approval)->where('flow', $diesel->flow)->where('head', $diesel->head)->where('speed_rpm', $diesel->speed_rpm)->where('wilo_article_number', $diesel->wilo_article_number);
+        $cart_check_other = FireFightingCarts::where('category', $request->pump_type)
+                                                ->where('pump_id', $diesel->id)
+                                                ->where('pump_models', $pump_models)
+                                                ->where('power', $diesel->engine_power)
+                                                ->where('frequency', $diesel->frequency)
+                                                ->where('pump_approval', $diesel->pump_approval)
+                                                //->where('engine_approval', $diesel->engine_approval) // A Code: 22-05-2026 Comment
+                                                ->where(function($q) use ($diesel) {
+                                                    $q->where('engine_approval', $diesel->engine_approval)
+                                                    ->orWhere('engine_approval', str_replace('/', '&', $diesel->engine_approval));
+                                                }) // A Code: 22-05-2026
+                                                ->where('flow', $diesel->flow)
+                                                ->where('head', $diesel->head)
+                                                ->where('speed_rpm', $diesel->speed_rpm)
+                                                ->where('wilo_article_number', $diesel->wilo_article_number);
+
         if (count($adder_ids) > 0) {
 
             // Adder Ids Search
@@ -1145,6 +1472,9 @@ class FireFightingPumpController extends Controller
             $cart_check_other = $cart_check_other->whereNull('adder_ids');
         }
         $cart_check_other = $cart_check_other->first();
+
+        //dd($diesel->id,$cart_check_other->article_number ?? null,$cart_check_other->full_article_number ?? null);
+
         if (!is_null($cart_check_other)) {
             $cart->article_number = $cart_check_other->article_number;
             $cart->full_article_number = $cart_check_other->full_article_number;
@@ -1217,6 +1547,7 @@ class FireFightingPumpController extends Controller
                     $pump_price = $request->data['unit_price'];
 
                     // Control Panel Price
+                    //here 1
                     $power = $request->data['power'] * 1.341;
                     
                     $adder_ids = [];
@@ -1248,6 +1579,8 @@ class FireFightingPumpController extends Controller
 
     public function jockeyPumpPriceCalculate($pump_price, $power, $frequency, $overhead, $ic_margin, $adder_ids)
     {
+        //$power = 30 //actual seletion
+        //$power = 40.23 // when we are doing * with 1.341
         $control_panel = ControlPanelMaster::select('*')->where('category', 'Jockey')->where('frequency', $frequency)->get()->toArray();
         $control_panel_price = collect($control_panel)->pluck('unit_price', 'motor_power')->pipe(function ($data) use ($power) {
             $closest = null;
@@ -1263,6 +1596,7 @@ class FireFightingPumpController extends Controller
 
         $adderprice = 0;
         $adderpricelist = [];
+
         if (count($adder_ids) > 0) {
             $data = FireFightingAdders::select('id', 'adder_list','version','code', 'type')->where('version', 'FireFighting/Jockey')->whereIn('id', $adder_ids)->get();
             if (count($data) > 0) {
@@ -1297,6 +1631,7 @@ class FireFightingPumpController extends Controller
             'id' => 'id',
             'electrical_pumpmodels' => 'wilo_pump_models', 
             'electrical_pumptype' => 'pump_type', 
+            'electrical_voltage' => 'voltage', // A Code: 11-03-2026
             'electrical_frequency' => 'frequency', 
             'electrical_pump_approval' => 'pump_approval', 
             'electrical_flow' => 'flow', 
@@ -1309,11 +1644,11 @@ class FireFightingPumpController extends Controller
 
         $field_val = [];
 
-        $electrical_control_panel_type = $electrical_frequency = $electrical_pump_approval = $motor_power = '';
+        $electrical_control_panel_type = $electrical_voltage = $electrical_frequency = $electrical_pump_approval = $motor_power = ''; // A Code: 11-03-2026
        
         $fetchElectrical = ElectricalPump::select('*');
         foreach ($request->data as $key => $value) {
-            if($value['name'] != 'electrical_control_panel_type'){
+            if($value['name'] != 'electrical_control_panel_type' && $value['name'] != 'electrical_voltage'){
                 $fetchElectrical = $fetchElectrical->where($change[$value['name']], $value['value']);
             }
             //start 20250107 taking filter for Control panel type
@@ -1321,6 +1656,11 @@ class FireFightingPumpController extends Controller
                 $electrical_control_panel_type = $value['value'];
             }
             //end 20250107 taking filter for Control panel type
+            // A Code: 10-03-2026 Start
+            if($value['name'] == 'electrical_voltage'){
+                $electrical_voltage = $value['value'];
+            }
+            // A Code: 10-03-2026 End
             if($value['name'] == 'electrical_frequency'){
                 $electrical_frequency = $value['value'];
             }
@@ -1349,7 +1689,13 @@ class FireFightingPumpController extends Controller
             $pump_price = $fetchElectrical->unit_price;
 
             //$control_panel = ControlPanelMaster::select('*')->where('category', 'Electrical')->where('model', $fetchElectrical->control_panel_model)->where('frequency', $fetchElectrical->frequency)->where('motor_power', $fetchElectrical->motor_power)->first();
-            $control_panel = ControlPanelMaster::select('*')->where('category', 'Electrical')->where('type', $electrical_control_panel_type )->where('frequency', $electrical_frequency)->where('motor_power',$motor_power)->where('approval', $electrical_pump_approval)->first();
+            $control_panel = ControlPanelMaster::select('*')->where('category', 'Electrical')
+                                ->where('type', $electrical_control_panel_type )
+                                ->where('voltage', $electrical_voltage) // A Code: 11-03-2026
+                                ->where('frequency', $electrical_frequency)
+                                ->where('motor_power',$motor_power)
+                                ->where('approval', $electrical_pump_approval)
+                                ->first();
 
             if (!is_null($control_panel)) {
                 $control_panel_price = $control_panel->unit_price;
@@ -1399,7 +1745,11 @@ class FireFightingPumpController extends Controller
                                         $pole = 4;
                                     }
 
-                                    $motor = FireFightingMotor::where('motor_power', $control_motor_power)->where('frequency', $fetchElectrical->frequency)->where('number_of_pole', $pole)->first();
+                                    $motor = FireFightingMotor::where('motor_power', $control_motor_power)
+                                        ->where('frequency', $fetchElectrical->frequency)
+                                        ->where('number_of_pole', $pole)
+                                        ->first();
+
                                     if (is_null($motor)) {
                                         return [
                                             'success' => false,
@@ -1428,6 +1778,7 @@ class FireFightingPumpController extends Controller
                     'data' => [
                         'wilo_pump_models' => $fetchElectrical->wilo_pump_models,
                         'pump_type' => $fetchElectrical->pump_type,
+                        'voltage' => $fetchElectrical->voltage, // A Code: 11-03-2026
                         'frequency' => $fetchElectrical->frequency,
                         'motor_power' =>  $fetchElectrical->motor_power //20250108 add motor power field in electrical flow              
                     ]
@@ -1468,6 +1819,7 @@ class FireFightingPumpController extends Controller
             'id' => 'id',
             'diesel_pumpmodels' => 'pump_models',
             'diesel_pumptype' => 'pump_type',
+            //'diesel_voltage' => 'voltage', // A Code: 11-03-2026 Comment
             'diesel_frequency' => 'frequency',
             'diesel_pump_approval' => 'pump_approval',
             'diesel_engine_approval' => 'engine_approval',
@@ -1508,7 +1860,10 @@ class FireFightingPumpController extends Controller
             
 
             // Control Panel Price Get
-            $control_panel = ControlPanelMaster::select('*')->where('category', 'Diesel')->where('model', $fetchDiesel->control_panel_model)->where('frequency', $fetchDiesel->frequency)->first();
+            $control_panel = ControlPanelMaster::select('*')->where('category', 'Diesel')
+                                ->where('model', $fetchDiesel->control_panel_model)
+                                ->where('frequency', $fetchDiesel->frequency)
+                                ->first();
             //$control_panel = ControlPanelMaster::select('*')->where('category', 'Diesel')->where('type', $diesel_control_panel_type )->where('frequency', $diesel_frequency)->where('motor_power',$motor_power)->where('approval', $diesel_pump_approval)->first();
 
             if (!is_null($control_panel)) {
@@ -1643,6 +1998,7 @@ class FireFightingPumpController extends Controller
                             'data' => [
                                 'wilo_pump_models' => $fetchDiesel->pump_models,
                                 'pump_type' => $fetchDiesel->pump_type,
+                                //'voltage' => $fetchDiesel->voltage, // A Code: 11-03-2026 Comment
                                 'frequency' => $fetchDiesel->frequency,
                             ]
                         ];
@@ -1747,6 +2103,8 @@ class FireFightingPumpController extends Controller
         //     $return['data']['Waste cone'] = $diesel['data']['price']; 
         // }
         // dd($electrical, $diesel);
+
+        // A Code: 11-03-2026 Start
         return [
             'success' => true,
             'html' => '<div class="row">
@@ -1756,6 +2114,7 @@ class FireFightingPumpController extends Controller
                             <li class="header"><u>Electrical</u></li>
                             <li class="header">'.$electrical['data']['wilo_pump_models'].'</li>
                             <li class="grey">'.$electrical['data']['pump_type'].'</li>
+                            <li class="grey">'.$electrical['data']['voltage'].'</li>
                             <li class="grey">'.$electrical['data']['frequency'].' </li>
                             <li>Total Price: <b>'.round($electrical['price'], 2).'</b><span>$</span> </li>  
                         </ul>
@@ -1774,6 +2133,8 @@ class FireFightingPumpController extends Controller
                 </div>
             </div>'
         ];
+        // A Code: 11-03-2026 End
+
         // dd($electrical, $diesel);
     }
 

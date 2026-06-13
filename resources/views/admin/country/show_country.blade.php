@@ -4,52 +4,50 @@
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.12/css/dataTables.bootstrap.min.css" />
 </style>
+
 <style>
-#add_country{
-background-color: #169e88;
-color: white;
-padding: 5px 10px;
-text-align: center;
-text-decoration: none;
-display: inline-block;
-margin-top: 20px;
-margin-left: 980px;
-}
-#edit_country{
-background-color: #169e88;
-color: white;
-padding: 5px 10px;
-text-align: center;
-text-decoration: none;
-display: inline-block;
-margin-top: 20px;
-}
-#table{
-    width:50%;
-    height:50%;
-    margin-left: auto;
-    margin-right: auto;
-}
-/*** 27 Feb Alpesh - Country Edit/Delete - Start ***/
-.addCountryBtn,.editCountryBtn{border-color:#169e88;background-color:#169e88;}
+    #add_country{
+    background-color: #169e88;
+    color: white;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 20px;
+    margin-left: 980px;
+    }
+    #edit_country{
+    background-color: #169e88;
+    color: white;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 20px;
+    }
+    #table{
+        width:50%;
+        height:50%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+	.addCountryBtn,.editCountryBtn{border-color:#169e88;background-color:#169e88;}
 .addCountryBtn:hover,.editCountryBtn:hover{border-color:#169e88;background-color:#169e88;}
 .cntry_msg{border-radius: .2rem;}
-/*** 27 Feb Alpesh - Country Edit/Delete - End ***/
 </style>
 
-<div class="container-fluid">
+	<!--
+@if (\Session::has('success'))
+    <div class="alert alert-success">
+        <ul>
+            <li>{!! \Session::get('success') !!}</li>
+        </ul>
+    </div>
+@endif
+-->
+<div class = "container-fluid">
 <div class="row">
-<!-- /*** 27 Feb Alpesh - Country Edit/Delete - Start ***/ -->
-    <!-- @if (\Session::has('success'))
-        <div class="col-xl-12">
-            <div class="alert alert-success mt-2 px-0 py-2 cntry_msg">
-                <ul class="mb-0">
-                    <li>{!! \Session::get('success') !!}</li>
-                </ul>
-            </div>
-        </div>
-    @endif -->
-    @if (session('success'))
+@if (session('success'))
         <div class="col-12">
             <div class="alert alert-success mt-2 cntry_msg alert-dismissible fade show d-flex align-items-center" role="alert">
                 <span class="me-2 mr-2">
@@ -76,34 +74,30 @@ margin-top: 20px;
             </div>
         </div>
     @endif
-<!-- /*** 27 Feb Alpesh - Country Edit/Delete - End ***/ -->
-
     <div class="col-xl-12 float-right">
-        <a href="" id="add_country" data-toggle="modal" data-target="#mediumModal" title="Create a Country">Add Country</a>
+        <a href = "" id =  "add_country" data-toggle="modal" data-target="#mediumModal" title="Create a Country">Add Country</a>
         <br>
         <br>
     </div>
-    <div class="row"></div>
+    <div class="row">
+</div>
 </div>
 
 <table class="table cell-border table-striped" id="table">
-    <thead>
-        <tr>
-            <th class="text-center">Sr.no.</th>
-            <th class="text-center">Name</th>
-            <!-- /*** 27 Feb Alpesh - Country Edit/Delete - Start ***/ -->
-            <td class="text-center">Action</td>
-            <!-- /*** 27 Feb Alpesh - Country Edit/Delete - End ***/ -->
-        </tr>
-    </thead>
+<thead>
+    <tr>
+        <th class="text-center">Sr.no.</th>
+        <th class="text-center">Name</th>
+		<td class="text-center">Action</td>
+    </tr>
+</thead>
     <tbody>
         <?php $i = 1; ?>
         @foreach($country as $value)
         <tr>
             <td class="text-center">{{$i}}</td>
             <td class="text-center">{{$value->country}}</td>
-            <!-- /*** 27 Feb Alpesh - Country Edit/Delete - Start ***/ -->
-            <td class="text-center">
+			<td class="text-center">
                 <button class="btn btn-success btn-sm editCountryBtn" 
                         data-toggle="modal" 
                         data-target="#editCountryModal" 
@@ -122,20 +116,21 @@ margin-top: 20px;
                     Delete
                 </button>
             </td>
-            <!-- /*** 27 Feb Alpesh - Country Edit/Delete - End ***/ -->
         </tr>
         <?php $i++; ?>
-        @endforeach
+    @endforeach
     </tbody>   
 </table>
 </div>
 
 
-<!-- /*** 27 Feb Alpesh - Country Edit/Delete - Start ***/ -->
- <!-- medium modal -->
- <!-- <form action="add_country" method="post">
+
+ <!-- medium modal
+
+ <form action = "add_country" method="post">
      @csrf
- <div class="modal fade" id="mediumModal" tabindex="-1" role="dialog" aria-labelledby="mediumModalLabel" aria-hidden="true">
+ <div class="modal fade" id="mediumModal" tabindex="-1" role="dialog" aria-labelledby="mediumModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">Add Country
@@ -145,15 +140,15 @@ margin-top: 20px;
                 </div>
                 <div class="modal-body" id="mediumBody">
                     <div>
-                        <input type="text" name="country_name" required>
-                        <input type="submit" value="add">
+                        <input type = "text" name="country_name" required>
+                        <input type = "submit" value = "add">
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</form> -->
-
+</form>
+ -->
 <form action="add_country" method="post">
     @csrf
     <div class="modal fade" id="mediumModal" tabindex="-1" role="dialog" aria-labelledby="mediumModalLabel" aria-hidden="true">
@@ -231,7 +226,7 @@ margin-top: 20px;
         </div>
     </div>
 </div>
-<!-- /*** 27 Feb Alpesh - Country Edit/Delete - End ***/ -->
+
 @endsection
 
 <script src="//code.jquery.com/jquery-1.12.3.js"></script>
@@ -239,20 +234,44 @@ margin-top: 20px;
 <script
     src="https://cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js"></script>
 <script>
-$(document).ready(function() {
+  $(document).ready(function() {
     $('#table').DataTable();
-});
-/*** 27 Feb Alpesh - Country Edit/Delete - Start ***/
-function fetchCountry(id,name){
-    $("#country_id").val(id);
-    $("#country_name").val(name);
-    $("#editCountryModal").modal("show"); 
-}
-function ConfirmDeleteCountry(id){
-    $("#cntry_id").val(id);
-    $("#deleteCountryModal").modal("show");
-}
-/*** 27 Feb Alpesh - Country Edit/Delete - End ***/
-</script>
+} );
+ </script>
+ <script>
+    //  $(document).on('click', '#add_country', function(event) {
+    //         event.preventDefault();
+    //         let href = $(this).attr('data-attr');
+    //         $.ajax({
+    //             url: href,
+    //             beforeSend: function() {
+    //                 $('#loader').show();
+    //             },
+    //             // return the result
+    //             success: function(result) {
+    //                 $('#mediumModal').modal("show");
+    //                 $('#mediumBody').html(result).show();
+    //             },
+    //             complete: function() {
+    //                 $('#loader').hide();
+    //             },
+    //             error: function(jqXHR, testStatus, error) {
+    //                 console.log(error);
+    //                 alert("Page " + href + " cannot open. Error:" + error);
+    //                 $('#loader').hide();
+    //             },
+    //             timeout: 8000
+    //         })
+    //     });
+	function fetchCountry(id,name){
+		$("#country_id").val(id);
+		$("#country_name").val(name);
+		$("#editCountryModal").modal("show"); 
+	}
+	function ConfirmDeleteCountry(id){
+		$("#cntry_id").val(id);
+		$("#deleteCountryModal").modal("show");
+	}
+ </script>
 
 

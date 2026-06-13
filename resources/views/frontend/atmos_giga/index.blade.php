@@ -81,11 +81,10 @@
                             <div class="popper-content hide"></div>
                         </div>
                         <span class="formArrowIcon"><img src="{{asset('fassets/images/arrowDownIcon.png')}}" /></span>
-                        
                         <select name="bareshaft_pump_full_pump" id="bareshaft_pump_full_pump" class="formInput">
                             <option value="both_pump">Select Bareshaft pump Or Full pump</option>
                             <option value="full_pump">Full pump</option>
-                            @if(Auth::check())
+							@if(Auth::check())
                                 @if(Auth::user()->country_id == "6" || Auth::user()->country_id == "9" || Auth::user()->isAdmin())
                                     <option value="bareshaft_pump">Bareshaft pump</option>
                                 @endif
@@ -318,7 +317,7 @@
         <div class="modalBtns">
             <button id="addtocart">Add to Cart</button>
             <span class="close" onclick="refresh()">Cancel</span>
-            <span class="close-cart-modal" >Close</span>
+            <!-- <span class="close-cart-modal" >Close</span> -->
         </div>
     </div>
 </div>
@@ -900,6 +899,7 @@
                 url: "{{url('atmos/ajaxCalculate')}}",
                 data: $('#atmos_form').serialize() + "&code_price=" + adder_code_price,
                 success: function (response) {
+					console.log(response);
                     if (response.data.cp_records_html) {
                         $(document).ajaxComplete(function () {
                             $("#loader").hide();

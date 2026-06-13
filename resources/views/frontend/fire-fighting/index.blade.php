@@ -7,7 +7,6 @@
 @endphp
 
 @extends('frontend.layout.app')
-
 @section('content')
 <section class="midContent" id="midContent">
     <div class="container">
@@ -62,6 +61,16 @@
             @endforeach
         </select>
     </div>
+    
+    <!-- A Code: 10-03-2026 Start -->
+    <div class="formFields">
+        <span class="formArrowIcon"><img src="{{url('fassets/images/arrowDownIcon.png')}}" /></span>
+        <select name="electrical_voltage" id="electrical_voltage" class="formInput electrical-formInput">
+            <option value="">Select Voltage*</option>     
+        </select>
+    </div>
+    <!-- A Code: 10-03-2026 End -->
+
     <div class="formFields">
         <span class="formArrowIcon"><img src="{{url('fassets/images/arrowDownIcon.png')}}" /></span>
         <select name="electrical_frequency" id="electrical_frequency" class="formInput electrical-formInput">
@@ -129,12 +138,23 @@
             @endforeach
         </select>
     </div>
+
+    <!-- A Code: 11-03-2026 Comment Start -->
+    <!-- <div class="formFields">
+        <span class="formArrowIcon"><img src="{{url('fassets/images/arrowDownIcon.png')}}" /></span>
+        <select name="diesel_voltage" id="diesel_voltage" class="formInput diesel-formInput">
+            <option value="">Select Voltage*</option>           
+        </select>
+    </div> -->
+    <!-- A Code: 11-03-2026 Comment End -->
+
     <div class="formFields">
         <span class="formArrowIcon"><img src="{{url('fassets/images/arrowDownIcon.png')}}" /></span>
         <select name="diesel_frequency" id="diesel_frequency" class="formInput diesel-formInput">
             <option value="">Select Frequency*</option>
         </select>
     </div>
+
     <div class="formFields">
         <span class="formArrowIcon"><img src="{{url('fassets/images/arrowDownIcon.png')}}" /></span>
         <select name="diesel_pump_approval" id="diesel_pump_approval" class="formInput diesel-formInput">
@@ -201,6 +221,13 @@
                                                                 <div class="formFields">
                                                                     <input type="text" name="jockey_pumppower" id="jockey_pumppower" class="formInput jockeypump-formInput" placeholder="Pump Power*">
                                                                 </div>
+
+                                                                <!-- Add voltage code starts -->
+                                                                <div class="formFields">
+                                                                    <input type="text" name="jockey_voltage" id="jockey_voltage" class="formInput jockeypump-formInput" placeholder="Voltage*">
+                                                                </div>
+                                                                <!-- Add voltage code ends -->
+
                                                                 <div class="formFields">
                                                                     <span class="formArrowIcon"><img src="{{url('fassets/images/arrowDownIcon.png')}}" /></span>
                                                                     <select name="jockey_frequency" id="jockey_frequency" class="formInput jockeypump-formInput">
@@ -209,6 +236,7 @@
                                                                         <option>60</option>
                                                                     </select>
                                                                 </div>
+                                                            
                                                             </div>
                                                             <div class="col-12">
                                                                 <div class="optBtn m-0 d-flex justify-content-center"><a href="javascript:void(0)" id="jockey-optional-button" class="">Optional</a></div>
@@ -489,6 +517,7 @@
                 var dataSetForTemp = [];
                 var disableDieselSelection = {
                     'diesel_pumptype': 'pump_type',
+                    //'diesel_voltage': 'voltage', // A Code: 11-03-2026 Comment
                     'diesel_frequency': 'frequency',
                     'diesel_pump_approval': 'pump_approval',
                     'diesel_engine_approval': 'engine_approval',
@@ -532,17 +561,32 @@
     });
 
     function disableElectricalInput(changed = '') {
-        var disableElectricalList = ['electrical_pumptype', 'electrical_frequency', 'electrical_pump_approval',
-            'electrical_flow', 'electrical_head', 'electrical_speed','electrical_motor_power' //20250108 add motor power field in electrical flow
+        var disableElectricalList = [
+            'electrical_pumptype', 
+            'electrical_voltage', // A Code: 10-03-2026
+            'electrical_frequency', 
+            'electrical_pump_approval',
+            'electrical_flow', 
+            'electrical_head', 
+            'electrical_speed',
+            'electrical_motor_power' //20250108 add motor power field in electrical flow
         ];
 
-        var disableDieselList = ['diesel_pumptype', 'diesel_frequency', 'diesel_pump_approval',
-            'diesel_engine_approval', 'diesel_flow', 'diesel_head', 'diesel_speed'
+        var disableDieselList = [
+            'diesel_pumptype', 
+            //'diesel_voltage', // A Code: 11-03-2026 Comment
+            'diesel_frequency', 
+            'diesel_pump_approval',
+            'diesel_engine_approval', 
+            'diesel_flow', 
+            'diesel_head', 
+            'diesel_speed'
         ];
 
         var disableElectricalSelection = {
             'electrical_pumpmodels': 'wilo_pump_models',
             'electrical_pumptype': 'pump_type',
+            'electrical_voltage': 'voltage', // A Code: 10-03-2026
             'electrical_frequency': 'frequency',
             'electrical_pump_approval': 'pump_approval',
             'electrical_flow': 'flow',
@@ -554,6 +598,7 @@
         var disableElectricalSelectionOptionsText = {
             'electrical_pumpmodels': 'Select Pump Models*',
             'electrical_pumptype': 'Select Pump type*',
+            'electrical_voltage': 'Select Voltage*', // A Code: 10-03-2026
             'electrical_frequency': 'Select Frequency*',
             'electrical_pump_approval': 'Select Pump approval*',
             'electrical_flow': 'Select Flow*',
@@ -565,7 +610,8 @@
 
         var changeElectricalwithDiesel = {
             'electrical_pumpmodels': 'diesel_pumpmodels',
-            'electrical_pumptype': 'diesel_pumptype',
+            'electrical_pumptype': 'diesel_pumptype',             
+            //'electrical_voltage': 'diesel_voltage', // A Code: 11-03-2026 voltage removed because diesel does not have voltage
             'electrical_frequency': 'diesel_frequency',
             'electrical_pump_approval': 'diesel_pump_approval',
             'electrical_flow': 'diesel_flow',
@@ -576,6 +622,7 @@
         var disableDieselSelection = {
             // 'diesel_pumpmodels':'pump_models',
             'diesel_pumptype': 'pump_type',
+            //'diesel_voltage': 'voltage', // A Code: 11-03-2026 Comment
             'diesel_frequency': 'frequency',
             'diesel_pump_approval': 'pump_approval',
             'diesel_engine_approval': 'engine_approval',
@@ -632,7 +679,7 @@
                     var original_key_val = $('#' + original_key).val();
 
                     electricalpumptemp = electricalFilterData = jQuery.grep(electricalpumptemp, function(filter) {
-                        if (db_original_key in filter) {
+                        if (db_original_key in filter) {                            
                             return filter[db_original_key] == original_key_val;
                         }
                     });
@@ -643,32 +690,43 @@
                 var new_changed = disableElectricalList[selected_options];
                 var new_changed_selection = disableElectricalSelection[new_changed];
                 var new_changed_selection_text = disableElectricalSelectionOptionsText[new_changed];
-
+                
                 if (main_panel_selection == 'electrical-diesel') {
                     // change custom diesel engine approval
                     if (new_changed == 'electrical_flow') {
                         var electricalDieselFilterData = [];
-                        dieselpumptemp = dieselpump;
+                        dieselpumptemp = dieselpump;  
+                        
+                        
                         for (var i = 0; i <= selected_options - 1; i++) {
                             var original_key = disableElectricalList[i];
+                            console.log(original_key);
+
+                            // A Code: 12-03-2026 Start [skip voltage for diesel]
+                            if(original_key == 'electrical_voltage'){
+                                continue;
+                            }
+                            // A Code: 12-03-2026 End
+                            
                             var db_original_key = disableDieselSelection[changeElectricalwithDiesel[original_key]];
                             var original_key_val = $('#' + original_key).val();
-                            if (original_key == 'electrical_frequency' && (original_key_val == '50' ||
-                                    original_key_val == '60')) {
+                            if (original_key == 'electrical_frequency' && (original_key_val == '50' || original_key_val == '60')) {
                                 original_key_val = '50/60';
-                            }
-
+                            }  
+                            //console.log(db_original_key);
                             dieselpumptemp = electricalDieselFilterData = jQuery.grep(dieselpumptemp, function(filter) {
-                                if (db_original_key in filter) {
+                                if (db_original_key in filter) {                                    
                                     return filter[db_original_key] == original_key_val;
                                 }
                             });
+                            console.log(dieselpumptemp);
                         }
-
+                        
                         var select_val_electricalDieselFilterData = [];
                         electricalDieselFilterData = $.each(electricalDieselFilterData, function(key, value) {
                             select_val_electricalDieselFilterData.push(value.engine_approval);
                         });
+                        console.log(electricalDieselFilterData);
 
                         electricalDieselFilterData = select_val_electricalDieselFilterData;
                         electricalDieselFilterData = groupSimilar(electricalDieselFilterData);
@@ -686,7 +744,7 @@
                         }
                     }
                 }
-                console.log(selected_options);
+                console.log('selected_options' + selected_options); 
                 $('#' + new_changed).prop('disabled', false);
                 $('#' + new_changed).prop('disabled', false);
 
@@ -794,55 +852,125 @@
                 // Custom Option for Electrical & Diesel Options
                 if (main_panel_selection == 'electrical-diesel') {
                     // change custom diesel head
+                    // if (new_changed == 'electrical_head') {
+                    //     var dataSetForHead = true;
+                    //     dieselpumptemp = dieselpump;
+                    //     for (var i = 0; i <= selected_options; i++) {                          
+
+                    //         var original_key = disableDieselList[i];
+                    //         var db_original_key = disableDieselSelection[original_key];
+                    //         var original_key_val = $('#' + original_key).val();
+
+                    //         console.log('original_key: ' + original_key);
+                    //         console.log('original_key_val: ' + original_key_val);
+
+                    //         if (original_key_val == undefined || original_key_val == '') {
+                    //             dataSetForHead = false;
+                    //         } else {
+                    //             dieselpumptemp = jQuery.grep(dieselpumptemp, function(filter) {
+                    //                 if (db_original_key in filter) {
+                    //                     return filter[db_original_key] == original_key_val;
+                    //                 }
+                    //             });
+                    //             dataSetForTemp = [];
+                    //             dieselpumptemp.forEach(function(element) {
+                    //                 dataSetForTemp.push(element.head);
+                    //             });
+
+                    //             dataSetForTemp = dataSetForTemp.filter(function(el, index, arr) {
+                    //                 return index === arr.indexOf(el);
+                    //             });
+                    //             dataSetForTemp.sort();
+
+                    //             // console.log(dataSetForTemp);
+
+                    //             $('#diesel_head').find('option').not(':first').remove();
+                    //             dataSetForTemp.forEach(function(element) {
+                    //                 $('#diesel_head').append($("<option></option>").text(element));
+                    //             });
+                    //         }
+                    //     }
+                    //     if (!dataSetForHead) {
+                    //         // Disable Head Field for not getting all value of diesel
+                    //         console.log(new_changed + ' is Disabled');
+                    //         $('#' + new_changed).prop('disabled', true);
+
+                    //     }
+                    // }
+
+                    // A Code: 12-03-2026 Start 
+                    // change custom diesel head
                     if (new_changed == 'electrical_head') {
+
                         var dataSetForHead = true;
                         dieselpumptemp = dieselpump;
-                        for (var i = 0; i <= selected_options; i++) {
 
-                            var original_key = disableDieselList[i];
-                            var db_original_key = disableDieselSelection[original_key];
-                            var original_key_val = $('#' + original_key).val();
+                        for (var i = 0; i < selected_options; i++) {
 
-                            if (original_key_val == undefined || original_key_val == '') {
-                                dataSetForHead = false;
-                            } else {
-                                dieselpumptemp = jQuery.grep(dieselpumptemp, function(filter) {
-                                    if (db_original_key in filter) {
-                                        return filter[db_original_key] == original_key_val;
-                                    }
-                                });
-                                dataSetForTemp = [];
-                                dieselpumptemp.forEach(function(element) {
-                                    dataSetForTemp.push(element.head);
-                                });
+                            var electrical_key = disableElectricalList[i];
 
-                                dataSetForTemp = dataSetForTemp.filter(function(el, index, arr) {
-                                    return index === arr.indexOf(el);
-                                });
-                                dataSetForTemp.sort();
-
-                                // console.log(dataSetForTemp);
-
-                                $('#diesel_head').find('option').not(':first').remove();
-                                dataSetForTemp.forEach(function(element) {
-                                    $('#diesel_head').append($("<option></option>").text(element));
-                                });
+                            // skip voltage because diesel has no voltage
+                            if (electrical_key == 'electrical_voltage') {
+                                continue;
                             }
+
+                            var diesel_key = changeElectricalwithDiesel[electrical_key];
+                            var db_original_key = disableDieselSelection[diesel_key];
+
+                            var original_key_val = $('#' + electrical_key).val();
+
+                            console.log('electrical_key:', electrical_key);
+                            console.log('value:', original_key_val);
+
+                            if (!original_key_val) {
+                                dataSetForHead = false;
+                                break;
+                            }
+
+                            dieselpumptemp = jQuery.grep(dieselpumptemp, function(filter) {
+                                if (db_original_key in filter) {
+                                    return filter[db_original_key] == original_key_val;
+                                }
+                            });
                         }
-                        if (!dataSetForHead) {
-                            // Disable Head Field for not getting all value of diesel
+
+                        if (dataSetForHead) {
+
+                            var dataSetForTemp = [];
+
+                            dieselpumptemp.forEach(function(element) {
+                                dataSetForTemp.push(element.head);
+                            });
+
+                            // remove duplicates
+                            dataSetForTemp = [...new Set(dataSetForTemp)];
+
+                            // numeric sort
+                            dataSetForTemp.sort(function(a, b) {
+                                return parseFloat(a) - parseFloat(b);
+                            });
+
+                            $('#diesel_head').find('option').not(':first').remove();
+
+                            dataSetForTemp.forEach(function(element) {
+                                $('#diesel_head').append($("<option></option>").text(element));
+                            });
+
+                        } else {
+
+                            console.log(new_changed + ' is Disabled');
                             $('#' + new_changed).prop('disabled', true);
 
                         }
                     }
-
+                    // A Code: 12-03-2026 End
 
                     if (new_changed == 'electrical_speed') {
 
                         // On Head Change recreate options 
                         var dataSetForHead = true;
                         dieselpumptemp = dieselpump;
-                        for (var i = 0; i <= selected_options; i++) {
+                        for (var i = 0; i <= selected_options; i++) {                          
 
                             var original_key = disableDieselList[i];
                             var db_original_key = disableDieselSelection[original_key];
@@ -876,6 +1004,7 @@
 
                         // Change value of head of selected electircal head in beetween -5 to +1
                         $('#diesel_head').val('').change();
+                        
                         var min = electricalSelectedData - 0.5;
                         var max = parseFloat(electricalSelectedData) + parseFloat(1);
                         var deisel_heade_count = 0;
@@ -911,6 +1040,11 @@
                     // Group by values
                     electrical_selction_data = groupSimilar(electrical_selction_data);
 
+                    // A Code: 16-03-2026 Start
+                    if(new_changed == 'electrical_voltage'){
+                        electrical_selction_data.push('415');
+                    }
+                    // A Code: 16-03-2026 End
 
                     electrical_selction_option.push('<option value="">' + new_changed_selection_text + '</option>');
                     $.each(electrical_selction_data, function(key, value) {
@@ -944,13 +1078,21 @@
     }
 
     function disableDieselInput(changed = '') {
-        var disableDieselList = ['diesel_pumptype', 'diesel_frequency', 'diesel_pump_approval',
-            'diesel_engine_approval', 'diesel_flow', 'diesel_head', 'diesel_speed'
+        var disableDieselList = [
+            'diesel_pumptype', 
+            //'diesel_voltage', // A Code: 11-03-2026 Comment
+            'diesel_frequency',             
+            'diesel_pump_approval',
+            'diesel_engine_approval', 
+            'diesel_flow', 
+            'diesel_head', 
+            'diesel_speed'
         ];
 
         var disableDieselSelection = {
             'diesel_pumpmodels': 'pump_models',
             'diesel_pumptype': 'pump_type',
+            //'diesel_voltage': 'voltage', // A Code: 11-03-2026 Comment
             'diesel_frequency': 'frequency',
             'diesel_pump_approval': 'pump_approval',
             'diesel_engine_approval': 'engine_approval',
@@ -962,6 +1104,7 @@
         var disableDieselSelectionOptionsText = {
             'diesel_pumpmodels': 'Select Pump Models*',
             'diesel_pumptype': 'Select Pump type*',
+            //'diesel_voltage': 'Select Voltage*', // A Code: 11-03-2026 Comment
             'diesel_frequency': 'Select Frequency*',
             'diesel_pump_approval': 'Select Pump approval*',
             'diesel_engine_approval': 'Select Engine approval*',
@@ -1563,6 +1706,7 @@
                 var dieselSelection = {
                     'diesel_pumpmodels': 'pump_models',
                     'diesel_pumptype': 'pump_type',
+                    //'diesel_voltage': 'voltage', // A Code: 11-03-2026 Comment
                     'diesel_frequency': 'frequency',
                     'diesel_pump_approval': 'pump_approval',
                     'diesel_engine_approval': 'engine_approval',
@@ -1589,6 +1733,7 @@
                 var electricalSelection = {
                     'electrical_pumpmodels': 'wilo_pump_models',
                     'electrical_pumptype': 'pump_type',
+                    'electrical_voltage': 'voltage', // A Code: 11-03-2026
                     'electrical_frequency': 'frequency',
                     'electrical_pump_approval': 'pump_approval',
                     'electrical_flow': 'flow',
@@ -1741,6 +1886,7 @@
                 var dieselSelection = {
                     'diesel_pumpmodels': 'pump_models',
                     'diesel_pumptype': 'pump_type',
+                    //'diesel_voltage': 'voltage', // A Code: 11-03-2026 Comment
                     'diesel_frequency': 'frequency',
                     'diesel_pump_approval': 'pump_approval',
                     'diesel_engine_approval': 'engine_approval',
@@ -1802,6 +1948,7 @@
                                 'data': dieselserialize
                             },
                             success: function(response) {
+                                console.log(response);
                                 if (response['success']) {
                                     if ('data' in response) {
                                         if ('Pressure relief valve' in response['data']) {
@@ -1818,12 +1965,19 @@
                                     $("#price").html(getPrice(response['price']) + '$');
                                     $("#master-price-record").html('');
                                     $("#master-price-record").html(`<div class="columns">
+
+                                    
                                     <ul class="price" style="list-style: none;">
                                         <li class="header">${response['data'].wilo_pump_models}</li>
-                                        <li class="grey">${response['data'].pump_type}</li>
-                                        <li class="grey">${response['data'].frequency} </li>${diesel_append_str}
+                                        <li class="grey">Pump Power: ${response['data'].pump_type}</li>
+                                        
+                                        <!-- A Comment: 12-03-2026 -->
+                                        <!-- <li class="grey">Voltage: ${response['data'].voltage}</li> -->
+
+                                        <li class="grey">Frequency: ${response['data'].frequency} </li>${diesel_append_str}
                                         <li>Total Price: <b>${getPrice(response['price'])}</b><span>$</span> </li>  
                                     </ul>
+
                                 </div>`);
                                     if (!article_modal_show) {
                                         $("#myModal").show();
@@ -1874,6 +2028,7 @@
                 var electricalSelection = {
                     'electrical_pumpmodels': 'wilo_pump_models',
                     'electrical_pumptype': 'pump_type',
+                    'electrical_voltage': 'voltage', // A Code: 11-03-2026
                     'electrical_frequency': 'frequency',
                     'electrical_pump_approval': 'pump_approval',
                     'electrical_flow': 'flow',
@@ -1933,6 +2088,7 @@
                 if (electricalSelectionData.length > 0) {
                     if (electricalSelectionData.length == 1) {
 
+                        // A Code: 12-11-2026 Start
                         $.ajax({
                             type: "post",
                             url: "{{ route('fire-fighting.store') }}",
@@ -1953,6 +2109,7 @@
                                     <ul class="price" style="list-style: none;">
                                         <li class="header">${response['data'].wilo_pump_models}</li>
                                         <li class="grey">${response['data'].pump_type}</li>
+                                        <li class="grey">${response['data'].voltage} </li>
                                         <li class="grey">${response['data'].frequency} </li>
                                         <li>Total Price: <b>${getPrice(response['price'])}</b><span>$</span> </li>  
                                     </ul>
@@ -1967,6 +2124,8 @@
                             },
                             error: function(data) {}
                         });
+                        // A Code: 12-11-2026 End
+
                     } else {
                         $("#other-pump-modal-body").html('');
                         var other_pump_modal_html = '';
@@ -2029,16 +2188,18 @@
                                         }
                                     },
                                     success: function(response) {
+                                        console.log("tset");
                                         if (response['success']) {
                                             $("#price").html('');
                                             $("#price").html(getPrice(response['price']) + '$');
                                             $("#master-price-record").html('');
                                             $("#master-price-record").html(`<div class="columns">
                                             <ul class="price" style="list-style: none;">
-                                                <li class="header">${jockeypump_article_data[0].pump_article_no}</li>
-                                                <li class="header">${jockeypump_article_data[0].description}</li>
-                                                <li class="grey">${jockeypump_article_data[0].power}</li>
-                                                <li class="grey">${jockeypump_article_data[0].frequency} </li>
+                                                <li class="header">Pump Article Number: <b> ${jockeypump_article_data[0].pump_article_no} </b> </li>
+                                                <li class="header">Description: <b> ${jockeypump_article_data[0].description} </b> </li>
+                                                <li class="grey">Power: <b> ${jockeypump_article_data[0].power} </b> </li>
+                                                <li class="grey">Voltage: <b> ${jockeypump_article_data[0].voltage} </b> </li>
+                                                <li class="grey">Frequency: <b> ${jockeypump_article_data[0].frequency} </b>  </li>
                                                 <li>Total Price: <b>${getPrice(response['price'])}</b><span>$</span> </li>  
                                             </ul>
                                         </div>`);
@@ -2099,11 +2260,13 @@
                 var jockeypump_article_data = jQuery.grep(jockeypump, function(articless) {
                     return articless.pump_article_no == jockeypump_article_no
                 });
-                // console.log(jockeypump_article_data);
+                console.log(jockeypump_article_data);
                 if ($.isArray(jockeypump_article_data) && jockeypump_article_data.length > 0) {
                     $('#jockey_pumppower').val(jockeypump_article_data[0]['power']);
+                    //
+                    $('#jockey_voltage').val(jockeypump_article_data[0]['voltage']);
+                    //
                     $('#jockey_frequency').prop('disabled', false);
-
                     $('#jockey_frequency').find('option').remove().end().append('<option>' +
                         jockeypump_article_data[0]['frequency'] + '</option>').val(jockeypump_article_data[0][
                         'frequency'
@@ -2130,8 +2293,12 @@
                     $('#jockey_article_number').val(jockeypump_article_data[0]['jockey_article_number'])
                     /** end 20241231 for jockey pump form auto fill*************/
                     $('#jockey_pumppower').val(jockeypump_article_data[0]['power']);
-                    $('#jockey_frequency').prop('disabled', false);
 
+                    // A Code: 27-04-2026 Start
+                    $('#jockey_voltage').val(jockeypump_article_data[0]['voltage']);
+                    // A Code: 27-04-2026 End
+
+                    $('#jockey_frequency').prop('disabled', false);
                     $('#jockey_frequency').find('option').remove().end().append('<option>' +
                         jockeypump_article_data[0]['frequency'] + '</option>').val(jockeypump_article_data[0][
                         'frequency'
@@ -2184,6 +2351,18 @@
         function mainPumpAjax() {
             var main_pump_selection = $('.main_panel_selection').find(":selected").val();
 
+            // A Code: 06-05-2026 Start
+            var pumpLoaded = false;
+            var articleLoaded = false;
+            var controlPanelLoaded = false;
+
+            function enableArticleInput() {
+                if (pumpLoaded && articleLoaded && controlPanelLoaded) {
+                    $('#electrical_article_number').prop('disabled', false);
+                }
+            }
+            // A Code: 06-05-2026 End
+
             if (main_pump_selection == 'electrical' || main_pump_selection == 'electrical-diesel') {
                 $.ajax({
                     type: "GET",
@@ -2195,7 +2374,9 @@
                     success: function(response) {
                         electricalpump = electricalpumptemp = response;
                         $('#electrical_pumptype').prop('disabled', false);
-                        $('#electrical_article_number').prop('disabled', false);
+                        //$('#electrical_article_number').prop('disabled', false); // A Code: 06-05-2026 Comment
+                        pumpLoaded = true; // A Code: 06-05-2026
+                        enableArticleInput(); // A Code: 06-05-2026
                     },
                     error: function(data) {
                         console.log(data);
@@ -2210,7 +2391,9 @@
                     },
                     success: function(response) {
                         electricalpumparticle = response;
-                        $('#electrical_article_number').prop('disabled', false);
+                        //$('#electrical_article_number').prop('disabled', false); // A Code: 06-05-2026 Comment
+                        articleLoaded = true; // A Code: 06-05-2026
+                        enableArticleInput(); // A Code: 06-05-2026
                     },
                     error: function(data) {
                         console.log(data);
@@ -2226,6 +2409,9 @@
                     success: function(response) {
                         electrical_control_panel_type = response;
                         $('#control_panel_type').prop('disabled', false);
+
+                        controlPanelLoaded = true; // A Code: 06-05-2026
+                        enableArticleInput(); // A Code: 06-05-2026
                     },
                     error: function(data) {
                         console.log(data);
@@ -2242,6 +2428,7 @@
                         $('#diesel_pumptype').prop('disabled', true);
                     },
                     success: function(response) {
+                        //console.log(response);
                         dieselpump = dieselpumptemp = response;
                         if (main_pump_selection != 'electrical-diesel') {
                             $('#diesel_pumptype').prop('disabled', false);
@@ -2450,18 +2637,52 @@
                     }                    
                     break;
             }
+
+            // $.ajax({
+            //     type: "post",
+            //     url: "{{ route('fire-fighting.update', auth()->id()) }}",
+            //     'dataType': 'json',
+            //     data: {
+            //         _token: "{{ csrf_token() }}",
+			// 		_method:"put",
+            //         'pump_type': pump_type,
+            //         'adder_ids': adderIds,
+            //         'data': cart_pump_data,
+            //         'extra_data': cart_pump_extra_data
+            //     },
+            //     success: function(response) {
+            //         if (response['success']) {
+            //             location.reload();
+            //         } else {
+            //             alert(response['msg']);
+            //         }
+            //     },
+            //     error: function(data) {}
+            // });
+
+            // A Code: 06-05-2026 Start
+            var requestData = {
+                _token: "{{ csrf_token() }}",
+                _method: "put",
+                'pump_type': pump_type,
+                'adder_ids': adderIds,
+                'data': cart_pump_data,
+                'extra_data': cart_pump_extra_data
+            };            
+
+            // Only add electrical_article_number when pump_type is electrical AND value exists
+            if (pump_type === 'electrical') {
+                const searchedArticleNumber = $("#electrical_article_number").val();                
+                if (searchedArticleNumber && searchedArticleNumber.trim() !== '') {
+                    requestData.electrical_article_number = searchedArticleNumber.trim();
+                }
+            }
+
             $.ajax({
                 type: "post",
                 url: "{{ route('fire-fighting.update', auth()->id()) }}",
-                'dataType': 'json',
-                data: {
-                    _token: "{{ csrf_token() }}",
-					_method:"put",
-                    'pump_type': pump_type,
-                    'adder_ids': adderIds,
-                    'data': cart_pump_data,
-                    'extra_data': cart_pump_extra_data
-                },
+                dataType: 'json',
+                data: requestData,
                 success: function(response) {
                     if (response['success']) {
                         location.reload();
@@ -2471,6 +2692,8 @@
                 },
                 error: function(data) {}
             });
+            // A Code: 06-05-2026 End
+
         });
     </script>
 @stop

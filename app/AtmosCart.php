@@ -31,9 +31,6 @@ class AtmosCart extends Model {
         return $atmosCartData;
     }
 
-    public function atmos_materials_code(){
-        return $this->hasMany('App\AtmosMaterial', 'code', 'material_id');
-    }
 
     public function atmosItems() {
         return $this->hasMany('App\AtmosItem', 'atmos_cart_id', 'id');

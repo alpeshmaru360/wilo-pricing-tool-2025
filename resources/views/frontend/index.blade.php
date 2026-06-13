@@ -1,4 +1,4 @@
-@extends('frontend.layout.app')
+@extends('frontend.layout.app');
 @section('content')
 
 @if(Auth::user())

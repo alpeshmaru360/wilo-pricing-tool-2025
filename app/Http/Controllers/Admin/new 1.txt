@@ -1,0 +1,58 @@
+elseif($value->cart_model_name == 'firefighting')
+            {
+                $firefightingCart = FireFightingCarts::where('quotation_no', $value->quotation_number)->where('id', $value->cp_cart_id)->first();
+                if (is_null($firefightingCart)) {
+                    goto elsemode;
+                }
+                
+                $data['simple_article_no'] = $firefightingCart->article_number;
+                $data['article_no'] = $firefightingCart->full_article_number;
+                $data['description'] = $firefightingCart->pump_models;
+                $data['qty'] = $firefightingCart->qty;
+                $data['unit_price'] = $firefightingCart->price;
+                $data['total_price'] = $firefightingCart->total_price;
+                $data['pump_type'] = $firefightingCart->pump_type ?? '-';
+
+                $pump_data = static::fireFightingPumpData($firefightingCart);
+                // dd($value, $firefightingCart, $pump_data); 
+
+                $data['system_pressure'] = $pump_data['system_pressure'];
+                $data['impeller_material'] = $pump_data['impeller_material'];
+                $data['no_of_pumps'] = $pump_data['no_of_pumps'];
+                $data['manifold_material'] = '-';
+                $data['Seal/gland pack'] = '-';
+                $data['pump_description'] = current(explode('/', $firefightingCart->pump_models));
+                $data['motor_power'] = $pump_data['motor_power'];
+                $data['voltage'] = $pump_data['voltage'];
+                $data['frequency'] = $pump_data['frequency'];
+                $data['no_of_poles'] = $pump_data['no_of_poles'];
+                $data['efficicency'] = $pump_data['efficicency'];
+                $data['motor_brand'] = $pump_data['motor_brand'];
+
+                $data['application'] = 'Fire Pump';
+                $data['adder_ids'] =  implode(',', $firefightingCart->adder_ids ?? []);
+                $data['adder_ids_data'] = '-';
+                $data['shipping_cost'] = '-';
+                $data['packing_charge'] = '-';
+                $data['painting_charge'] = '-';
+                $data['assembly_charge'] = '-';
+                $data['insulate_bearing_price'] = '-';
+                $data['accesories_price'] = '-';
+                $data['inter_company_margin_price'] = $firefightingCart->inter_company_margin_price;
+                $data['overhead'] = $firefightingCart->overhead_price;
+                $data['mechanical_total_adder_id_price'] = '-';
+                $data['total_adders_ids_price'] = $firefightingCart->total_adders_price;
+                $data['CP Price'] = $firefightingCart->all_prices['control_panel_price'];
+                $data['Cable Price'] = '-';
+                $data['Mechnical System price'] = '-';
+                $data['Pump price'] = $firefightingCart->all_prices['pump_price'];
+                $data['pump_article_number'] = $pump_data['pump_article_number'] ?? '-';
+                $data['ambient_temp'] = '-';
+                $data['starter_type'] = '-';
+                $data['commication_protocal'] = '-';
+                $data['ip_rating'] = '-';
+                $data['components'] = '-';
+                $data['Enclosure'] = '-';
+            }
+
+            

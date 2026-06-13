@@ -1,17 +1,12 @@
 <?php
-// namespace app\spreadsheetReader;
+//namespace app\spreadsheetReader;
 /**
  * Main class for spreadsheet reading
  *
  * @version 0.5.10
  * @author Martins Pilsetnieks
  */
-		// require('..\php-excel-reader\excel_reader2.php');
-
-		require('php-excel-reader/excel_reader2.php');
-		// Or
-		// require('php-excel-reader\\excel_reader2.php');
-
+require('php-excel-reader\excel_reader2.php');
 	class SpreadsheetReader implements SeekableIterator, Countable
 	{
 		const TYPE_XLSX = 'XLSX';

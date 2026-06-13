@@ -68,9 +68,10 @@ Class ScpGigaDynamicTableCreateHelper {
         }
         return DynamicTableCreateHelper::createNormalTable($table_name, $fields);
     }
-
     public static function createMasterSheetDynamic($table_name, $columns) {
+
         $fields = [];
+
         foreach ($columns as $key => $column) {
             if ($key == 0) {
                 $fields[] = array('name' => 'id', 'type' => 'increments', 'size' => null, 'index' => null, 'nullable' => 0, 'unsigned' => 0, 'default' => null);
@@ -100,11 +101,15 @@ Class ScpGigaDynamicTableCreateHelper {
     }
 
     public static function createTable($table_name, $fields = [], $columnBreak = [], $addNewColumnBreak = []) {
+        // check if table is not already exists
+//        dd($fields);
         if (Schema::hasTable($table_name)) {
             Schema::dropIfExists($table_name);
         }
 
+
         Schema::create($table_name, function (Blueprint $table) use ($fields, $table_name) {
+//            $table->increments('id');
             if (count($fields) > 0) {
                 foreach ($fields as $field) {
                     $table->{$field['type']}($field['name']);
@@ -119,6 +124,9 @@ Class ScpGigaDynamicTableCreateHelper {
 
             if (in_array(trim($val['name']), $addNewColumnBreak, true)) {
 
+//                echo "sdfds";
+//                echo $val['name'];
+//                unset($fields[$key]);
             } else {
                 $newColumnFields[] = $fields[$key];
             }
@@ -127,6 +135,10 @@ Class ScpGigaDynamicTableCreateHelper {
         foreach ($columnBreak as $key => $val) {
             $parentColumn[$val] = $addNewColumnBreak[$key];
         }
+
+//        dd($parentColumn);
+//        die;
+
         return array($newColumnFields, $columnBreak, $parentColumn);
     }
 
@@ -136,7 +148,9 @@ Class ScpGigaDynamicTableCreateHelper {
             Schema::dropIfExists($table_name);
         }
 
+
         Schema::create($table_name, function (Blueprint $table) use ($fields, $table_name) {
+//            $table->increments('id');
             if (count($fields) > 0) {
                 foreach ($fields as $field) {
                     $table->{$field['type']}($field['name']);

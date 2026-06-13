@@ -28,29 +28,37 @@ class ScpFileImportController extends Controller {
         $file = $request->file_import;
         if (!empty($file)) {
             $path = '/app/public/';
+
             if (!File::exists($path)) {
                 $this->make_directory(storage_path() . '/' . $path);
             }
+
             $filePath = storage_path() . $path . "/";
             $file_excel = $this->uploadFile($file, $filePath);
+
             $data = new \SpreadsheetReader($filePath . $file_excel);
             ScpPumpType::truncate();
             ScpPump::truncate();
             $materialCode = [];
             foreach ($data as $key => $d) {
-                unset($d[0]);
+                unset($d[0]); // Remove S.No Rows
+//                dd($d[0]);
                 if ($key == 0) {
                     for ($i = 3; $i <= count($d); $i += 2) {
                         $materialCode[] = $d[$i];
                     }
+//                     dd($materialCode);
                 }
+
                 if ($key > 1) {
+
                     $scpPumpType = new ScpPumpType();
                     $scpPumpType->bare_shaft_article_number = $d[1];
                     $scpPumpType->name = $d[2];
                     $scpPumpType->save();
                     $scpPumpTypeId = $scpPumpType->id;
                     $a = 3;
+
                     foreach ($materialCode as $code) {
                         $getMaterialCode = $this->getIdByValue('App\ScpMaterial', 'code', $code);
                         $scpPump = new ScpPump();
@@ -60,35 +68,39 @@ class ScpFileImportController extends Controller {
                         $a++;
                         $scpPump->mechanical_seal_price = $d[$a];
                         $scpPump->save();
+
                         $a++;
                     }
                 }
             }
         }
+
         Session::flash('message', "Success! Your file has been imported ");
         return redirect()->back();
     }
 
     public function importAccessories(Request $request) {
+//        dd('dd');
+
         return view('admin.scp_import.accesories_price_import');
     }
 
     public function importAccessoriesUpload(Request $request) {
         set_time_limit(0);
+
+
         $tableName = 'scp_accessories_price';
         $file = $request->file_import;
         if (!empty($file)) {
-            //
-                $path = '/storage/app/public/';
-                if(!File::exists(storage_path() . '/' . $path)){
-                    $this->make_directory(storage_path() . '/' . $path);
-                }
+            $path = '/app/public/' . $tableName;
 
-                $filePath = storage_path() . $path . "/";
-                $file_excel = $this->uploadFile($file, $filePath);
+            if (!File::exists($path)) {
+                $this->make_directory(storage_path() . '/' . $path);
+            }
 
+            $filePath = storage_path() . $path . "/";
+            $file_excel = $this->uploadFile($file, $filePath);
 
-            //
             $data = new \SpreadsheetReader($filePath . $file_excel);
 
             $row1Data = [];
@@ -96,9 +108,9 @@ class ScpFileImportController extends Controller {
             $row3Data = [];
             foreach ($data as $key => $d) {
 
-                   //                 unset($d[0]);
+//                 unset($d[0]);
                 if ($key == 0) {
-                   //                     echo print_r($d) . "<br>";
+//                     echo print_r($d) . "<br>";
                     unset($d[0]);
                     unset($d[1]);
                     unset($d[2]);
@@ -133,7 +145,7 @@ class ScpFileImportController extends Controller {
 
             foreach ($row1Data as $key => $val) {
                 $combineRows[] = $val . 'x' . $row2Data[$key];
-                   //                    
+//                    
             }
 				foreach ($row3Data as $key => $rd) {
                 $check_space = strpos($rd, ' ');
@@ -163,8 +175,11 @@ class ScpFileImportController extends Controller {
                 }
             }
         }
+
         Session::flash('message', "Success! Your file has been imported ");
         return redirect()->back();
+
+//        redirect()->back()
     }
 
     public function masterPriceImport(Request $request) {
@@ -174,8 +189,9 @@ class ScpFileImportController extends Controller {
     public function masterPriceImportUpload(Request $request) {
         $file = $request->file_import;
         if (!empty($file)) {
-            $path = '/storage/app/public/';
-            if(!File::exists(storage_path() . '/' . $path)){
+            $path = '/app/public/';
+
+            if (!File::exists($path)) {
                 $this->make_directory(storage_path() . '/' . $path);
             }
 
@@ -183,11 +199,14 @@ class ScpFileImportController extends Controller {
             $file_excel = $this->uploadFile($file, $filePath);
 
             $data = new \SpreadsheetReader($filePath . $file_excel);
+//            dd($data);
             ScpMasterMotorPrice::truncate();
             foreach ($data as $key => $d) {
 
 
                 if ($key > 0) {
+//                    echo $d[2];
+//                    die;
                     $scpMasterMotorPrice = new ScpMasterMotorPrice();
                     $scpMasterMotorPrice->brand = $d[0];
                     $scpMasterMotorPrice->power = $d[1];

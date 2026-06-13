@@ -18,12 +18,12 @@ class checkifcustomer {
     public function handle($request, Closure $next) {
         $user = User::with('roles')->find(Auth::user()->id);
         $user_role = $user->roles[0]->title;
-        if (Auth::check() && $user_role == 'User' || Auth::check() && $user_role == 'Admin' || Auth::check() && $user_role == 'Supervisor') {
+        if (Auth::check() && $user_role == 'User' || Auth::check() && $user_role == 'Admin') {
             return $next($request);
         } elseif (Auth::check() && ($user_role != 'User')) {
             return redirect('/admin');
         } else {
-            return redirect('/admin/login');
+            return redirect('/login');
         }
     }
 

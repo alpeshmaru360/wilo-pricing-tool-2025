@@ -66,7 +66,9 @@ class AtmosGigaFileImportController extends Controller {
         Session::flash('message', "Success! Your file has been imported ");
         return redirect()->back();
     }
+    // Assemebly cost ends
 
+    // BOM starts
     public function pumpBOMImport(Request $request){
         return view('admin.atmos_giga_import.pump_bom');
     }
@@ -78,12 +80,16 @@ class AtmosGigaFileImportController extends Controller {
             if (!File::exists(storage_path($path))) {
                 $this->make_directory1(storage_path($path));
             }
+
             $filePath = storage_path($path);
             $file_excel = $this->uploadFile1($file, $filePath);
+
             $data = new \SpreadsheetReader($filePath . $file_excel);
+
             $columnNames = [];
             $firstRow = '';
             $secondRow = '';
+
             AtmosPumpBOM::truncate();
             foreach ($data as $key => $row) {
                 if ($key == 0) {
@@ -121,6 +127,7 @@ class AtmosGigaFileImportController extends Controller {
                 }
             }
         }
+
         Session::flash('message', "Success! Your file has been imported ");
         return redirect()->back();
     }
@@ -137,6 +144,7 @@ class AtmosGigaFileImportController extends Controller {
         return $fileName;
     }
 
+    //Master import starts
     public function pumpMasterPumpPriceImport(Request $request){
         return view('admin.atmos_giga_import.pump_master_sheet');
     }
@@ -172,6 +180,7 @@ class AtmosGigaFileImportController extends Controller {
         Session::flash('message', "Success! Your file has been imported ");
         return redirect()->back();
     }
+    //Master import ends
 
     public function pumpTypeImport(Request $request) {
         return view('admin.atmos_giga_import.pump_type_import');
@@ -240,18 +249,11 @@ class AtmosGigaFileImportController extends Controller {
         $tableName = 'atmos_accessories_price';
         $file = $request->file_import;
         if (!empty($file)) {
-            
-            // $path = '/app/public/' . $tableName;
-            // if (!File::exists($path)) {
-            //     $this->make_directory(storage_path() . '/' . $path);
-            // }
-            //
-            $path = 'storage/app/public/';
-            if (!File::exists(storage_path($path))) {
-                $this->make_directory1(storage_path($path));
-            }
+            $path = '/app/public/' . $tableName;
 
-            //
+            if (!File::exists($path)) {
+                $this->make_directory(storage_path() . '/' . $path);
+            }
 
             $filePath = storage_path() . $path . "/";
             $file_excel = $this->uploadFile($file, $filePath);
@@ -343,8 +345,9 @@ class AtmosGigaFileImportController extends Controller {
     public function masterPriceImportUpload(Request $request) {
         $file = $request->file_import;
         if (!empty($file)) {
-            $path = '/storage/app/public/';
-            if(!File::exists(storage_path() . '/' . $path)){
+            $path = '/app/public/';
+
+            if (!File::exists($path)) {
                 $this->make_directory(storage_path() . '/' . $path);
             }
 
@@ -355,7 +358,10 @@ class AtmosGigaFileImportController extends Controller {
 			AtmosMasterMotorPrice::truncate();
             $materialCode = [];
             foreach ($data as $key => $d) {
+
+
                 if ($key > 0) {
+
                     $atmosMasterMotorPrice = new AtmosMasterMotorPrice();
                     $atmosMasterMotorPrice->brand = $d[0];
                     $atmosMasterMotorPrice->power = $d[1];
@@ -373,6 +379,7 @@ class AtmosGigaFileImportController extends Controller {
                     $atmosMasterMotorPrice->forwinding = $d[13];
                     $atmosMasterMotorPrice->forbearing = $d[14];
                     $atmosMasterMotorPrice->space_heater = $d[15];
+
 
                     $atmosMasterMotorPrice->save();
                 }

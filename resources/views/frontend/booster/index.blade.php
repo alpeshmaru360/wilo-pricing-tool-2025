@@ -1,9 +1,9 @@
 @php
-    $tool_tip = DB::table('tool_tip')->where('part_id',1)->get();
-    foreach($tool_tip as $t){
-    $key = $t->component_name;
-    $t->$key = $t->tool_tip;
-    }
+$tool_tip = DB::table('tool_tip')->where('part_id',1)->get();
+foreach($tool_tip as $t){
+$key = $t->component_name;
+$t->$key = $t->tool_tip;
+}
 @endphp
 @extends('frontend.layout.app')
 <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -395,7 +395,14 @@
                 </div>
             </div>
         </div>
-    
+    <!--<div class="d-flex cusPagination">
+            <div class="">
+                <a href=""><img src="assets/images/arrowLefticon.png" /> Back</a>
+            </div>
+            <div class="">
+                <button>Next <img src="assets/images/arrowLefticon.png" /></button>
+            </div>
+        </div>-->
         <div class="d-flex formPageFooter">
             <div class="left">
                 Unit Price:
@@ -404,7 +411,10 @@
             <div class="right">
                 <ul>
                     <li><a href="#" tooltip="Generate Quotation"><img src="{{asset('fassets/images/generateIcon.png')}}" /></a></li>
+                <!-- <li><a href="#" tooltip="Go to Home Page"><img src="{{asset('fassets/images/homeIcon.png')}}" /></a></li> -->
                     <li><a href="{{URL::to('controlpanel/cart/'.Auth::user()->id)}}" tooltip="Cart"><img src="{{asset('fassets/images/addIcon.png')}}" /></a></li>
+
+                <!--<li><a href="#" tooltip="Checkout"><img src="{{asset('fassets/images/goIcon.png')}}" /></a></li>-->
                 </ul>
             </div>
         </div>
@@ -413,6 +423,7 @@
 
 <!-- The Modal -->
 <div id="myModal" class="modal">
+
     <!-- Modal content -->
     <div class="modal-content">
         <!-- <span class="close">&times;</span> -->
@@ -422,9 +433,10 @@
         <div class="modalBtns">
             <button id="addtocart">Add to Cart</button>
             <span class="close" onclick="refresh()">Cancel</span>
-            <span class="close-cart-modal" >Close</span>
+          <!--  <span class="close-cart-modal" >Close</span>-->
         </div>
     </div>
+
 </div>
 
 <div id="countryOriginModal" class="modal">
@@ -446,15 +458,20 @@
         </div>
     </div>
 </div>
-
 <div id="error-modal" class="modal">
+
+    <!-- Modal content -->
     <div class="modal-content">
+      <!-- <span class="close">&times;</span> -->
         <div class="modal-body" id="error-modal-body">
+
         </div>
         <div class="modalBtns">
+
             <span class="close" id="error-close">Close</span>
         </div>
     </div>
+
 </div>
 
 <div id="price-modal" class="modal">
@@ -485,7 +502,6 @@
     </div>
 </div>
 @endsection
-
 <style>
     /* Float cancel and delete buttons and add an equal width */
     .cancelbtn, .deletebtn {
@@ -565,7 +581,6 @@
         }
     }
 </style>
-
 @section('script')
 <script>
         //PUMP INFO STARTS
@@ -949,7 +964,6 @@
         {
             location.reload();
         }
-
         function callCpanel() {
             $("#application").removeAttr('disabled');
             $("#motor_power select").val($('#motor_power_pi').val());
@@ -993,8 +1007,8 @@
 
             });
         }
-
         $("#no_of_pump").on('change', function (e) {
+
             var no_of_pump = $('#no_of_pump option:selected').val();
             $('#no_of_pumps_pi').val(no_of_pump);
             $("#power_rating").removeAttr('disabled');
@@ -1071,7 +1085,6 @@
 
             });
         });
-
         $("#power_rating").on('change', function () {
             $("#voltage").removeAttr('disabled');
             $('#controlpanel_form select[id="voltage"] option:gt(0)').remove().end();
@@ -1117,7 +1130,6 @@
 
             });
         });
-
         //Voltage
         $("#voltage").on('change', function () {
             $("#application").removeAttr('disabled');
@@ -1160,7 +1172,6 @@
 
             });
         });
-
         $("#application").on('change', function () {
             $("#ambient_temp").removeAttr('disabled');
             $('#controlpanel_form select[id="ambient_temp"] option:gt(0)').remove().end();
@@ -1199,7 +1210,6 @@
 
             });
         });
-
         $("#ambient_temp").on('change', function () {
             $("#stater_type").removeAttr('disabled');
             $('#controlpanel_form select[id="stater_type"] option:gt(0)').remove().end();
@@ -1235,7 +1245,6 @@
 
             });
         });
-
         $("#stater_type").on('change', function () {
             $("#communication_protocol").removeAttr('disabled');
             $('#controlpanel_form select[id="communication_protocol"] option:gt(0)').remove().end();
@@ -1270,7 +1279,6 @@
 
             });
         });
-
         $("#communication_protocol").on('change', function () {
             $("#ip_rating").removeAttr('disabled');
             $('#controlpanel_form select[id="ip_rating"] option:gt(0)').remove().end();
@@ -1302,7 +1310,6 @@
 
             });
         });
-
         $("#ip_rating").on('change', function () {
             $("#component").removeAttr('disabled');
             $('#controlpanel_form select[id="component"] option:gt(0)').remove().end();
@@ -1333,7 +1340,6 @@
 
             });
         });
-
         $("#component").on('change', function () {
             $('#controlpanel_form select[id="enclosure"] option:gt(0)').remove().end();
             $("#enclosure").removeAttr('disabled');
@@ -1360,8 +1366,8 @@
                 }
             });
         });
-
         $(".electrical-adder-tab").on('click', function () {
+
             var adder_code_price = $('#code-price').val();
             var enclousreItem = $('#adder-enclousre-area-item').val();
             $.ajax({
@@ -1516,7 +1522,6 @@
     $("#system_pressure_pi").on('change', function () {
         calculateMechanicalComponent();
     });
-
     function mechanicalAdder(cp_id) {
         $.ajax({
             type: "get",
@@ -1538,7 +1543,6 @@
             }
         });
     }
-
     function electrical_adder(cp_id) {
         $.ajax({
             type: "post",
@@ -1558,7 +1562,6 @@
             }
         });
     }
-
     $(document).on("click", '#add-mechanical-adder', function (event) {
         var mechanicaAdderIds = [];
         var code60 = '';
@@ -1633,19 +1636,15 @@
             });
         }
     });
-
     $("#system_pressure_pi").on('change', function () {
         calculateMechanicalComponent();
     });
-
     $("#motor_power_pi").on('change', function () {
         calculateMechanicalComponent();
     });
-
     $("#manifold_material_pi").on('change', function () {
         calculateMechanicalComponent();
     });
-
     $("#supply_voltage_pi").on('change', function () {
         calculateMechanicalComponent();
     });
@@ -1753,6 +1752,7 @@
     function printValidationMessages() {
         text += (index + 1) + ": " + item + "<br>";
     }
+
     
     $(document).on("click", '#optional-button-add', function (event) {
         var adderIds = [];
@@ -1762,6 +1762,7 @@
 
         if (adderIds.length >= 1) {
             var cp_id = $("#cp-id").val();
+            // alert(cp_id + )
             var tableName = encodeURIComponent($("#table-name").val());
             
             var columnName = $("#column-name").val();
@@ -1868,8 +1869,6 @@
         var electrical_items_price = $("#electrical_items_price").val();
         var countryOrigin = true;
         var selectedCountry = '';
-		console.log("add to cart");
-		console.log(electrical_items_price);
         $('input[name="adder_mechnical_id"]:checked').each(function () {
             mechanicaAdderIds.push($(this).val());
         });
@@ -1914,8 +1913,8 @@
                         $("#countryOriginModal").hide();
                         var countryOrigin = false;
 						control_panel_price_for_booster = $('#control_panel_price_for_booster').val();
-                        console.log(control_panel_price_for_booster);
-                        console.log("test1");
+						console.log(control_panel_price_for_booster);
+                    console.log("test1");
                         if(!countryOrigin){
                             // $('input[name="adder_id"]:checked').each(function () {
                             //     adderIds.push($(this).val());
@@ -1925,7 +1924,7 @@
                                 url: "{{route('boosterset.addtocart')}}",
                                 headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                                 data: {
-									control_panel_price_for_booster:control_panel_price_for_booster,
+									control_panel_price_for_booster:electrical_items_price,
                                     full_article_number:full_article_number,
                                     pump_model: pump_model,article_number:article_number, no_of_pumps: no_of_pumps,
                                     pump_height: pump_height_pi, panel_height: cp_height, panel_width: cp_width,
@@ -1978,7 +1977,7 @@
                 }
                 else{
 					control_panel_price_for_booster = $('#control_panel_price_for_booster').val();
-                    console.log(control_panel_price_for_booster);
+					console.log(control_panel_price_for_booster);
                     console.log("test2");
                     $.ajaxSetup({
                         headers: {
@@ -1991,7 +1990,7 @@
                         url: "{{route('boosterset.addtocart')}}",
                         headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                         data: {
-							control_panel_price_for_booster:control_panel_price_for_booster,
+							control_panel_price_for_booster:electrical_items_price,
                             full_article_number:full_article_number,
                             pump_model: pump_model,article_number:article_number, no_of_pumps: no_of_pumps,
                             pump_height: pump_height_pi, panel_height: cp_height, panel_width: cp_width,
@@ -2196,6 +2195,7 @@
             }
         }
     });
+
 </script>
 @stop
 

@@ -99,6 +99,7 @@
                     @endif
 
                     @if(auth()->user()->sch_access == "1")
+                        {{--
                         <div class="componentBox" data-aos="flip-left" data-aos-offset="300"
                         data-aos-easing="ease-in-sine">
                             @if(isset($maintance_mode_sch))
@@ -114,6 +115,7 @@
                             </label>
                             </a>
                         </div>
+                        --}}
                     @endif
 
                     <!-- A Code: 05-03-2026 Start -->

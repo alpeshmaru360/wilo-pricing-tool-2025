@@ -16,7 +16,6 @@ class ChangePasswordController extends Controller
      */
     public function __construct()
     {
-        dd("test");
         $this->middleware('auth');
     }
    
@@ -27,7 +26,6 @@ class ChangePasswordController extends Controller
      */
     public function index()
     {
-        dd("test");
         return view('auth.passwords.changepassword');
     } 
    

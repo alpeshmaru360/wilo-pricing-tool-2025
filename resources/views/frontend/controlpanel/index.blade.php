@@ -222,7 +222,7 @@ foreach($tool_tip as $t){
         <div class="modalBtns">
             <button id="addtocart">Add to Cart</button>
             <span class="close" onclick="refresh()">Cancel</span>
-            <span class="close-cart-modal" >Close</span>
+            <!--<span class="close-cart-modal" >Close</span>-->
         </div>
     </div>
 </div>

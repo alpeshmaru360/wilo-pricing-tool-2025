@@ -55,7 +55,8 @@
                   <option value="{{$val}}">{{$val}}</option>
                 @endforeach
               </select>
-              <select class="mr-3 d-flex font-weight-bold border-dark mt-3 text-primary month_selection" style="border-color: #169e88 !important;">
+				
+			<select class="mr-3 d-flex font-weight-bold border-dark mt-3 text-primary month_selection" style="border-color: #169e88 !important;">
                 <option value="">Select a month</option>
                 <option value="01">January</option>
                 <option value="02">February</option>
@@ -70,6 +71,7 @@
                 <option value="11">November</option>
                 <option value="12">December</option>
             </select>
+			  
               <a href="javascript:;" class="button download-quotation-log">Download Quotation Log</a>
               <div class="download-quotation-process ml-2 d-flex align-items-center blink_me" style="display: none !important;">
                 <i class="fa fa-spinner fa-spin text-primary"></i><p class="p-0 m-0 ml-1 text-primary ">Initialize Processes</p>
@@ -112,7 +114,6 @@
   </div>
 </div>
 <br><br>
-
 <div class = container-fluid>
   <div class = "row">
     <div class="col-sm-6">
@@ -128,7 +129,7 @@
 @section('scripts')    
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
-  <script type="text/javascript">
+	 <script type="text/javascript">
     var selected_year = '';
     var selected_month = '';
     var query = '';
@@ -219,7 +220,7 @@
               link.click();
               document.body.removeChild(link);
 
-              $('.download-quotation-process').hide();
+            $('.download-quotation-process').hide();
                 $('.download-quotation-log').prop('disabled', false).css('cursor', 'pointer');
                 $('.download-quotation-process')
                     .find('i')

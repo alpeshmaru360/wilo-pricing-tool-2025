@@ -8,20 +8,18 @@ elseif(!Schema::hasColumn('atmos_carts', 'atmos_cart_id') && $is_manual == "1"){
 else{
     $atmos = App\atmosCart::where('id', $items[0]->atmos_cart_id)->get()[0];
 }
-
 $article_number = DB::table('atmos_pumps')->where('pump_id',$atmos->pump_id)
                 ->where('material_id',$atmos->material_id)->first();
 
 $atmos_master_motor_prices = DB::table('atmos_master_motor_prices')
-                                ->where('brand', 'like', '%' . $atmos->brand . '%')
+                                ->where('brand',$atmos->brand)
                                 ->where('power',$atmos->power)
                                 ->where('no_of_pole',$atmos->no_of_pole)
                                 ->where('frequency',$atmos->frequency)
                                 ->where('voltage',$atmos->voltage)
                                 ->get();
-
-$atmos_master_motor_prices_article_number = $atmos_master_motor_prices[0]->wilo_article_number; 
-$atmos_master_motor_prices_item_desc = $atmos_master_motor_prices[0]->item_desc; 
+$atmos_master_motor_prices_article_number = $atmos_master_motor_prices[0]->wilo_article_number;
+$atmos_master_motor_prices_item_desc = $atmos_master_motor_prices[0]->item_desc;
 
 if($atmos->is_bareshaft_selection != 1){     
     if($atmos->application == 2){     
@@ -67,10 +65,10 @@ if($atmos->is_bareshaft_selection != 1){
                                     @foreach($items as $key=> $item)
                                         @if($item->item_description != null)
                                             <tr>
-                                                <td>{{$key + 1}}  </td>
+                                                <td>{{$key + 1}}</td>
                                                 <td>{{$item->item_description}}</td>
                                                 <td>{{$item->wilo_artilce_no}}</td>
-                                                <td>this are accessories</td>
+                                                <td></td>
                                                 @if(auth()->user()->isAdmin())
                                                 <td>{{$item->unit_price}}</td>
                                                 @elseif(auth()->user()->isSupervisor())
@@ -149,7 +147,7 @@ if($atmos->is_bareshaft_selection != 1){
                                 <tr>
                                     <td>{{$j}}</td>
                                     <td>{{$item['name']}}</td>
-                                    <td>{{$atmos_master_motor_prices_article_number}} / {{$item['id']}} </td>
+                                    <td>{{$atmos_master_motor_prices_article_number}}/{{$item['id']}}</td>
                                     <td>{{$item['id']}}</td>
                                     @if(auth()->user()->isAdmin() || auth()->user()->isSupervisor())
                                     <td>{{$item['price']}}</td>@endif
@@ -168,12 +166,11 @@ if($atmos->is_bareshaft_selection != 1){
                                     @if(auth()->user()->isAdmin())
                                     <tr>
                                         <td>{{$j}}</td>
-                                        <td>
-                                            {{--
-                                            {{$atmos->power}}KW {{$atmos->no_of_pole}}P {{$atmos->effieciency}} {{$atmos->voltage}}V {{$atmos->frequency}}Hz {{$atmos->brand}} {{$atmos->application == 1 ? "constant" : "Variable"}} Speed 
-                                            --}} {{$atmos_master_motor_prices_item_desc}}
+                                        <td>{{--
+                                            {{$atmos->power}}KW {{$atmos->no_of_pole}}P {{$atmos->effieciency}} {{$atmos->voltage}}V {{$atmos->frequency}}Hz {{$atmos->brand}} {{$atmos->application == 1 ? "constant" : "Variable"}} Speed  --}} {{$atmos_master_motor_prices_item_desc}}
                                         </td>
-        								<td>{{$atmos_master_motor_prices_article_number}}</td>
+        								<td>{{$atmos_master_motor_prices_article_number}}
+        								</td>
                                         <td></td>
                                         <td>{{$atmos_master_motor_prices ?? 0}}</td>
         								<td>1</td>

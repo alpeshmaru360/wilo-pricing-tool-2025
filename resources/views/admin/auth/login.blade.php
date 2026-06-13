@@ -1,4 +1,4 @@
-@extends('frontend.layout.applogin')
+@extends('frontend.layout.applogin');
 @section('content')
             @if(\Session::has('message'))
                 <p class="alert alert-info">

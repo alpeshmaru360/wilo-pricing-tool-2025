@@ -1,9 +1,3 @@
-
-@php
-    $secondSegment = Request::segment(2);
-@endphp
-@if($secondSegment == 'dashboard')
-
 <ol class="breadcrumb float-sm-right">
     <li class="breadcrumb-item"><a href="{{ route('admin.home') }}">Home</a></li>
     <?php $segments = ''; ?>
@@ -16,5 +10,3 @@
         @endif
     @endfor
 </ol>
-
-@endif

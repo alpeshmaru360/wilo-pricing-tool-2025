@@ -75,37 +75,43 @@ class FireFightingPumpController extends Controller
 
     public function electricalPumpImportStore(Request $request)
     {
+        
         $this->validate($request, [
             'file_import' => 'required'
         ]);
+		
         if ($request->hasFile('file_import')) {
             ini_set('memory_limit', '-1');
             $csvfile = $request->file('file_import');
             $import = new ExcelImportData();
             $excel = Excel::Import($import, $csvfile);
-            
+
             $save_data = $import->getDataList();
             ElectricalPump::truncate();
+			
+			//
+			
             $new_data = new ElectricalPump();
             $data_keys = $new_data->getFillable();
 
-            // array_map(function ($val) use ($data_keys)
-            // {
-            //     $val_data = array_slice($val, 0, count($data_keys), true);
-            //     ElectricalPump::create(array_combine($data_keys, $val_data));
-            // }, $save_data);
-
-            array_map(function ($val) use ($data_keys) {
+            //array_map(function ($val) use ($data_keys)
+            //{
+                //$val_data = array_slice($val, 0, count($data_keys), true);
+                //ElectricalPump::create(array_combine($data_keys, $val_data));
+            //}, $save_data);
+            
+			array_map(function ($val) use ($data_keys) {
+				
                 $val_data = array_slice($val, 0, count($data_keys), true);
                 $val_data1 = array_filter($val_data);
-
+ 
                 // Only process if there's data AND column count matches
+				//dd(count($val_data1) > 0 , count($val_data) , count($data_keys));
                 if (count($val_data1) > 0 && count($val_data) === count($data_keys)) {
                     ElectricalPump::create(array_combine($data_keys, $val_data));
                 }
             }, $save_data);
-
-
+			//
             Session::flash('message', "Success! Your file has been imported");
         }
         return redirect()->back();

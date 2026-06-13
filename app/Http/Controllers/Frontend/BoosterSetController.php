@@ -27,14 +27,12 @@ use Illuminate\Http\Request;
 use DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
-use Auth;
 
 class BoosterSetController extends Controller {
 
     use ControlPanelModelIdGet;
     
     public function index($qoutation=null) {
-
         $numberOfPumps = NumberOfPump::select('id', 'value')->get();
         $mechanicalLists = DB::table('main_electrical_list')->get();
         return view('frontend.booster.index', compact('numberOfPumps','qoutation'));
@@ -106,7 +104,6 @@ class BoosterSetController extends Controller {
         return response()->json(array('success' => true, 'data' => $data1));
     }
 
-    //here mechanical price avaliable
     public function calculateMechanicalComponent(Request $request) {
         $article_number = \request()->get('article_number');
         $pump_model = \request()->get('pump_model');
@@ -116,22 +113,16 @@ class BoosterSetController extends Controller {
         $panel_width = (float)\request()->get('panel_width');
         $system_pressure = \request()->get('system_pressure');
         $manifold = \request()->get('manifold');
-        
-        // $cp_price = (float)\request()->get('cp_price');
-        
-        $cp_price_raw = \request()->get('cp_price');
+        //$cp_price = (float)\request()->get('cp_price');
+		$cp_price_raw = \request()->get('cp_price');
         $cp_price = (float)str_replace(',', '', $cp_price_raw);
-
         $code_price = (float)\request()->get('code_price'); ////Electrical adder code price
         $mechanical_code_price = (float)\request()->get('mechanical_code_price'); //Mechanical adder code price
         $pump_unit_price = (float)\request()->get('pump_unit_price');
-        
         $starter_type = \request()->get('starter_type');
         $range = \request()->get('range');
         $motor_power = (float)\request()->get('power');
         $voltage = (float)\request()->get('voltage');
-
-
         $validator = Validator::make(\request()->all(), [
                     'pump_model' => 'required',
                     'no_of_pumps' => 'required',
@@ -565,10 +556,11 @@ class BoosterSetController extends Controller {
         $intercompany_margin = $interCompanyMargin; 
         $standard_component_price = $this->calcualtePriceInBOM($no_of_pumps, $ptd_distance_id, $system_pressure, $manifold);
         $mechanical_system_price = $standard_component_price + $base_frame_size_price + $power_monitor_flag_price + $mechanical_code_price + $panel_stand_price;  
+		
+
         $booster_price = ((($pump_unit_price * $no_of_pumps) + $cp_price + $code_price + ($mechanical_system_price + $cablePrice)) * $overhead ) / $intercompany_margin;
 
         $mechanical_price = ((($pump_unit_price * $no_of_pumps) + ($mechanical_system_price + $cablePrice)) * $overhead ) / $intercompany_margin;
-
         $data['booster_price'] = $booster_price;
         $data['standard_component_price'] = $standard_component_price;
         $data['mechanical_system_price'] = $mechanical_system_price;
@@ -592,18 +584,19 @@ class BoosterSetController extends Controller {
         $data['Cablelength'] = $Cablelength;
 
         $data['mechanical_items_price'] = $mechanical_price;
-        $data['electrical_items_price'] =  ($cp_price * $overhead) / $intercompany_margin + ($code_price * $overhead) / $intercompany_margin;
+        //$data['electrical_items_price'] =  ($cp_price * $overhead) / $intercompany_margin;
         
+		$data['electrical_items_price'] =  ($cp_price * $overhead) / $intercompany_margin + ($code_price * $overhead) / $intercompany_margin;
+		
         // dd($bill_of_material);
-
         $data['bill_of_material_booster'] = json_encode($bill_of_material);
         $returnHTML = view('frontend.booster.table')->with('boosterData', $data)->render();
         $data['html'] = $returnHTML;
-        // dd($data['mechanical_items_price'],$data['electrical_items_price'],$data['booster_price'],$data['code_price'],$data['mechanical_code_price'],$overhead,$intercompany_margin);
         return response()->json(array('success' => true, 'data' => $data));
     }
 
     public function calcualtePriceInBOM($noOfPump, $ptpDistanceId, $systemPressure, $mainfold) {
+        
         $price = 0.00;
         if ($systemPressure == 'PN16') {
             $tableName = 'booster_pn16_mechanical_component';
@@ -626,6 +619,7 @@ class BoosterSetController extends Controller {
 
     public function calculatePriceInItem($columnName, $mainfold, $systemPressure,$val = []) {
         // add here
+        // dd($val);
         $price = 0.00;
         if ($systemPressure == 'PN16') {
             if ($mainfold == 'SS316' && $val['function_code'] == 65) { // Sunction
@@ -783,18 +777,19 @@ class BoosterSetController extends Controller {
                     case ($code == 62):  //electrical_common_adder_based_on_ampere code
                         $variable = $this->getCommonStainer($noOfPump, $ptpDistanceId, $systemPressure, $mainfold, $code);
                         $desc = "Strainer" . " " . $variable;
-                        // dd($desc);Strainer MANIFOLD-D-8P-8
+						//$desc = "Strainer";
                         $get_vals = DB::table('mechanical_adder_common_strainer')->where('item_description', 'LIKE', "%" . $desc . "%")->get();
+						
                         $price += $this->getMasterSheetPriceData($get_vals[0]->brand_code, $get_vals[0]->function_code, $get_vals[0]->range);
+                        // $price += $this->getMasterSheetPriceData($arrayResult['brand_code'], $arrayResult['function_code'], $arrayResult['range']);
+                        //$price += $this->getMasterSheetPriceData($arrayResult['bran  d_code'], $arrayResult['function_code'], $arrayResult['range']) * $code60;
                         break;
 
                     case ($code == 63):  //electrical_common_adder_based_on_ampere code
 
                         $variable = $this->getCommonStainer($noOfPump, $ptpDistanceId, $systemPressure, $mainfold, $code);
-
                         $desc = "Flexible connector" . " " . $variable;
                         $get_vals = DB::table('mechanical_adder_common_flexible')->where('item_description', 'LIKE', "%" . $desc . "%")->get();
-                        // dd($get_vals);
 
                         $price += $this->getMasterSheetPriceData($get_vals[0]->brand_code, $get_vals[0]->function_code, $get_vals[0]->range);
                         // $price += $this->getMasterSheetPriceData($arrayResult['brand_code'], $arrayResult['function_code'], $arrayResult['range']);
@@ -811,7 +806,7 @@ class BoosterSetController extends Controller {
                         // $price += $this->getMasterSheetPriceData($arrayResult['brand_code'], $arrayResult['function_code'], $arrayResult['range']);
                         //$price += $this->getMasterSheetPriceData($arrayResult['bran  d_code'], $arrayResult['function_code'], $arrayResult['range']) * $code60;
                         break;
-                    case ($code == 65):  //electrical_common_adder_based_on_ampere code
+                    case ($code == 65 ):  //electrical_common_adder_based_on_ampere code
                         if ($request->code65 && !empty($request->code65)) {
                             $cpRecords = DB::table('mechanical_adder_common_pressure_vessel')->select('brand_code', 'function_code', 'range')
                                     ->whereNotNull($code)->where($code, '!=', 0)
@@ -855,33 +850,35 @@ class BoosterSetController extends Controller {
                 }
             }
         }
+		
         return ['mechanical_adder_price' => $price];
     }
 
     public function getCommonStainer($noOfPump, $ptpDistanceId, $systemPressure, $mainfold, $code) {
-        $itemDescription = '';
+		$itemDescription = '';
         if ($systemPressure == 'PN16') {
             $tableName = 'booster_pn16_mechanical_component';
         } else {
             $tableName = 'booster_pn25_mechanical_component';
         }
-
         $columnName = $noOfPump . 'x' . $ptpDistanceId;
         if (Schema::hasColumn($tableName, $columnName)) {
             $cpRecords = DB::table($tableName)->select('item_description', $columnName, 'function_code', 'brand_code', 'range', 'unit_price')
                             ->whereNotNull($columnName)->where($columnName, '!=', 0)->get();
-            $arrayResult = json_decode(json_encode($cpRecords), true);
+			
+			$arrayResult = json_decode(json_encode($cpRecords), true);
             foreach ($arrayResult as $key => $val) {
+				
                 if ($systemPressure == 'PN16') {
                     if ($mainfold == 'SS316' && $val['function_code'] == 65 && ($code == 62 || $code = 63)) { // Sunction
                         $itemDescription = $this->getStrainerQty($val['brand_code'], 69, $val['range'],$code);
                     //
                     } elseif ($val['function_code'] == 65 && ($code == 62 || $code = 63)) {
                         $itemDescription = $this->getStrainerQty($val['brand_code'], $val['function_code'], $val['range'],$code);
+                        
                     }
-
+					
                     if ($mainfold == 'SS316' && $val['function_code'] == 65 && $code == 64) { // Sunction
-
                         $itemDescription = $this->getStrainerQty($val['brand_code'], 71, $val['range'],$code);
                     } elseif ($val['function_code'] == 65 && $code == 64) {
                         $itemDescription = $this->getStrainerQty($val['brand_code'], $val['function_code'], $val['range'],$code); //Discharge
@@ -901,35 +898,38 @@ class BoosterSetController extends Controller {
                         $itemDescription = $this->getStrainerQty($val['brand_code'], $val['function_code'], $val['range'],$code);
                     }
                 }
-            }
-        }
+			}
+		}		
         return $itemDescription;
     }
 
     public function getStrainerQty($brand_code, $function_code, $range,$code = null) {
+		
         $masterData = DB::table('booster_master_sheet_mechanical_component')->select('description')
                 ->where('brand_code', $brand_code)
                 ->where('function_code', $function_code)
                 ->where('range', $range)
                 ->get();
-                $desc = $masterData[0]->description;
-                if ($code == "62" || $code == "63" || $code == "64") {
-                    // Try to extract fraction like 1/4 or 21/2
-                    preg_match('/\b\d+\/\d+\b/', $desc, $matches);
-
-                    if (!empty($matches[0])) {
-                        $desc = $matches[0]; // e.g., '1/4'
-                    } else {
-                        // If no fraction found, extract number after 3P- to 8P-
-                        preg_match('/\b[2-8]P-(\d+)/', $desc, $matches_3to8p);
-                        if (!empty($matches_3to8p[1])) {
-                            $desc = $matches_3to8p[1]; // e.g., '4'
-                        } else {
-                            $desc = "0";
-                        }
-                    }
-                }
-                $first_break = explode('"', $desc)[0];
+				$desc = $masterData[0]->description;
+				if ($code == "62" || $code == "63" || $code == "64") {
+					// Try to extract fraction like 1/4 or 21/2
+					preg_match('/\b\d+\/\d+\b/', $desc, $matches);
+ 
+					if (!empty($matches[0])) {
+						$desc = $matches[0]; // e.g., '1/4'
+					} else {
+					// If no fraction found, extract number after 3P- to 8P-
+					preg_match('/\b[2-8]P-(\d+)/', $desc, $matches_3to8p);
+						if (!empty($matches_3to8p[1])) {
+							$desc = $matches_3to8p[1]; // e.g., '4'
+						} else {
+							$desc = "0";
+						}
+					}
+					
+				}
+				
+				$first_break = explode('"', $desc)[0];
                 $last = explode(" ", $first_break);
         return end($last);
     }
@@ -1013,6 +1013,7 @@ class BoosterSetController extends Controller {
             }
 
             $boosterCartData = $boosterCartData->first();
+
             if($boosterCartData == null || $request->qoutation_value != null){
                 $boosterCart = new BoosterCart;
 
@@ -1034,6 +1035,7 @@ class BoosterSetController extends Controller {
                     }
 
                     $boosterCartData1 = $boosterCartData1->first();
+					
 					$new_ksa_article_number = '';
                 if(auth()->user()->country_id == 6){
                     if($boosterCartData1){
@@ -1087,7 +1089,6 @@ class BoosterSetController extends Controller {
                 $boosterCart->cable_size_ampere_constant = $cable_size_ampere_constant;
                 $boosterCart->cable_length_constant = $cable_length_constant;
                 $boosterCart->spare_length = $spare_length;
-
                 if($request->cp_price == null){
                     $request->cp_price = $BoosterCartData->cp_price;
                 }
@@ -1105,12 +1106,15 @@ class BoosterSetController extends Controller {
 				$boosterCart->country_origin = $request->country;
                 $boosterCart->ksa_full_article_number = $new_ksa_article_number;
                 $boosterCart->quotation_no = $request->qoutation_value;
-
-                $boosterCart->mechanical_items_price = $request->mechanical_items_price + ($request->mechanical_code_price * $overHead) / $interCompanyMargin;
-                $boosterCart->electrical_items_price = ($request->control_panel_price_for_booster * $overHead) / $interCompanyMargin + ($request->code_price * $overHead) / $interCompanyMargin;
+				$boosterCart->mechanical_items_price = $request->mechanical_items_price + ($request->mechanical_code_price * $overHead) / $interCompanyMargin;
+				$boosterCart->electrical_items_price = ($request->control_panel_price_for_booster) / $interCompanyMargin + ($request->code_price * $overHead) / $interCompanyMargin;
+                //$boosterCart->mechanical_items_price = $request->mechanical_items_price;
+                //$boosterCart->electrical_items_price = $request->electrical_items_price;
+	
                 $boosterCart->save();
                 $boosterCartId = $boosterCart->id;
             
+
                 if (!empty($bill_of_mechanical)) {
                     foreach ($bill_of_mechanical as $data) {
                         $this->insertBoosterItem($boosterCartId, $data['brand_code'], $data['function_code'], $data['range'], $data['qty'], $data['price'], $data);
@@ -1118,7 +1122,6 @@ class BoosterSetController extends Controller {
                 }
                 $this->insertItem($boosterCartId, $request->no_of_pump, $request->ptp_distance_id, $request->system_pressure, $request->manifold);
 
-                //here123
                 $this->getControlPanelDataItemSave($request->cp_id, $request, $boosterCartId);
 
                 if ($request->mechanical_adder_ids) {
@@ -1185,6 +1188,7 @@ class BoosterSetController extends Controller {
                 }
             }
         } else{
+                //DB::enableQueryLog();
                 $boosterCartData = BoosterCart::where('pump_type', $request->pump_type) 
                     ->where('model_no', $request->pump_model)
                     ->where('motor_power', $request->power)
@@ -1203,6 +1207,7 @@ class BoosterSetController extends Controller {
                     }
                     
                     $boosterCartData = $boosterCartData->first();
+
 
                 if($boosterCartData == null || $request->qoutation_value != null){
                     $boosterCart = new BoosterCart;
@@ -1360,17 +1365,15 @@ class BoosterSetController extends Controller {
         }
         $columnName = $noOfPump . 'x' . $ptpDistanceId;
         if (Schema::hasColumn($tableName, $columnName)) {
-          
-            $cpRecords = DB::table($tableName)->select('item_description', 'brand_code', 'function_code', 'range', 'unit_price','wilo_article_no', $columnName)->whereNotNull($columnName)->where($columnName, '!=', 0)->get();
-
+            $cpRecords = DB::table($tableName)->select('item_description', 'brand_code', 'function_code', 'range', 'unit_price','wilo_article_no', $columnName)
+                            ->whereNotNull($columnName)->where($columnName, '!=', 0)->get();
             $arrayResult = json_decode(json_encode($cpRecords), true);
-
             foreach ($arrayResult as $key => $val) {
                 if ($systemPressure == 'PN16') {
                     if ($mainfold == 'SS316' && $val['function_code'] == 65) { // Sunction
                         
                         $price = $this->getMasterSheetPriceData($val['brand_code'], 69, $val['range']); //Qty * price // 2 parameter is equal to brand code
-                        $this->insertBoosterItem($booster_cart_id, $val['brand_code'], 69, $val['range'], $val['range'], $val[$columnName], $price, $val);
+                        $this->insertBoosterItem($booster_cart_id, $val['brand_code'], 69, $val['range'], $val[$columnName], $price, $val);
                     } else if ($mainfold == 'SS316' && $val['function_code'] == 67) { //Discharge
                         
                         $price = $this->getMasterSheetPriceData($val['brand_code'], 71, $val['range']); //Qty * price
@@ -1407,6 +1410,8 @@ class BoosterSetController extends Controller {
                 }
             }
         }
+
+
         return $price;
     }
 
@@ -1414,8 +1419,16 @@ class BoosterSetController extends Controller {
         $boosterItem = new BoosterItems;
         $boosterItem->booster_cart_id = $booster_cart_id;
 
-        $boosterItem->item_description = $this->getMasterSheetBoosterItemDescription($brand_code, $function_code, $range);
-        $boosterItem->wilo_artilce_no = $this->getMasterSheetBoosterItemWiloArticleNo($brand_code, $function_code, $range);
+        //        if($brand_code == null && $function_code == null && $range == null){
+        //            $boosterItem->item_description = $val['item_description'];
+        //            $boosterItem->wilo_artilce_no = $val['wilo_artilce_no'];
+        //
+        //        }
+        //        else{
+            $boosterItem->item_description = $this->getMasterSheetBoosterItemDescription($brand_code, $function_code, $range);
+            //$boosterItem->wilo_artilce_no = $val['wilo_article_no'] ?? '';
+        //        }
+		$boosterItem->wilo_artilce_no = $this->getMasterSheetBoosterItemWiloArticleNo($brand_code, $function_code, $range);
 
         $boosterItem->material_number = '';
         $boosterItem->weight = '';
@@ -1426,11 +1439,38 @@ class BoosterSetController extends Controller {
         $boosterItem->function_code = $function_code;
         $boosterItem->ranges = $range;
         $boosterItem->qty = $columnName;
-
-        $boosterItem->price = $this->getMasterSheetBoosterItemPrice($brand_code, $function_code, $range);
-
-        $boosterItem->total_price = $boosterItem->price * $columnName;
+        //$boosterItem->price = $price;
+		$boosterItem->price = $this->getMasterSheetBoosterItemPrice($brand_code, $function_code, $range);
+        $boosterItem->total_price = $price * $columnName;
         $boosterItem->save();
+    }
+	
+	public function getMasterSheetBoosterItemWiloArticleNo($brand_code, $function_code, $range) {
+
+        $masterData = DB::table('booster_master_sheet_mechanical_component')->select('wilo_article_no')
+                ->where('brand_code', $brand_code)
+                ->where('function_code', $function_code)
+                ->where('range', $range)
+                ->get();
+        if (isset($masterData[0]->wilo_article_no)) {
+            return $masterData[0]->wilo_article_no;
+        }
+
+        return 0;
+    }
+
+    public function getMasterSheetBoosterItemPrice($brand_code, $function_code, $range) {
+
+        $masterData = DB::table('booster_master_sheet_mechanical_component')->select('price')
+                ->where('brand_code', $brand_code)
+                ->where('function_code', $function_code)
+                ->where('range', $range)
+                ->get();
+        if (isset($masterData[0]->price)) {
+            return $masterData[0]->price;
+        }
+
+        return 0;
     }
 
     public function ajaxQtyUpdate(Request $request) {
@@ -1450,16 +1490,16 @@ class BoosterSetController extends Controller {
         $deleteItem = BoosterItems::where('booster_cart_id', $id)->delete();
     }
 
-    public function cartItems($cartId, $returnDataOnly = false) {
+    public function cartItems($cartId, $returnDataOnly=false) { //$val is itemData
         $adderData = [];
         $boosterCartData = BoosterCart::with('boosterCpData')->where('id',$cartId)->first();
         $items = BoosterItems::where('booster_cart_id', $cartId)->with('boosterCart')->get();
         $cpBoosterItems = BoosterCpItems::where('booster_cart_id', $cartId)->with('boosterCart')->orderBy('adder_code')->get();
         if($returnDataOnly) {
-            
+           
             $bomSummaryItems = $items;
             $bomSummarycpBoosterItems = $cpBoosterItems;
-
+ 
             $items = $items->whereNotIn('brand_code', [16, 17, 18]);
             $cpBoosterItems = BoosterCpItems::where('booster_cart_id', $cartId)->with('boosterCart')->whereNotIn('brand_code', [16, 17, 18])->orderBy('adder_code')->get();
             return [
@@ -1472,7 +1512,6 @@ class BoosterSetController extends Controller {
                 'bomSummarycpBoosterItems' => $bomSummarycpBoosterItems,
             ];
         }
-        
         return view('frontend.booster.items', compact('items', 'cpBoosterItems','boosterCartData'));
     }
 
@@ -1970,33 +2009,6 @@ class BoosterSetController extends Controller {
         if (isset($masterData[0]->description)) {
             return $masterData[0]->description;
         }
-        return 0;
-    }
-
-    public function getMasterSheetBoosterItemWiloArticleNo($brand_code, $function_code, $range) {
-
-        $masterData = DB::table('booster_master_sheet_mechanical_component')->select('wilo_article_no')
-                ->where('brand_code', $brand_code)
-                ->where('function_code', $function_code)
-                ->where('range', $range)
-                ->get();
-        if (isset($masterData[0]->wilo_article_no)) {
-            return $masterData[0]->wilo_article_no;
-        }
-
-        return 0;
-    }
-
-    public function getMasterSheetBoosterItemPrice($brand_code, $function_code, $range) {
-
-        $masterData = DB::table('booster_master_sheet_mechanical_component')->select('price')
-                ->where('brand_code', $brand_code)
-                ->where('function_code', $function_code)
-                ->where('range', $range)
-                ->get();
-        if (isset($masterData[0]->price)) {
-            return $masterData[0]->price;
-        }
 
         return 0;
     }
@@ -2041,6 +2053,7 @@ class BoosterSetController extends Controller {
     }
 
     public function boosterAddersData($booster_cart_id, $request) {
+        //$BoosterCartData = BoosterCart::where('full_article_number','=',$request->full_article_number)->first();
 		$BoosterCartData = BoosterCart::where('full_article_number','=',$request->full_article_number);
             if(auth()->user()->country_id == 6){
 			$BoosterCartData = $BoosterCartData->orWhere('ksa_full_article_number','=',$request->full_article_number);
@@ -2199,8 +2212,7 @@ class BoosterSetController extends Controller {
                         // $arrayResult = json_decode(json_encode($cpRecords), true);
                         $variable = $this->getCommonStainer($noOfPump, $ptpDistanceId, $systemPressure, $mainfold, $code);
                         $desc = "Strainer" . " " . $variable;
-
-                        $get_vals = DB::table('mechanical_adder_common_strainer')->where('item_description', 'LIKE', "%" . $desc . "%")->get();
+						$get_vals = DB::table('mechanical_adder_common_strainer')->where('item_description', 'LIKE', "%" . $desc . "%")->get();
                         $price = $this->getMasterSheetPriceData($get_vals[0]->brand_code, $get_vals[0]->function_code, $get_vals[0]->range);
                         $this->insertAdderBoosterItem($booster_cart_id, $get_vals[0]->brand_code, $get_vals[0]->function_code, $get_vals[0]->range, $price, $code);
                         // $price += $this->getMasterSheetPriceData($arrayResult['brand_code'], $arrayResult['function_code'], $arrayResult['range']);
@@ -2390,8 +2402,10 @@ class BoosterSetController extends Controller {
         return response()->json(array('success' => true, 'data' => $data));
     }
 
+    //Added for search ensloure area formula starts..!!
     public function getControlPanelItemEnclousreAreaFormula($tableName, $columnName, $totalEnclousreArea) {
         $enclousreItem = null;
+        // $totalEnclousreArea = 70000;
         $nextSize = true;
         if (Schema::hasTable($tableName)) {
             if (Schema::hasColumn($tableName, $columnName)) {
@@ -2453,6 +2467,7 @@ class BoosterSetController extends Controller {
     //Added for search ensloure area formula ends..!!
     //search factor
     public function searchCalculateMechanicalComponent(Request $request) {
+        //$BoosterCartData = BoosterCart::where('full_article_number','=',$request->full_article_number)->first();
 		$BoosterCartData = BoosterCart::where('full_article_number','=',$request->full_article_number);
         if(auth()->user()->country_id == 6){
 		$BoosterCartData = $BoosterCartData->orWhere('ksa_full_article_number','=',$request->full_article_number);
@@ -2914,7 +2929,9 @@ class BoosterSetController extends Controller {
             $booster_price = ((($pump_unit_price * $no_of_pumps) + $cp_price + $code_price + ($mechanical_system_price + $cablePrice)) * $overhead ) / $intercompany_margin;
 
             $mechanical_price = ((($pump_unit_price * $no_of_pumps) + ($mechanical_system_price + $cablePrice)) * $overhead ) / $intercompany_margin;
-
+			
+			
+	
             $data['full_article_number'] = $request->full_article_number;
             $data['booster_price'] = $booster_price;
             $data['standard_component_price'] = $standard_component_price;
@@ -2947,7 +2964,9 @@ class BoosterSetController extends Controller {
         return response()->json(array('success' => true, 'data' => $data));
     }
 
+    //where('user_id', auth()->user()->id)
     public function searchByArticleNumber(Request $request) {
+        //$BoosterCartData = BoosterCart::where('full_article_number', $request->full_article_number)->first();
 		$BoosterCartData = BoosterCart::where('full_article_number','=',$request->full_article_number);
 		if(auth()->user()->country_id == 6){
             $BoosterCartData = $BoosterCartData->orWhere('ksa_full_article_number','=',$request->full_article_number);
@@ -3345,7 +3364,8 @@ class BoosterSetController extends Controller {
 
     //Function for search by full article number functionality of booster mechanical adder ids.
     //here by search
-    public function searchBoosterAddersData($booster_cart_id, $request) {  
+    public function searchBoosterAddersData($booster_cart_id, $request) {   
+        //$BoosterCartData = BoosterCart::where('full_article_number','=',$request->full_article_number)->first();
 			$BoosterCartData = BoosterCart::where('full_article_number','=',$request->full_article_number);
 			if(auth()->user()->country_id == 6){
             $BoosterCartData = $BoosterCartData->orWhere('ksa_full_article_number','=',$request->full_article_number);
@@ -3407,6 +3427,7 @@ class BoosterSetController extends Controller {
                             ->where('booster_cart_id',$BoosterCartData->id)
                             ->where('adder_code','66')
                             ->value('item_description');
+
             $code67_desc = DB::table('booster_items')
                             ->where('booster_cart_id',$BoosterCartData->id)
                             ->where('adder_code','67')
@@ -3534,9 +3555,11 @@ class BoosterSetController extends Controller {
                     case ($code == 66 ):  //mechanical_adder_common_pressure_vessel code
                         //if ($request->code66 && !empty($request->code66)) {
                             $cpRecords = DB::table('mechanical_adder_common_pressure_vessel')->select('brand_code', 'function_code', 'range')
-                                    ->whereNotNull($code)->where($code, '!=', 0)
+                                    ->whereNotNull($code)
+									->where($code, '!=', 0)
                                     ->where('id', $request->code66)
                                     ->first();
+							
                             $arrayResult = json_decode(json_encode($cpRecords), true);
                              //date : 8-4-2022 change remove * $code61 from below price formula
                             $price += $this->getMasterSheetPriceData($arrayResult['brand_code'], $arrayResult['function_code'], $arrayResult['range']);

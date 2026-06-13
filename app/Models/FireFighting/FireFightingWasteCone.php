@@ -9,6 +9,6 @@ class FireFightingWasteCone extends Model
     protected $table = 'firefighting_waste_cone';
 
     protected $fillable = [
-        'item_article_number', 'description', 'size', 'unit_price'
+        'item_article_number','description', 'size', 'unit_price'
     ];
 }
